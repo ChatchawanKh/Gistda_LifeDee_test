@@ -51,7 +51,7 @@ import heavyRain from '../../weather/3_heavy_rain.svg';
 import veryHeavyRain from '../../weather/4_very_heavy.svg';
 import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 
-import MediaCard from '../Card.jsx'
+// import MediaCard from '../Card.jsx'
 // import HealthInsert from './HealthInsert.jsx'
 import MiniDrawer from '../NavigationBar/SidebarDng.jsx'
 import Dashboard from './DashboardDng.jsx'
