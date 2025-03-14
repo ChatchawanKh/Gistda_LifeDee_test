@@ -7,7 +7,7 @@ import { renderToString } from "react-dom/server";
 // import { styled, css } from '@mui/system';
 
 //LEGENDS
-import PM25Legend from "../../Icon/Weather/normal.png";
+import PM25Legend from "/src/Icon/legend/PM25_legend.png";
 
 //Mui infra
 import {
