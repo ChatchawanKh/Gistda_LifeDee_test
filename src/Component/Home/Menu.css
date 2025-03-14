@@ -1,0 +1,19 @@
+.menu-container {
+  width: 100%;
+  height: 100%;
+  margin-top: 3rem;
+}
+
+.menu-container-warp {
+    max-width: 1160px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin: 0rem auto;
+}
+
+.menu-bg {
+  background-color: #8DBAFF;
+  width: 100%;
+  height: 20vh;
+  border-radius: 20px;
+}

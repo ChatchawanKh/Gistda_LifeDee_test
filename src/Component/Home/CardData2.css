@@ -1,0 +1,482 @@
+.card-data-container {
+    width: 100%;
+    /* background-image: url('/src/Icon/Card_bg.png');
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: cover; */
+    /* margin-top: 3rem; */
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+    font-family: 'Prompt', sans-serif;
+    overflow: hidden;
+    background-color: #F5F5F5;
+}
+
+.background-video-weather {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    border-radius: 20px;
+    opacity: 0;
+    animation: fadeIn 2s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.3;
+    }
+}
+
+.card-data-box {
+    max-width: 1160px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin: 0rem auto;
+}
+
+.card-data-head {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.card-data-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.card-weather {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgb(108,166,255);
+    background: linear-gradient(180deg, rgba(108,166,255,1) 35%, rgb(149, 221, 255) 100%);
+    border-radius: 20px;
+    padding: 10px;
+}
+
+.card-data-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    padding-left: 20px;
+    /* border-left: 3px solid #8DBAFF; */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: #303c46;
+    margin-right: 15px;
+}
+
+.card-data-head-logo img {
+    height: 40px;
+    padding-right: 5px;
+}
+
+.card-data-menu {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    /* padding: 20px; */
+    padding-top: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.card-data-location-n-weather {
+
+    background: rgb(108,166,255);
+    background: linear-gradient(180deg, rgba(108,166,255,1) 35%, rgb(149, 221, 255) 100%);
+    border-radius: 20px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-data-pm25 {
+    width: 350px;
+    height: 190px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px
+}
+
+  @keyframes moveLeftRight {
+    0% {
+      transform: translateX(-5px); /* เริ่มที่จุดปกติ */
+    }
+    50% {
+      transform: translateX(5px); /* เลื่อนไปทางขวา */
+    }
+    100% {
+      transform: translateX(-5px); /* เลื่อนกลับมาทางซ้าย */
+    }
+  }
+  
+  /* กำหนดให้วัตถุมีการลอยขึ้นครั้งเดียวและเลื่อนซ้ายขวาแบบวนลูป */
+  .card-data-weather img {
+    position: relative;
+    animation: moveLeftRight 5s ease-in-out infinite;
+  }
+
+.card-data-location {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    p {
+        font-size: 14px;
+        padding-left: 10px;
+        color: #ffffff;
+        margin: 0;
+        text-align: center;
+    }
+}
+
+.card-data-weather {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    /* margin-top: 2.5rem; */
+    margin-bottom: 2.5rem;
+    img {
+        width: 180px;
+    }
+
+    h1 {
+        font-size: 40px;
+        font-weight: 500;
+        color: #ffffff;
+        text-align: center;
+        margin: 0;
+    }
+    h2 {
+        font-size: 24px;
+        font-weight: 400;
+        color: #ffffff;
+        text-align: center;
+        margin: 0;
+    }
+    span {
+        font-size: 12px;
+        font-weight: 400;
+        color: #ffffff;
+        text-align: center;
+        margin: 0;
+    }
+}
+
+.rain-detail {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    p {
+        font-size: 14px;
+        font-weight: 400;
+        color: #ffffff;
+        text-align: center;
+        margin: 0;
+        padding-left: 5px;
+    }
+}
+
+.card-text-data {
+    h1 {
+        font-family: 'Prompt';
+        text-align: left;
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 30px;
+        padding: 0;
+        margin: 0;
+    }
+    p {
+        font-family: 'Prompt';
+        font-weight: 600;
+        font-size: 14px;
+        padding: 0;
+        margin: 5px 0px 0px 0px;
+        text-align: left;
+        color: #303c46;
+    }
+    span {
+        font-family: 'Prompt';
+        font-weight: 400;
+        font-size: 12px;
+        padding: 0;
+        margin: 5px 0px 0px 0px;
+        text-align: left;
+    }
+}
+
+.pm25-info p {
+    font-size: 20px;
+    color: #303c46;
+    margin: 10px 0;
+}
+
+.pm25-info span {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.skeleton {
+    width: 100%;
+    height: 400px;
+    background-color: #e0e0e0;
+    border-radius: 20px;
+}
+
+.item1-card-data {
+    /* max-width: 350px; */
+    grid-area: weather;
+    background: rgb(108,166,255);
+    background: linear-gradient(0deg, rgba(108,166,255,1) 40%, rgb(149, 221, 255) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    box-shadow: 2px 4px 12px #00000014;
+}
+
+.item2-card-data { 
+    grid-area: pm;
+    /* background-color: #F0F5FA;  */
+    display: flex;
+    flex-direction: column;
+    /* border: 2px solid #cacaca; */
+
+}
+
+.level {
+    width: 100%;
+    height: 100%;
+    background-color: #F0F5FA;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+
+.levelbar {
+    width: 50%;
+    height: 100%;
+    background-color: #F0F5FA;
+    border-radius: 20px;
+}
+
+.item3-card-data { 
+    grid-area: hid;
+    /* border: 2px solid #cacaca; */
+    /* background-color: #F0F5FA; */
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: space-betweenzx;
+}
+.item4-card-data { 
+    grid-area: dng;
+    /* border: 2px solid #cacaca; */
+    /* background-color: #F0F5FA; */
+    display: flex;
+    flex-direction: column;
+    background: rgb(108,166,255);
+    background: linear-gradient(180deg, rgba(108,166,255,1) 40%, rgb(149, 221, 255) 100%)
+}
+
+.item5-card-data { 
+    grid-area: etc;
+    /* border: 2px solid #cacaca; */
+    /* background-color: #F0F5FA; */
+}
+
+
+.item2-card-data,
+.item3-card-data,
+.item4-card-data,
+.item5-card-data {
+    background-color: #ffffff;
+    transition: all 0.3s ease-in-out; /* เพิ่ม animation smooth */
+    box-shadow: 2px 4px 12px #00000014;
+}
+
+
+.item2-card-data:hover,
+.item3-card-data:hover,
+.item4-card-data:hover,
+.item5-card-data:hover {
+  /* transform: scale(1.02); */
+  cursor: pointer;
+  /* border: 2px solid rgb(108,166,255); */
+  box-shadow: rgb(108,166,255, 0.4) 0px 4px 16px, rgb(108,166,255,0.3) 0px 8px 32px;
+}
+
+/* .item2-card-data:hover,
+.item3-card-data:hover,
+.item4-card-data:hover {
+    transition: all 300ms ease-in-out;
+    transform: scale(1.02);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+} */
+
+.grid-card-data-container {
+    display: grid;
+    /* overflow-y: auto; */
+    grid-template-areas:
+        'weather pm pm pm'
+        'weather hid etc dng'
+    ;
+    gap: 20px;
+}
+
+.card-data-pm-data {
+    display: flex;
+    margin-top: 1rem;
+    gap: 5px;
+}
+
+.card-data-pm-description {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@media screen and (max-width: 768px){
+    .card-data-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .swiper-description {
+        display: none;
+    }
+    .grid-card-data-container {
+
+        display: grid;
+        /* overflow-y: auto; */
+        grid-template-areas:
+          'weather'
+          'pm'
+          'etc'
+          'hid'
+          'dng'
+          ;
+        gap: 20px;
+        padding: 10px;
+    }
+    /* .rain-detail {
+        display: none;
+    } */
+    .card-data-weather {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-top: 2.5rem;
+        margin-bottom: 2.5rem;
+        img {
+            width: 120px;
+        }
+    }
+    .item1-card-data { 
+        align-content: center;
+        box-shadow: 2px 4px 12px #00000014;
+    }
+    .card-data-head {
+        flex-flow: wrap;
+    }
+    .item2-card-data,
+    .item3-card-data,
+    .item4-card-data,
+    .item5-card-data{
+        /* border: 2px solid rgb(108,166,255); */
+    cursor: pointer;
+    box-shadow: 2px 4px 12px #00000014;
+    }
+    .card-text-data {
+        h1 {
+            font-family: 'Prompt';
+            text-align: left;
+            font-weight: 600;
+            font-size: 20px;
+            line-height: 30px;
+            padding: 0;
+            margin: 0;
+        }
+        p {
+            font-family: 'Prompt', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 0;
+            margin: 0px 0px 0px 0px;
+            text-align: left;
+            color: #303c46;
+        }
+        span {
+            font-family: 'Prompt';
+            font-weight: 400;
+            font-size: 12px;
+            padding: 0;
+            margin: 0px 0px 0px 0px;
+            text-align: left;
+        }
+    }
+}
+
+.grid-card-data-container > div {
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.header-pm {
+    background: linear-gradient(180deg, #22BBC7 0%, #98DD9F 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-heat {
+    background: linear-gradient(180deg, #FFC226 10%, #FF9921 90%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-dengue {
+    background: linear-gradient(180deg, #F9575D 13.27%, #CC33C9 75.61%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* .header-dengue:hover {
+    animation: gradientShift 5s infinite ease-in-out;
+} */
+
+
+/* @keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+} */
+

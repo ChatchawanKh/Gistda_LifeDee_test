@@ -1,0 +1,348 @@
+.CardData-container {
+    background-image: url('/src/Icon/Card_bg.png');
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    overflow: hidden;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.container-card-data {
+    max-width: 1160px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.CardData-head {
+    display: flex;
+    justify-content: center;
+    flex-flow: nowrap;
+    margin-bottom: 10rem;
+    gap: 20px;
+}
+
+.CardData-head h1 {
+    font-family: 'Prompt';
+    font-style: normal;
+    font-size: 38px;
+    color: #1AB9CB;
+}
+
+.CardData-head-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: nowrap;
+}
+
+.CardData-head-logo img {
+    height: 40px;
+    padding-right: 5px;
+}
+
+.CardData-items {
+    width: 340px;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.mySwiper-card-data {
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    overflow: visible;
+    list-style: none;
+    padding: 0;
+    z-index: 1;
+    display: block;
+}
+
+.card-container-home-location:hover{
+    transform: scale(1.04);
+    transition: all 300ms ease-in-out;
+}
+
+.card-container-home:hover{
+    transform: scale(1.04);
+    transition: all 300ms ease-in-out;
+}
+
+.location-card {
+    
+    background-image: url('/src/Icon/location_bg_card.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+}
+
+.card-head-text {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 50px;
+        line-height: 100%;
+        color: #FFFFFF;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+    }
+
+    p {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 20px;
+        margin-top: 20px;
+        color: #FFFFFF;
+        text-align: center;
+        padding: 0;
+        margin-top: 10px;
+    }
+}
+
+.level-location {
+    width: 100%;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    gap: 30px;
+}
+
+.card-container-home {
+    width: 340px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    transition: all 300ms ease-in-out;
+}
+
+.card-text-data {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        text-align: center;
+        font-weight: 700;
+        font-size: 45px;
+        line-height: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    p {
+        font-family: 'Prompt';
+        font-style: bold;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 16px;
+        color: #717171;
+        padding: 0;
+        margin-top: 10px;
+        text-align: center;
+    }
+    span {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 11px;
+        line-height: 11px;
+        color: #717171;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+    }
+}
+
+.level {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 70px;
+    background-color: #f4f4f4;
+    border-radius: 15px;
+}
+
+.level-detail {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 10px;
+    img {
+        height: 40px;
+        padding-right: 10px;
+    }
+    h2 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 24px;
+        text-align: center;
+        color: #525252;
+        padding-right: 5px;
+    }
+    p {
+        margin-left: 5px;
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 18px;
+        text-align: center;
+        color: #525252;
+    }
+}
+
+.pm-level {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    h2 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 600;
+        font-size: 19px;
+        line-height: 39px;
+        text-align: center;
+        color: white;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
+.header-pm {
+    background: linear-gradient(180deg, #22BBC7 0%, #98DD9F 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-heat {
+    background: linear-gradient(131.82deg, #FFC226 22.95%, #FF9921 77.05%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-dengue {
+    background: linear-gradient(95.88deg, #F9575D 13.27%, #CC33C9 75.61%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.weather-temp, .weather-rain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+        width: 40px;
+        height: 40px;
+        padding-right: 10px;
+    }
+    h2 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 24px;
+        text-align: center;
+        color: #525252;
+        padding-right: 5px;
+    }
+}
+
+
+@media screen and (max-width: 1024px){
+    .mySwiper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .CardData-head {
+        display: flex;
+        justify-content: center;
+        flex-flow: row wrap;
+        margin-bottom: 6rem;
+        gap: 20px;
+    }
+
+    .CardData-head h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-size: 30px;
+        color: #1AB9CB;
+    }
+
+    .mySwiper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 430px){
+    .CardData-head {
+        display: flex;
+        justify-content: center;
+        flex-flow: row wrap;
+        margin-bottom: 3rem;
+        gap: 20px;
+    }
+
+    .CardData-head h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-size: 26px;
+        color: #1AB9CB;
+    }
+
+    .CardData-head-logo img {
+        height: 35px;
+        padding-right: 5px;
+    }
+    
+    .mySwiper {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 390px){
+    .CardData-head h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-size: 20px;
+        color: #1AB9CB;
+    }
+
+    .mySwiper {
+        width: 100%;
+    }
+}

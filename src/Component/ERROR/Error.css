@@ -1,0 +1,13 @@
+.cont-404 {
+    width: 50%;
+    margin: auto;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+.err-container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,0 +1,436 @@
+
+/* body {
+    font-family: "Prompt", sans-serif;
+    font-style: normal;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+} */
+
+
+.Dashboard {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    z-index: 11;
+    left: 6rem;
+    margin-top: 2vh;
+    height: calc(100% - 4vh);
+    width: var(--dash-width);
+    max-width: 450px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    filter: drop-shadow(2.57364px 2.57364px 2.57364px rgba(0, 0, 0, 0.25));
+    backdrop-filter: blur(5px);
+}
+
+.Dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.open-dashboard-btn {
+    position: absolute;
+    z-index: 100;
+    bottom: 1rem;
+    left: 1rem;
+}
+
+.OpenDashboard {
+    /* background-image: linear-gradient(94.27deg, #4BE3BF 0.64%, #4B87E3 70.94%, #294A7D 105.61%) !important; */
+    /* background-color: transparent !important; */
+    background-color: white !important;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.OpenDashboard:hover {
+    transition: all 0.2s ease-in-out !important;
+    /* background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), linear-gradient(104.14deg, #4BE3BF 9.81%, #4B87E3 76.56%, #294A7D 114.58%) !important;
+    background-color: transparent !important; */
+    background-color: white !important;
+    transform: scale(1.1) !important;
+}
+
+.Dashboard-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.Dashboard-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.Dashboard-container::-webkit-scrollbar-track {
+    background-color: rgba(241, 241, 241, 0.8);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+
+.Dashboard-card-data {
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(3px);
+    width: 90%;
+    border-radius: 16px;
+    justify-items: center;
+    padding: 20px;
+}
+
+.Dashboard-card-data h1 {
+    font-family: 'Prompt';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 17.8477px;
+    line-height: 22px;
+    text-align: center;
+    color: #919191;
+}
+
+.Dashboard-sortbylocation-date, .Dashboard-HID-Rank {
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(3px);
+    width: 90%;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.Dashboard-sortbylocation-date-head {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+
+    h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 24px;
+        line-height: 120%;
+        color: #303c46;
+        text-align: center;
+        margin: 0;
+    }
+
+    p {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 100%;
+        color: #303c46;
+        text-align: center;
+    }
+}
+
+.Dashboard-HID-Rank-head {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+
+    h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 24px;
+        line-height: 120%;
+        color: #303c46;
+        text-align: center;
+        margin: 0;
+    }
+
+    p {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 100%;
+        color: #303c46;
+        text-align: center;
+    }
+}
+
+.Rank1 {
+    width: 70px;
+    height: 70px;
+    border-radius: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+    h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 30px;
+        line-height: 100%;
+        color: #ffffff;
+        text-align: center;
+    }
+}
+
+.Rank1-location-detail {
+    z-index: 0;
+    position: absolute;
+    margin-left: 60px;
+    background-color: #ffffff;
+    height: 50px;
+    border-radius: 15px;
+    padding-left: 30px;
+    padding-right: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+    p {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 18px;
+        color: #303c46;
+        text-align: left;
+    }
+
+    span {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 14px;
+        color: #303c46;
+        text-align: left;
+    }
+}
+
+.Dashboard-HID-Rank-top1 {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.input-by-pv-ap-tb, .input_by_lat_long {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-swipe-detail {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.my-custom-swiper {
+    width: 100% ;
+    overflow: hidden !important;
+}
+
+.HID-1day-card, .HID-1hr-card {
+    width: auto;
+    height: 150px;
+    background-color: #8b8b8b;
+    border-radius: 16px;
+    padding: 10px; /* Add spacing around the content */
+    display: flex;
+}
+
+.HID-1day-card-data, .HID-1hr-card-data, .pm10-1hr-card-data, .aqi-card-data {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    p {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 20px;
+        color: #303c46;
+        z-index: 1;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+    }
+
+    h1 {
+        font-family: 'Prompt';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 54px;
+        line-height: 54px;
+        color: #303c46;
+        text-align: left;
+        z-index: 1;
+        margin: 0;
+        padding-top: 15px;
+    }
+
+    span {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 11px;
+        line-height: 14px;
+        color: #303c46;
+        text-align: center;
+        z-index: 1;
+        margin-top: 10px;
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        border-radius: 16px;
+        left: 0px;
+        top: 0px;
+        z-index: 0;
+        opacity: 70%;
+    }
+}
+
+.Dashboard-sortby {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; 
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.Dashboard-graph {
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(3px);
+    width: 90%;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.onLoadingGraph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    p {
+        padding-left: 10px;
+    }
+}
+
+.Dashboard-graph h1 {
+    font-family: 'Prompt';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 17.8477px;
+    line-height: 22px;
+    text-align: center;
+    color: #FEBF0E;
+}
+
+/* Hide scrollbar for Firefox */
+.Dashboard::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}
+
+.Dashboard {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.level-pm-pic {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+
+    img {
+        width: 100%;
+    }
+    li {
+        margin-top: 15px;
+        font-family: 'Prompt';
+        font-style: normal;
+        font-size: 14px;
+        text-align: center;
+    }
+}
+
+.openDashboard-HID {
+    color: #FFA447;
+    transition: background-color 0.3s ease;
+}
+
+.openDashboard-HID:hover {
+    color: #FFA447;
+    transition: background-color 0.3s ease;
+}
+
+.open-dashboard-HID-tooltip {
+    background-color: #FFA447 !important;
+    font-family: 'Prompt', sans-serif !important;
+    font-size: 12px !important;
+}
+
+.open-dashboard-HID-tooltip .MuiTooltip-arrow {
+    color: #FFA447 !important;
+}
+
+.searchButton-HID {
+    font-family: 'Prompt' !important;
+    width: 259px;
+    margin-bottom: 8px;
+    background-color: #FFA447 !important;
+    transition: background-color 0.3s ease;
+}
+
+.searchButton-HID:hover {
+    background-color: #FFA447 !important;
+}
+
+.openDashboard-HID {
+    color: #FFA447;
+    transition: all 0.3s ease-in-out !important;
+}
+
+.ranking {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+
+    h1 {
+        font-size: 24px;
+        margin: 0;
+    }
+
+    h3 {
+        font-size: 16px;
+        color: #303c46;
+    }
+}

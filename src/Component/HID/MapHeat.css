@@ -1,0 +1,191 @@
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0px;
+  height: 100%;
+}
+
+#map{
+  height: 100%;
+}
+
+#root {
+    height: 100%;
+}
+
+.location,
+.basemap,
+.thZoom,
+.zoomout,
+.zoomin {
+  background-color: #ff9900 !important;
+}
+
+.location:hover,
+.basemap:hover,
+.thZoom:hover,
+.zoomout_hid:hover,
+.zoomin_hid:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.thZoom:hover svg{
+  fill: #ff9900;
+}
+
+/* .Box {
+  button{
+    background-color: #ff9900;
+    border-radius: 15px;
+  }
+
+  .remove{
+    background-color: #fff;
+  }
+
+  margin: 0.25rem;
+
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: end;
+  top: 16rem !important;
+  right: 0.75rem;
+} */
+
+.maplibregl-popup-close-button, 
+.mapboxgl-popup-close-button {
+  border-color: transparent!important;
+  font-size: 40px!important;
+  margin-top: -1rem!important;
+  height: 0!important;
+  width: auto!important;
+}
+
+.maplibregl-popup-close-button:hover {
+  background-color: transparent !important;
+}
+
+.Box-Heat {
+button{
+  background-color: #ff9900;
+  border-radius: 15px;
+}
+
+.remove{
+  background-color: #fff;
+}
+
+.infoIcon{
+  background-color: #fff;
+  bottom: 0;
+}
+
+margin: 0.25rem;
+
+position: absolute;
+z-index: 10;
+display: flex;
+flex-direction: column;
+-webkit-box-pack: center;
+justify-content: center;
+-webkit-box-align: center;
+align-items: end;
+top: 17.5rem;
+right: 0.75rem;
+}
+
+.Basemap {
+z-index: 12;
+}
+
+.Sat img {
+transition: transform 0.5s, filter 0.5s ease-in-out;
+}
+
+.Sat:hover img {
+transform: scale(1.1);
+}
+
+.Street img {
+transition: transform 0.5s, filter 0.5s ease-in-out;
+}
+
+.Street:hover img {
+transform: scale(1.1);
+}
+
+#th {
+fill: #fff !important;
+transition: fill 0.3s ease;
+width: 25px;
+height: 25px;
+}
+
+#th:hover {
+fill: #ff9900 !important;
+width: 25px;
+height: 25px;
+}
+
+.thaiZoom:hover #th svg{
+  fill: #ff9900 !important;
+}
+
+#value{
+line-height: 0;
+}
+
+.HIDsat,
+.HIDmodel,
+.HIDtmd{
+  color: #FF9900!important;
+  background-color: #fff !important;
+  width: 35px !important;
+  height: 35px !important;
+  border-radius: 50%!important;
+}
+
+.HIDsat:hover,
+.HIDmodel:hover,
+.HIDtmd:hover {
+  transform: scale(1.25);
+  background: linear-gradient(135.12deg, #FFBC57 3.3%, #FF8A00 45.86%, #DDA0DD 94.15%);
+  color: #fff !important;
+}
+
+.HIDsat.active,
+.HIDmodel.active,
+.HIDtmd.active {
+  transform: scale(1.5);
+  background: linear-gradient(135.12deg, #FF8A00 3.3%, #FFBC57 45.86%, #DDA0DD 94.15%) !important;
+  color: #fff !important;
+  transition: all 0.1s ease;
+}
+
+.maplibregl-marker:hover {
+  z-index: 12;
+}
+
+.mapboxgl-user-location-accuracy-circle, .maplibregl-user-location-accuracy-circle{
+  display: none;
+}
+
+/* styles.css */
+@keyframes blinkShadow {
+  0% {
+      box-shadow: 0 0 10px rgba(255, 69, 0, 0.7);
+  }
+  50% {
+      box-shadow: 0 0 45px rgba(255, 99, 71, 1);
+  }
+  100% {
+      box-shadow: 0 0 10px rgba(255, 69, 0, 0.7);
+  }
+}

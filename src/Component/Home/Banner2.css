@@ -1,0 +1,147 @@
+.Banner2-container {
+    width: 100%;
+    overflow: hidden;
+    /* padding-top: 3rem;
+    padding-bottom: 3rem; */
+    background-color: #fafafa ;
+}
+
+.banner2-container-a {
+    max-width: 1160px;
+    padding-left: 16px;
+    padding-right: 16px;
+    justify-content: space-between ;
+    align-items: center;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    flex-flow: row wrap;
+}
+
+.banner2-text {
+    align-items: center;
+    justify-content: center;
+}
+
+.banner2-text-ad-pic-app {
+    align-items: center;
+    justify-content: left;
+    display: flex;
+    gap: 20px;
+    padding-top: 5px;
+    img {
+        width: 140px;
+        border-radius: 10px;
+        transition: transform 0.3s ease-in-out;
+        margin-top: 5px;
+    }
+}
+
+.banner2-text-ad-pic-app img:hover {
+
+    transform: scale(1.06);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: rgba(114, 239, 255, 0.4) 0px 0px 20px;
+
+}
+
+.banner2-text-ad h1{
+    font-family: 'Prompt';
+    font-size: 50px;
+    line-height: 100%;
+    text-align: left;
+    color: #303C46;
+    padding: 0;
+    margin: 10px 0px;
+}
+
+.banner2-text-ad h2{
+    font-family: 'Prompt';
+    font-style: 'bold';
+    font-size: 20px;
+    margin: 0;
+}
+
+.banner2-text-ad p {
+    font-family: 'Prompt';
+    font-size: 14px;
+    color: #303C46;
+    padding: 0;
+    margin: 20px 0px 0px 0px;
+}
+
+/* .Banner2-img {
+    width: 540px;
+    height: 400px;
+    align-items: center;
+    display: flex;
+    background-image: url('/src/Icon/animation_lifedee_bg_before.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: all 250ms ease-in-out;
+    
+    .Banner2-img-phone{
+        padding-left: 10px;
+        padding-right: 10px;
+        transition: all 150ms ease-in-out;
+    }
+} */
+
+.Banner2-img-phone img {
+    height: 500px;
+}
+
+.header-lifedee-ani {
+    background: linear-gradient(90deg, #2AB9C6 0%, #AACB55 29.4%, #F69021 53.9%, #F34B2D 84.4%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 180%;
+    animation: gradientShift 7s infinite ease-in-out;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@media screen and (max-width:789px) {
+    .banner2-text {
+        margin-top: 3rem;
+    }
+    .banner2-container-a {
+        justify-content: center;
+    }
+    .banner2-text-ad {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .banner2-text-ad h2{
+        margin: 2rem 0rem;
+    }
+
+    .banner2-text-ad h1{
+
+        font-size: 40px;
+        line-height: 80%;
+        
+    }
+
+    .banner2-text-ad-pic-app {
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        padding-top: 30px;
+    }
+}

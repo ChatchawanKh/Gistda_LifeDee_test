@@ -1,0 +1,90 @@
+.contact-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.contact-section {
+    width: 100%;
+    max-width: 1160px;
+    padding: 16px;
+}
+
+.contact-header h1,
+.contact-column h2,
+.contact-info,
+.contact-info h3,
+.contact-info p,
+.contact-content h4,
+.contact-content {
+    font-family: 'Prompt', sans-serif;
+    color: #303C46;
+}
+
+.contact-header h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.contact-columns {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+    gap: 20px;
+}
+
+.contact-column h2 {
+    text-align: left;
+    font-size: 22px;
+    margin-top: 24px;
+    font-weight: bold;
+}
+
+.contact-info {
+    font-size: 16px;
+    padding-left: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-left: 3px solid #8DBAFF;
+    margin-top: 20px;
+}
+
+.contact-info h3 {
+    font-size: 16px;
+    margin-top: 0;
+    font-weight: bold;
+}
+
+.contact-info p {
+    font-size: 14px;
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+.contact-info p:last-child {
+    margin-bottom: 0;
+}
+
+.contact-supporters {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.contact-content h4 {
+    text-align: center;
+}
+
+.contact-content {
+    padding-left: 16px;
+    padding-right: 16px;
+}

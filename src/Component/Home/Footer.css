@@ -1,0 +1,164 @@
+.footer-container {
+    width: 100%;
+    background-color: #FAFAFA;
+}
+
+.footer {
+    border-top: 0.5px solid hsla(0, 0%, 70%, 0.3);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: center;
+    align-items: flex-start;
+    flex-flow: row wrap;
+    overflow: hidden;
+    max-width: 1160px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 16px;
+}
+
+.footer-address, .footer-contact, .footer-map {
+    margin: 16px 0px;
+}
+
+.address-logo img {
+    height: 34px;
+    padding-right: 10px;
+}
+
+.address-text p {
+    font-family: "Prompt";
+    font-style: medium;
+    font-weight: medium;
+    font-size: 12px;
+    color: #303c46;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-logo h1 {
+    font-family: "Prompt", sans-serif;
+    font-style: bold;
+    font-weight: bold;
+    font-size: 14px;
+    color: #303c46;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-logo img {
+    height: 25px;
+}
+
+.contact-text {
+    padding-top: 10px;
+}
+
+.contact-text h1 {
+    font-family: "Prompt", sans-serif;
+    font-style: bold;
+    font-weight: bold;
+    font-size: 14px;
+    color: #303c46;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-text p {
+    font-family: "Prompt";
+    font-style: medium;
+    font-weight: medium;
+    font-size: 12px;
+    color: #303c46;
+    margin: 0;
+    padding: 0;
+}
+
+.footer-map h1 {
+    font-family: "Prompt", sans-serif;
+    font-style: bold;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #303c46;
+    margin: 0;
+    padding: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .footer {
+        grid-template-columns: 1fr;
+        gap: 0px;
+    }
+    
+    .footer-address .address-logo,
+    .footer-address .address-text,
+    .footer-contact .contact-logo,
+    .footer-contact .contact-text,
+    .footer-map span {
+        display: none;
+    }
+
+    .footer-address .dropdown.show .address-logo,
+    .footer-address .dropdown.show .address-text,
+    .footer-contact .dropdown.show .contact-logo,
+    .footer-contact .dropdown.show .contact-text,
+    .footer-map .dropdown.show span {
+        display: block;
+    }
+
+    .footer-map h1 {
+        font-family: "Prompt", sans-serif;
+        font-style: bold;
+        font-weight: bold;
+        font-size: 24px;
+        line-height: 24px;
+        margin-bottom: 10px;
+        color: #303c46;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .dropdown-toggle img {
+        height: 34px;
+    }
+
+    .dropdown-toggle h1 {
+        font-family: "Prompt", sans-serif;
+        font-style: bold;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 24px;
+        color: #303c46;
+    }
+    .dropdown {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 1.0s ease-out;
+    }
+    
+    .dropdown.show {
+        max-height: 500px; /* Adjust max-height as needed */
+        transition: max-height 1.0s ease-in;
+    }
+}
+
+.footer-copyright {
+    width: 100%;
+    max-width: 1160px;
+    text-align: center;
+    font-size: 12px;
+    font-family: "Prompt", sans-serif;
+    color: #303C46;
+    padding: 5px 0;
+    border-top: 1px solid #DDD;
+    background-color: #FAFAFA;
+    margin: auto;
+}
