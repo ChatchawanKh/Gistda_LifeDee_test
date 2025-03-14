@@ -11,7 +11,7 @@ import { Box, Typography, Chip, Stack } from '@mui/material';
 import MediaCard from '../Card_hid'
 
 //LEGENDS
-import HIDSatLegend from '/src/assets/legend/HID_Sat_Legend.png';
+import HIDSatLegend from '/src/Icon/legend/HID_Sat_Legend.png';
 
 //ICON
 import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';

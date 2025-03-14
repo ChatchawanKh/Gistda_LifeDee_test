@@ -19,7 +19,7 @@ import { Box, Typography, Button } from "@mui/material";
 import MediaCard from "../Card_hid.jsx";
 
 //LEGENDS
-import HIDTmdLegend from "/src/assets/legend/HID_TMD_Legend.png";
+import HIDTmdLegend from "/src/Icon/legend/HID_TMD_Legend.png";
 
 //weather icon
 import { renderToString } from "react-dom/server";
