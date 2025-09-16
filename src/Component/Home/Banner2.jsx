@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Banner2.css";
-import Phone from "/src/Icon/banner_mobile_mockup.png";
-import appStore from "/src/Icon/appStore.png";
-import GooglePlay from "/src/Icon/GooglePlay.png";
-import VideoPromote from "/src/Icon/iphone_promote.mp4";
+import Phone from "/assets/Icon/banner_mobile_mockup.png";
+import appStore from "/assets/Icon/appStore.png";
+import GooglePlay from "/assets/Icon/GooglePlay.png";
+import VideoPromote from "/assets/Icon/iphone_promote.mp4";
 
 const Banner2 = () => {
   const videoRef = useRef(null);

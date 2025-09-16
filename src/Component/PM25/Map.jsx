@@ -7,7 +7,7 @@ import { renderToString } from "react-dom/server";
 // import { styled, css } from '@mui/system';
 
 //LEGENDS
-import PM25Legend from "/src/Icon/legend/PM25_legend.png";
+import PM25Legend from "/assets/Icon/legend/PM25_legend.png";
 
 //Mui infra
 import {
@@ -36,9 +36,10 @@ import StraightenIcon from "@mui/icons-material/Straighten";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import Vaccines from "@mui/icons-material/Vaccines";
 import MedicalInformation from "@mui/icons-material/MedicalInformation";
-import InfoIcon from "@mui/icons-material/Info";
+// import InfoIcon from "@mui/icons-material/Info";
 import NavigationRoundedIcon from "@mui/icons-material/NavigationRounded";
 import WaterDropRoundedIcon from "@mui/icons-material/WaterDropRounded";
+import NavigationIcon from '@mui/icons-material/Navigation';
 // import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 //Icon
@@ -52,8 +53,8 @@ import MyLocationIcon from "@mui/icons-material/MyLocation";
 import LayersIcon from "@mui/icons-material/Layers";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import Street from "/src/Icon/street.svg";
-import Satt from "/src/Icon/satt.svg";
+import Street from "/assets/Icon/street.svg";
+import Satt from "/assets/Icon/satt.svg";
 import ClearIcon from "@mui/icons-material/Clear";
 import WrongLocationIcon from "@mui/icons-material/WrongLocation";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -82,6 +83,7 @@ const MapPM = () => {
   const [pm25wmsLayer, setPm25wmsLayer] = useState(null);
   const [pm25ClickHandler, setPm25ClickHandler] = useState(null);
   const intervalRef = useRef(null);
+  const [bearingAngle, setbearingAngle] = useState(0);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -135,6 +137,7 @@ const MapPM = () => {
           const pm25wms = new sphere.Layer("0", {
             type: sphere.LayerType.WMS,
             url: "https://service-proxy-765rkyfg3q-as.a.run.app/api_geoserver/geoserver/pm25_hourly_raster_24hr/wms",
+            // url: "https://service-proxy-765rkyfg3q-as.a.run.app/api_geoserver/geoserver/pm25_hourly_raster/wms",
             zoomRange: { min: 1, max: 15 },
             zIndex: 5,
             opacity: 0.75,
@@ -149,154 +152,166 @@ const MapPM = () => {
 
             axios
               .get(
+                // `https://pm25.gistda.or.th/rest/pred/getPm25byLocation?lat=${lat}&lng=${lon}`
                 `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${lat}&lng=${lon}`
               )
               .then((response) => {
                 const data = response.data.data;
+                
                 const pm25 = data["pm25"];
-                const tb = data.loc["tb_tn"];
-                const ap = data.loc["ap_tn"];
-                const pv = data.loc["pv_tn"];
-                const date = data.datetimeThai["dateThai"];
-                const time = data.datetimeThai["timeThai"];
+                
+                const loctext = response.data.data.loc.loctext;
 
-                function fetchTemp() {
-                  const culture = "th-TH";
-                  // const forecastStatus = (
-                  //   <span style={{ color: "#a6a4a4", fontSize: "16px" }}>
-                  //     <CloudOffTwoToneIcon style={{ color: "#a6a4a4", width: 30, verticalAlign: "middle" }} />
-                  //     ค่าพยากรณ์อากาศไม่พร้อมใช้งาน
-                  //   </span>
-                  // );
+                const updateDate = data["datetimeThai"].dateThai
+                const updateTime = data["datetimeThai"].timeThai
 
-                  return fetch(
-                    `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
-                  )
-                    .then((response) => {
-                      if (!response.ok) {
-                        throw new Error(
-                          `fetchTemp response not ok: ${response.statusText}`
-                        );
-                      }
-                      return response.json();
-                    })
-                    .then((data) => {
-                      //   console.log("fetchTemp response data:", data);
-                      if (!data.weather3Hour)
-                        throw new Error("Missing weather3Hour in fetchTemp");
-                      const { dryBlubTemperature, rainfall } =
-                        data.weather3Hour;
-                      const temp = dryBlubTemperature.toFixed(0);
+                
 
-                      let rainfallIcon, rainText, rainValue, mm;
-                      if (rainfall < 0.1) {
-                        rainfallIcon = noRain;
-                        rainText = "ไม่มีฝนตก";
-                        rainValue = "";
-                        mm = "";
-                      } else if (rainfall <= 10) {
-                        rainfallIcon = lightRain;
-                        rainText = "ฝนตก";
-                        rainValue = rainfall;
-                        mm = "มม.";
-                      } else if (rainfall <= 35) {
-                        rainfallIcon = moderateRain;
-                        rainText = "ฝนตก";
-                        rainValue = rainfall;
-                        mm = "มม.";
-                      } else if (rainfall <= 90) {
-                        rainfallIcon = heavyRain;
-                        rainText = "ฝนตก";
-                        rainValue = rainfall;
-                        mm = "มม.";
-                      } else {
-                        rainfallIcon = veryHeavyRain;
-                        rainText = "ฝนตก";
-                        rainValue = rainfall;
-                        mm = "มม.";
-                      }
+                // function fetchTemp() {
+                //   const culture = "th-TH";
+                //   // const forecastStatus = (
+                //   //   <span style={{ color: "#a6a4a4", fontSize: "16px" }}>
+                //   //     <CloudOffTwoToneIcon style={{ color: "#a6a4a4", width: 30, verticalAlign: "middle" }} />
+                //   //     ค่าพยากรณ์อากาศไม่พร้อมใช้งาน
+                //   //   </span>
+                //   // );
 
-                      return { rainfallIcon, rainText, rainValue, temp, mm };
-                    })
-                    .catch((error) => {
-                      console.error("fetchTemp error:", error);
-                      throw error; // Re-throw error for Promise.all
-                    });
-                }
+                //   return fetch(
+                //     `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
+                //   )
+                //     .then((response) => {
+                //       if (!response.ok) {
+                //         throw new Error(
+                //           `fetchTemp response not ok: ${response.statusText}`
+                //         );
+                //       }
+                //       return response.json();
+                //     })
+                //     .then((data) => {
+                //       //   console.log("fetchTemp response data:", data);
+                //       if (!data.weather3Hour)
+                //         throw new Error("Missing weather3Hour in fetchTemp");
+                //       const { dryBlubTemperature, rainfall } =
+                //         data.weather3Hour;
+                //       const temp = dryBlubTemperature.toFixed(0);
 
-                function fetchRain() {
-                  const culture = "th-TH";
-                  return fetch(
-                    `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
-                  )
-                    .then((response) => {
-                      if (!response.ok) {
-                        throw new Error(
-                          "Network response was not ok: " + response.statusText
-                        );
-                      }
-                      return response.json();
-                    })
-                    .then((data) => {
-                      const forecastData = data[0];
+                //       let rainfallIcon, rainText, rainValue, mm;
+                //       if (rainfall < 0.1) {
+                //         rainfallIcon = noRain;
+                //         rainText = "ไม่มีฝนตก";
+                //         rainValue = "";
+                //         mm = "";
+                //       } else if (rainfall <= 10) {
+                //         rainfallIcon = lightRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       } else if (rainfall <= 35) {
+                //         rainfallIcon = moderateRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       } else if (rainfall <= 90) {
+                //         rainfallIcon = heavyRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       } else {
+                //         rainfallIcon = veryHeavyRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       }
 
-                      if (forecastData && forecastData.weatherForecast7Day) {
-                        const weatherForecast =
-                          forecastData.weatherForecast7Day;
-                        const rainArea = weatherForecast.rainArea;
-                        const windSpeed = weatherForecast.windSpeed;
-                        const windDir = weatherForecast.windDirection;
+                //       return { rainfallIcon, rainText, rainValue, temp, mm };
+                //     })
+                //     .catch((error) => {
+                //       console.error("fetchTemp error:", error);
+                //       throw error; // Re-throw error for Promise.all
+                //     });
+                // }
 
-                        const windDirDeg = renderToString(
-                          <NavigationRoundedIcon
-                            style={{
-                              color: "#758CA3",
-                              width: 18,
-                              verticalAlign: "middle",
-                              transform: `rotate(${windDir}deg)`,
-                            }}
-                          />
-                        );
+                // function fetchRain() {
+                //   const culture = "th-TH";
+                //   return fetch(
+                //     `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
+                //   )
+                //     .then((response) => {
+                //       if (!response.ok) {
+                //         throw new Error(
+                //           "Network response was not ok: " + response.statusText
+                //         );
+                //       }
+                //       return response.json();
+                //     })
+                //     .then((data) => {
+                //       const forecastData = data[0];
 
-                        const waterDrop = renderToString(
-                          <WaterDropRoundedIcon
-                            style={{
-                              color: "#56c8f5",
-                              width: 18,
-                              verticalAlign: "middle",
-                            }}
-                          />
-                        );
+                //       if (forecastData && forecastData.weatherForecast7Day) {
+                //         const weatherForecast =
+                //           forecastData.weatherForecast7Day;
+                //         const rainArea = weatherForecast.rainArea;
+                //         const windSpeed = weatherForecast.windSpeed;
+                //         const windDir = weatherForecast.windDirection;
 
-                        return { waterDrop, rainArea, windDirDeg, windSpeed };
-                      } else {
-                        console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
-                        return {
-                          waterDrop: null,
-                          rainArea: null,
-                          windDirDeg: null,
-                          windSpeed: null,
-                        };
-                      }
-                    })
-                    .catch((error) => {
-                      console.error("fetchRain error:", error);
-                      throw error;
-                    });
-                }
+                //         const windDirDeg = renderToString(
+                //           <NavigationRoundedIcon
+                //             style={{
+                //               color: "#758CA3",
+                //               width: 18,
+                //               verticalAlign: "middle",
+                //               transform: `rotate(${windDir}deg)`,
+                //             }}
+                //           />
+                //         );
 
-                let color;
-                let level;
-                if (pm25 < 15) {
+                //         const waterDrop = renderToString(
+                //           <WaterDropRoundedIcon
+                //             style={{
+                //               color: "#56c8f5",
+                //               width: 18,
+                //               verticalAlign: "middle",
+                //             }}
+                //           />
+                //         );
+
+                //         return { waterDrop, rainArea, windDirDeg, windSpeed };
+                //       } else {
+                //         console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
+                //         return {
+                //           waterDrop: null,
+                //           rainArea: null,
+                //           windDirDeg: null,
+                //           windSpeed: null,
+                //         };
+                //       }
+                //     })
+                //     .catch((error) => {
+                //       console.error("fetchRain error:", error);
+                //       throw error;
+                //     });
+                // }
+
+                let color = "";
+                let level = "";
+                let display = "";
+
+                const value = Number(pm25);
+
+                if ( value === 0 || value === null || value === undefined || isNaN(value)) {
+                  color = "#999999";
+                  level = "ไม่พบข้อมูล";
+                  display = "none";
+                } else if (value  <= 15) {
                   color = "#4FAFBF";
                   level = "ดีมาก";
-                } else if (pm25 > 15 && pm25 <= 25) {
+                } else if (value  <= 25) {
                   color = "#9FCF62";
                   level = "ดี";
-                } else if (pm25 > 25 && pm25 <= 37.5) {
+                } else if (value  <= 37.5) {
                   color = "#F1E151";
                   level = "ปานกลาง";
-                } else if (pm25 > 37.5 && pm25 <= 75) {
+                } else if (value  <= 75) {
                   color = "#F1A53B";
                   level = "เริ่มมีผล";
                 } else {
@@ -304,152 +319,194 @@ const MapPM = () => {
                   level = "มีผล";
                 }
 
-                const pm25Formatted = pm25 % 1 === 0 ? pm25 : pm25.toFixed(1);
+                const pm25Formatted = value % 1 === 0 ? value : value.toFixed(1);
 
-                const loadingHtml = `
-                                            <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
-                                                <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
-                                                <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
-                                            </div>
-                                            <style>
-                                                @keyframes spin {
-                                                    0% { transform: rotate(0deg); }
-                                                    100% { transform: rotate(360deg); }
-                                                }
-                                            </style>
-                                        `;
+                const initialPopupContent = `
+                  <div style="padding:0.5rem;">
+                    <span style='font-weight: 600; font-size: 16px; display: ${display}'>${loctext}</span> <br />
 
-                Promise.all([fetchTemp(), fetchRain()])
-                  .then(([tempData, rainData]) => {
-                    console.log("Promise.all resolved data:", {
-                      tempData,
-                      rainData,
-                    });
-                    if (tempData && rainData) {
-                      const combinedData = { ...tempData, ...rainData };
-                      updateWeatherDetails(combinedData);
-                    } else {
-                      console.error("Failed to fetch one or both data sources");
+                    <span id="weather_click"></span>
+                    <span id="rainfall_click"></span>
+                    
+                    <span id="rainPer_click"></span>
+                    <span id="wind_click"></span>
 
-                      const errorData = {
-                        rainfallIcon: "",
-                        rainText: "",
-                        rainValue: "",
-                        temp: "",
-                        mm: "",
-                        waterDrop: "",
-                        rainArea: "",
-                        windDirDeg: "",
-                        windSpeed: "",
-                      };
-                      updateWeatherDetails(errorData);
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Promise.all error:", error);
-                    const errorData = {
-                      rainfallIcon: "",
-                      rainText: "",
-                      rainValue: "",
-                      temp: "",
-                      mm: "",
-                      waterDrop: "",
-                      rainArea: "",
-                      windDirDeg: "",
-                      windSpeed: "",
-                    };
-                    updateWeatherDetails(errorData);
-                  });
+                    <span style="font-size: 12px;">ค่าฝุ่น PM2.5 รายชั่วโมง (µg/m³)</span><br />
+                    <span id='value' style="font-weight: bold; font-size: 30px;">
+                      <span style="color: ${color}; font-weight: bold; font-size: 30px; display: ${display} ">${pm25Formatted} </span>
+                    </span>
+                    <span id="level">
+                      <span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span>
+                    </span><br />
 
-                function updateWeatherDetails({
-                  rainfallIcon,
-                  rainText,
-                  rainValue,
-                  temp,
-                  mm,
-                  waterDrop,
-                  rainArea,
-                  windDirDeg,
-                  windSpeed,
-                }) {
+                    <span id="updateTMD" style="font-size: 12px; color: #a6a6a6; display: ${display}">
+                      อัพเดตล่าสุด ${updateDate} ${updateTime}
+                    </span>
+                  </div>
+                `;
 
-                  const rainIcon = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? `${rainfallIcon}` 
-                  : "";
-
-                const rainIconStyle = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? ""
-                  : "opacity: 0";
-                  const formattedTemp = (temp !== undefined && temp !== null && temp !== "") 
-                  ? `${temp} °C` 
-                  : "";
-                  const formattedRainArea = (rainArea !== undefined && rainArea !== null && rainArea !== "")
-                      ? `${rainArea}% ของพื้นที่`
-                      : ``;
-                  const formattedWindSpeed = (windSpeed !== undefined && windSpeed !== null && windSpeed !== "") 
-                  ? `${windSpeed} กม./ชม.` 
-                  : "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน <br>";
-
-                  const popupDetail = `
-                    <div style="padding:0.5rem;">
-                      <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
-                      <span style="font-size: 14px;"></span>
-                
-                      <img style="width: 30px; vertical-align: middle; ${rainIconStyle}" src="${rainIcon}" alt="Rainfall Icon" />
-
-                      <span style="color: #a6a4a4; font-size: 16px;">${formattedTemp}</span>
-                      <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
-                      <span id="rainPer-pop"></span><span id="wind"></span></br>
-                      <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${formattedRainArea}</span>
-                      <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${formattedWindSpeed}</span><br />
-                
-                      <span style="font-size: 12px;">ค่า PM2.5</span><br />
-                      <span id="value" style="fontWeight: 'bold', fontSize: '30px'">
-                        <span style="color: ${color}; font-weight: bold; font-size: 30px;">
-                          ${pm25Formatted}
-                        </span>
+                var popUp = new sphere.Popup(
+                  { lon: lon, lat: lat },
+                  {
+                    title: `
+                      <span style='font-weight: 500; margin-left: 0.5rem;'>ตำแหน่งที่สนใจ</span>
+                      <span style='font-weight: 400; color: #a6a6a6;'>
+                          ${lat.toFixed(4)}, ${lon.toFixed(4)}
                       </span>
-                      <span style="font-size: 10px;">µg./m3</span>
-                      <span id="level">
-                        <span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span><br />
-                      </span>
-                      <span id="update" style="font-size: 12px; color: #a6a6a6;">
-                        อัพเดทล่าสุด ${date} ${time}
-                      </span>
-                    </div>
-                  `;
-
-                  const popupElement =
-                    document.getElementById("popup-container");
-                  if (popupElement) {
-                    popupElement.innerHTML = popupDetail;
-                  } else {
-                    console.log("popup-container not found in DOM");
+                    `,
+                    detail: initialPopupContent,
+                    size: { width: "100%" },
+                    closable: true,
                   }
 
-                  var popUp = new sphere.Popup(
-                    { lon: lon, lat: lat },
-                    {
-                      title: `
-                                        <span style='font-weight: 500; margin-left: 0.5rem;'> ตำแหน่งที่สนใจ</span>
-                                        <span style='font-weight: 400; color: #a6a6a6;'>
-                                            ${lat.toFixed(4)}, ${lon.toFixed(4)}
-                                        </span>
-                                    `,
-                      detail: loadingHtml,
-                      loadDetail: updateDetail,
-                      size: { width: "100%" },
-                      closable: true,
-                    }
-                  );
+                );
 
-                  function updateDetail(element) {
-                    setTimeout(function () {
-                      element.innerHTML = popupDetail;
-                    }, 1000);
-                  }
-                  map.Overlays.add(popUp);
-                }
+                map.Overlays.add(popUp);
+
+                // const loadingHtml = `
+                //                             <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
+                //                                 <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
+                //                                 <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
+                //                             </div>
+                //                             <style>
+                //                                 @keyframes spin {
+                //                                     0% { transform: rotate(0deg); }
+                //                                     100% { transform: rotate(360deg); }
+                //                                 }
+                //                             </style>
+                //                         `;
+
+                // Promise.all([fetchTemp(), fetchRain()])
+                //   .then(([tempData, rainData]) => {
+                //     console.log("Promise.all resolved data:", {
+                //       tempData,
+                //       rainData,
+                //     });
+                //     if (tempData && rainData) {
+                //       const combinedData = { ...tempData, ...rainData };
+                //       updateWeatherDetails(combinedData);
+                //     } else {
+                //       console.error("Failed to fetch one or both data sources");
+
+                //       const errorData = {
+                //         rainfallIcon: "",
+                //         rainText: "",
+                //         rainValue: "",
+                //         temp: "",
+                //         mm: "",
+                //         waterDrop: "",
+                //         rainArea: "",
+                //         windDirDeg: "",
+                //         windSpeed: "",
+                //       };
+                //       updateWeatherDetails(errorData);
+                //     }
+                //   })
+                //   .catch((error) => {
+                //     console.error("Promise.all error:", error);
+                //     const errorData = {
+                //       rainfallIcon: "",
+                //       rainText: "",
+                //       rainValue: "",
+                //       temp: "",
+                //       mm: "",
+                //       waterDrop: "",
+                //       rainArea: "",
+                //       windDirDeg: "",
+                //       windSpeed: "",
+                //     };
+                //     updateWeatherDetails(errorData);
+                //   });
+
+                // function updateWeatherDetails({
+                //   rainfallIcon,
+                //   rainText,
+                //   rainValue,
+                //   temp,
+                //   mm,
+                //   waterDrop,
+                //   rainArea,
+                //   windDirDeg,
+                //   windSpeed,
+                // }) {
+
+                //   const rainIcon = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
+                //   ? `${rainfallIcon}` 
+                //   : "";
+
+                // const rainIconStyle = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
+                //   ? ""
+                //   : "opacity: 0";
+                //   const formattedTemp = (temp !== undefined && temp !== null && temp !== "") 
+                //   ? `${temp} °C` 
+                //   : "";
+                //   const formattedRainArea = (rainArea !== undefined && rainArea !== null && rainArea !== "")
+                //       ? `${rainArea}% ของพื้นที่`
+                //       : ``;
+                //   const formattedWindSpeed = (windSpeed !== undefined && windSpeed !== null && windSpeed !== "") 
+                //   ? `${windSpeed} กม./ชม.` 
+                //   : "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน <br>";
+
+                //   const popupDetail = `
+                //     <div style="padding:0.5rem;">
+                //       <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
+                //       <span style="font-size: 14px;"></span>
+                
+                //       <img style="width: 30px; vertical-align: middle; ${rainIconStyle}" src="${rainIcon}" alt="Rainfall Icon" />
+
+                //       <span style="color: #a6a4a4; font-size: 16px;">${formattedTemp}</span>
+                //       <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
+                //       <span id="rainPer-pop"></span><span id="wind"></span></br>
+                //       <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${formattedRainArea}</span>
+                //       <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${formattedWindSpeed}</span><br />
+                
+                //       <span style="font-size: 12px;">ค่า PM2.5</span><br />
+                //       <span id="value" style="fontWeight: 'bold', fontSize: '30px'">
+                //         <span style="color: ${color}; font-weight: bold; font-size: 30px;">
+                //           ${pm25Formatted}
+                //         </span>
+                //       </span>
+                //       <span style="font-size: 10px;">µg./m3</span>
+                //       <span id="level">
+                //         <span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span><br />
+                //       </span>
+                //       <span id="update" style="font-size: 12px; color: #a6a6a6;">
+                //         อัพเดทล่าสุด ${date} ${time}
+                //       </span>
+                //     </div>
+                //   `;
+
+                //   const popupElement =
+                //     document.getElementById("popup-container");
+                //   if (popupElement) {
+                //     popupElement.innerHTML = popupDetail;
+                //   } else {
+                //     console.log("popup-container not found in DOM");
+                //   }
+
+                //   var popUp = new sphere.Popup(
+                //     { lon: lon, lat: lat },
+                //     {
+                //       title: `
+                //                         <span style='font-weight: 500; margin-left: 0.5rem;'> ตำแหน่งที่สนใจ</span>
+                //                         <span style='font-weight: 400; color: #a6a6a6;'>
+                //                             ${lat.toFixed(4)}, ${lon.toFixed(4)}
+                //                         </span>
+                //                     `,
+                //       detail: loadingHtml,
+                //       loadDetail: updateDetail,
+                //       size: { width: "100%" },
+                //       closable: true,
+                //     }
+                //   );
+
+                //   function updateDetail(element) {
+                //     setTimeout(function () {
+                //       element.innerHTML = popupDetail;
+                //     }, 1000);
+                //   }
+                //   map.Overlays.add(popUp);
+                // }
               });
           };
 
@@ -505,7 +562,7 @@ const MapPM = () => {
                     );
 
                     fetch(
-                      `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
+                      `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
                     )
                       .then((response) => {
                         if (!response.ok) {
@@ -819,7 +876,7 @@ const MapPM = () => {
                   function fetchRain() {
                     const culture = "th-TH";
                     fetch(
-                      `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
+                      `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
                     )
                       .then((response) => {
                         if (!response.ok) {
@@ -914,7 +971,7 @@ const MapPM = () => {
                   }
                   const pm25Formatted = pm25 % 1 === 0 ? pm25 : pm25.toFixed(1);
 
-                  titleElement.innerHTML = `<span style="font-size: 14px; font-weight: 500;">ค่าเฉลี่ย PM2.5 24 ชั่วโมง (µg./m³)</span></br> `;
+                  titleElement.innerHTML = `<span style="font-size: 14px; font-weight: 500; color: #267fde; ">ค่าเฉลี่ย PM2.5 รายชั่วโมง (µg./m³)</span></br> `;
                   //   valueElement.innerHTML = `
                   //                         <span style="color: ${color};">
                   //                             ${pm25Formatted} <span style="font-size: 10px; font-weight: 500; color: #000;">µg./m³</span>
@@ -958,8 +1015,9 @@ const MapPM = () => {
         }
 
         // getLoc();
-        intervalRef.current = setInterval(getLoc, 5000);
-
+        // intervalRef.current = setInterval(getLoc, 5000);
+        intervalRef.current = setTimeout(getLoc, 5000);
+        
         if (map && map.Ui && map.Ui.Geolocation) {
           map.Ui.Geolocation.trigger();
         } else {
@@ -994,6 +1052,7 @@ const MapPM = () => {
       const pm25wms = new sphere.Layer("0", {
         type: sphere.LayerType.WMS,
         url: "https://service-proxy-765rkyfg3q-as.a.run.app/api_geoserver/geoserver/pm25_hourly_raster_24hr/wms",
+        // url: "https://service-proxy-765rkyfg3q-as.a.run.app/api_geoserver/mapserver/pm25_hourly_raster/wms",
         zoomRange: { min: 1, max: 15 },
         zIndex: 5,
         opacity: 1,
@@ -1003,300 +1062,368 @@ const MapPM = () => {
       setPm25wmsLayer(pm25wms);
 
       const handleMapClick = (location) => {
-        const lat = location.lat;
-        const lon = location.lon;
+            const lat = location.lat;
+            const lon = location.lon;
 
-        axios
-          .get(
-            `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${lat}&lng=${lon}`
-          )
-          .then((response) => {
-            const data = response.data.data;
-            const pm25 = data["pm25"];
-            const tb = data.loc["tb_tn"];
-            const ap = data.loc["ap_tn"];
-            const pv = data.loc["pv_tn"];
-            const date = data.datetimeThai["dateThai"];
-            const time = data.datetimeThai["timeThai"];
-
-            function fetchTemp() {
-              const culture = "th-TH";
-              return fetch(
-                `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
+            axios
+              .get(
+                // `https://pm25.gistda.or.th/rest/pred/getPm25byLocation?lat=${lat}&lng=${lon}`
+                `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${lat}&lng=${lon}`
               )
-                .then((response) => {
-                  if (!response.ok) {
-                    throw new Error(
-                      `fetchTemp response not ok: ${response.statusText}`
-                    );
-                  }
-                  return response.json();
-                })
-                .then((data) => {
-                  //   console.log("fetchTemp response data:", data);
-                  if (!data.weather3Hour)
-                    throw new Error("Missing weather3Hour in fetchTemp");
-                  const { dryBlubTemperature, rainfall } = data.weather3Hour;
-                  const temp = dryBlubTemperature.toFixed(0);
-
-                  let rainfallIcon, rainText, rainValue, mm;
-                  if (rainfall < 0.1) {
-                    rainfallIcon = noRain;
-                    rainText = "ไม่มีฝนตก";
-                    rainValue = "";
-                    mm = "";
-                  } else if (rainfall <= 10) {
-                    rainfallIcon = lightRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainfall;
-                    mm = "มม.";
-                  } else if (rainfall <= 35) {
-                    rainfallIcon = moderateRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainfall;
-                    mm = "มม.";
-                  } else if (rainfall <= 90) {
-                    rainfallIcon = heavyRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainfall;
-                    mm = "มม.";
-                  } else {
-                    rainfallIcon = veryHeavyRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainfall;
-                    mm = "มม.";
-                  }
-
-                  return { rainfallIcon, rainText, rainValue, temp, mm };
-                })
-                .catch((error) => {
-                  console.error("fetchTemp error:", error);
-                  throw error;
-                });
-            }
-
-            function fetchRain() {
-              const culture = "th-TH";
-              return fetch(
-                `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
-              )
-                .then((response) => {
-                  if (!response.ok) {
-                    throw new Error(
-                      "Network response was not ok: " + response.statusText
-                    );
-                  }
-                  return response.json();
-                })
-                .then((data) => {
-                  const forecastData = data[0];
-
-                  if (forecastData && forecastData.weatherForecast7Day) {
-                    const weatherForecast = forecastData.weatherForecast7Day;
-                    const rainArea = weatherForecast.rainArea;
-                    const windSpeed = weatherForecast.windSpeed;
-                    const windDir = weatherForecast.windDirection;
-
-                    const windDirDeg = renderToString(
-                      <NavigationRoundedIcon
-                        style={{
-                          color: "#758CA3",
-                          width: 18,
-                          verticalAlign: "middle",
-                          transform: `rotate(${windDir}deg)`,
-                        }}
-                      />
-                    );
-
-                    const waterDrop = renderToString(
-                      <WaterDropRoundedIcon
-                        style={{
-                          color: "#56c8f5",
-                          width: 18,
-                          verticalAlign: "middle",
-                        }}
-                      />
-                    );
-
-                    return { waterDrop, rainArea, windDirDeg, windSpeed };
-                  } else {
-                    console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
-                    
-                  }
-                })
-                .catch((error) => {
-                  console.error("fetchRain error:", error);
-                  return "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน";
-                });
-            }
-
-            let color;
-            let level;
-            if (pm25 < 15) {
-              color = "#4FAFBF";
-              level = "ดีมาก";
-            } else if (pm25 > 15 && pm25 <= 25) {
-              color = "#9FCF62";
-              level = "ดี";
-            } else if (pm25 > 25 && pm25 <= 37.5) {
-              color = "#F1E151";
-              level = "ปานกลาง";
-            } else if (pm25 > 37.5 && pm25 <= 75) {
-              color = "#F1A53B";
-              level = "เริ่มมีผล";
-            } else {
-              color = "#EB4E47";
-              level = "มีผล";
-            }
-
-            const pm25Formatted = pm25 % 1 === 0 ? pm25 : pm25.toFixed(1);
-
-            const loadingHtml = `
-                                            <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
-                                                <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
-                                                <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
-                                            </div>
-                                            <style>
-                                                @keyframes spin {
-                                                    0% { transform: rotate(0deg); }
-                                                    100% { transform: rotate(360deg); }
-                                                }
-                                            </style>
-                                        `;
-
-                Promise.all([fetchTemp(), fetchRain()])
-                  .then(([tempData, rainData]) => {
-                    console.log("Promise.all resolved data:", {
-                      tempData,
-                      rainData,
-                    });
-                    if (tempData && rainData) {
-                      const combinedData = { ...tempData, ...rainData };
-                      updateWeatherDetails(combinedData);
-                    } else {
-                      console.error("Failed to fetch one or both data sources");
-
-                      const errorData = {
-                        rainfallIcon: "",
-                        rainText: "",
-                        rainValue: "",
-                        temp: "",
-                        mm: "",
-                        waterDrop: "",
-                        rainArea: "",
-                        windDirDeg: "",
-                        windSpeed: "",
-                      };
-                      updateWeatherDetails(errorData);
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Promise.all error:", error);
-                    const errorData = {
-                      rainfallIcon: "",
-                      rainText: "",
-                      rainValue: "",
-                      temp: "",
-                      mm: "",
-                      waterDrop: "",
-                      rainArea: "",
-                      windDirDeg: "",
-                      windSpeed: "",
-                    };
-                    updateWeatherDetails(errorData);
-                  });
-
-                function updateWeatherDetails({
-                  rainfallIcon,
-                  rainText,
-                  rainValue,
-                  temp,
-                  mm,
-                  waterDrop,
-                  rainArea,
-                  windDirDeg,
-                  windSpeed,
-                }) {
-
-                  const rainIcon = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? `${rainfallIcon}` 
-                  : "";
-
-                const rainIconStyle = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? ""
-                  : "opacity: 0";
-                  const formattedTemp = (temp !== undefined && temp !== null && temp !== "") 
-                  ? `${temp} °C` 
-                  : "";
-                  const formattedRainArea = (rainArea !== undefined && rainArea !== null && rainArea !== "")
-                      ? `${rainArea}% ของพื้นที่`
-                      : ``;
-                  const formattedWindSpeed = (windSpeed !== undefined && windSpeed !== null && windSpeed !== "") 
-                  ? `${windSpeed} กม./ชม.` 
-                  : "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน <br>";
-
-                  const popupDetail = `
-                    <div style="padding:0.5rem;">
-                      <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
-                      <span style="font-size: 14px;"></span>
+              .then((response) => {
+                const data = response.data.data;
                 
-                      <img style="width: 30px; vertical-align: middle; ${rainIconStyle}" src="${rainIcon}" alt="Rainfall Icon" />
-
-                      <span style="color: #a6a4a4; font-size: 16px;">${formattedTemp}</span>
-                      <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
-                      <span id="rainPer-pop"></span><span id="wind"></span></br>
-                      <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${formattedRainArea}</span>
-                      <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${formattedWindSpeed}</span><br />
+                const pm25 = data["pm25"];
                 
-                      <span style="font-size: 12px;">ค่า PM2.5</span><br />
-                      <span id="value" style="fontWeight: 'bold', fontSize: '30px'">
-                        <span style="color: ${color}; font-weight: bold; font-size: 30px;">
-                          ${pm25Formatted}
-                        </span>
-                      </span>
-                      <span style="font-size: 10px;">µg./m3</span>
-                      <span id="level">
-                        <span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span><br />
-                      </span>
-                      <span id="update" style="font-size: 12px; color: #a6a6a6;">
-                        อัพเดทล่าสุด ${date} ${time}
-                      </span>
-                    </div>
-                  `;
+                const loctext = response.data.data.loc.loctext;
 
-                  const popupElement =
-                    document.getElementById("popup-container");
-                  if (popupElement) {
-                    popupElement.innerHTML = popupDetail;
-                  } else {
-                    console.log("popup-container not found in DOM");
-                  }
+                const updateDate = data["datetimeThai"].dateThai
+                const updateTime = data["datetimeThai"].timeThai
 
-              var popUp = new sphere.Popup(
-                { lon: lon, lat: lat },
-                {
-                  title: `
-                                    <span style='font-weight: 500; margin-left: 0.5rem;'> ตำแหน่งที่สนใจ</span>
-                                    <span style='font-weight: 400; color: #a6a6a6;'>
-                                        ${lat.toFixed(4)}, ${lon.toFixed(4)}
-                                    </span>
-                                `,
-                  detail: loadingHtml,
-                  loadDetail: updateDetail,
-                  size: { width: "100%" },
-                  closable: true,
+                
+
+                // function fetchTemp() {
+                //   const culture = "th-TH";
+                //   // const forecastStatus = (
+                //   //   <span style={{ color: "#a6a4a4", fontSize: "16px" }}>
+                //   //     <CloudOffTwoToneIcon style={{ color: "#a6a4a4", width: 30, verticalAlign: "middle" }} />
+                //   //     ค่าพยากรณ์อากาศไม่พร้อมใช้งาน
+                //   //   </span>
+                //   // );
+
+                //   return fetch(
+                //     `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
+                //   )
+                //     .then((response) => {
+                //       if (!response.ok) {
+                //         throw new Error(
+                //           `fetchTemp response not ok: ${response.statusText}`
+                //         );
+                //       }
+                //       return response.json();
+                //     })
+                //     .then((data) => {
+                //       //   console.log("fetchTemp response data:", data);
+                //       if (!data.weather3Hour)
+                //         throw new Error("Missing weather3Hour in fetchTemp");
+                //       const { dryBlubTemperature, rainfall } =
+                //         data.weather3Hour;
+                //       const temp = dryBlubTemperature.toFixed(0);
+
+                //       let rainfallIcon, rainText, rainValue, mm;
+                //       if (rainfall < 0.1) {
+                //         rainfallIcon = noRain;
+                //         rainText = "ไม่มีฝนตก";
+                //         rainValue = "";
+                //         mm = "";
+                //       } else if (rainfall <= 10) {
+                //         rainfallIcon = lightRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       } else if (rainfall <= 35) {
+                //         rainfallIcon = moderateRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       } else if (rainfall <= 90) {
+                //         rainfallIcon = heavyRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       } else {
+                //         rainfallIcon = veryHeavyRain;
+                //         rainText = "ฝนตก";
+                //         rainValue = rainfall;
+                //         mm = "มม.";
+                //       }
+
+                //       return { rainfallIcon, rainText, rainValue, temp, mm };
+                //     })
+                //     .catch((error) => {
+                //       console.error("fetchTemp error:", error);
+                //       throw error; // Re-throw error for Promise.all
+                //     });
+                // }
+
+                // function fetchRain() {
+                //   const culture = "th-TH";
+                //   return fetch(
+                //     `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
+                //   )
+                //     .then((response) => {
+                //       if (!response.ok) {
+                //         throw new Error(
+                //           "Network response was not ok: " + response.statusText
+                //         );
+                //       }
+                //       return response.json();
+                //     })
+                //     .then((data) => {
+                //       const forecastData = data[0];
+
+                //       if (forecastData && forecastData.weatherForecast7Day) {
+                //         const weatherForecast =
+                //           forecastData.weatherForecast7Day;
+                //         const rainArea = weatherForecast.rainArea;
+                //         const windSpeed = weatherForecast.windSpeed;
+                //         const windDir = weatherForecast.windDirection;
+
+                //         const windDirDeg = renderToString(
+                //           <NavigationRoundedIcon
+                //             style={{
+                //               color: "#758CA3",
+                //               width: 18,
+                //               verticalAlign: "middle",
+                //               transform: `rotate(${windDir}deg)`,
+                //             }}
+                //           />
+                //         );
+
+                //         const waterDrop = renderToString(
+                //           <WaterDropRoundedIcon
+                //             style={{
+                //               color: "#56c8f5",
+                //               width: 18,
+                //               verticalAlign: "middle",
+                //             }}
+                //           />
+                //         );
+
+                //         return { waterDrop, rainArea, windDirDeg, windSpeed };
+                //       } else {
+                //         console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
+                //         return {
+                //           waterDrop: null,
+                //           rainArea: null,
+                //           windDirDeg: null,
+                //           windSpeed: null,
+                //         };
+                //       }
+                //     })
+                //     .catch((error) => {
+                //       console.error("fetchRain error:", error);
+                //       throw error;
+                //     });
+                // }
+
+                let color = "";
+                let level = "";
+                let display = "";
+
+                const value = Number(pm25);
+
+                if ( value === 0 || value === null || value === undefined || isNaN(value)) {
+                  color = "#999999";
+                  level = "ไม่พบข้อมูล";
+                  display = "none";
+                } else if (value  <= 15) {
+                  color = "#4FAFBF";
+                  level = "ดีมาก";
+                } else if (value  <= 25) {
+                  color = "#9FCF62";
+                  level = "ดี";
+                } else if (value  <= 37.5) {
+                  color = "#F1E151";
+                  level = "ปานกลาง";
+                } else if (value  <= 75) {
+                  color = "#F1A53B";
+                  level = "เริ่มมีผล";
+                } else {
+                  color = "#EB4E47";
+                  level = "มีผล";
                 }
-              );
 
-              function updateDetail(element) {
-                setTimeout(function () {
-                  element.innerHTML = popupDetail;
-                }, 1000);
-              }
-              map.Overlays.add(popUp);
-            }
-          });
-      };
+                const pm25Formatted = value % 1 === 0 ? value : value.toFixed(1);
+
+                const initialPopupContent = `
+                  <div style="padding:0.5rem;">
+                    <span style='font-weight: 600; font-size: 16px; display: ${display}'>${loctext}</span> <br />
+
+                    <span id="weather_click"></span>
+                    <span id="rainfall_click"></span>
+                    
+                    <span id="rainPer_click"></span>
+                    <span id="wind_click"></span>
+
+                    <span style="font-size: 12px;">ค่าฝุ่น PM2.5 รายชั่วโมง (µg/m³)</span><br />
+                    <span id='value' style="font-weight: bold; font-size: 30px;">
+                      <span style="color: ${color}; font-weight: bold; font-size: 30px; display: ${display} ">${pm25Formatted} </span>
+                    </span>
+                    <span id="level">
+                      <span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span>
+                    </span><br />
+
+                    <span id="updateTMD" style="font-size: 12px; color: #a6a6a6; display: ${display};">
+                      อัพเดตล่าสุด ${updateDate} ${updateTime}
+                    </span>
+                  </div>
+                `;
+
+                var popUp = new sphere.Popup(
+                  { lon: lon, lat: lat },
+                  {
+                    title: `
+                      <span style='font-weight: 500; margin-left: 0.5rem;'>ตำแหน่งที่สนใจ</span>
+                      <span style='font-weight: 400; color: #a6a6a6;'>
+                          ${lat.toFixed(4)}, ${lon.toFixed(4)}
+                      </span>
+                    `,
+                    detail: initialPopupContent,
+                    size: { width: "100%" },
+                    closable: true,
+                  }
+
+                );
+
+                map.Overlays.add(popUp);
+
+                // const loadingHtml = `
+                //                             <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
+                //                                 <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
+                //                                 <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
+                //                             </div>
+                //                             <style>
+                //                                 @keyframes spin {
+                //                                     0% { transform: rotate(0deg); }
+                //                                     100% { transform: rotate(360deg); }
+                //                                 }
+                //                             </style>
+                //                         `;
+
+                // Promise.all([fetchTemp(), fetchRain()])
+                //   .then(([tempData, rainData]) => {
+                //     console.log("Promise.all resolved data:", {
+                //       tempData,
+                //       rainData,
+                //     });
+                //     if (tempData && rainData) {
+                //       const combinedData = { ...tempData, ...rainData };
+                //       updateWeatherDetails(combinedData);
+                //     } else {
+                //       console.error("Failed to fetch one or both data sources");
+
+                //       const errorData = {
+                //         rainfallIcon: "",
+                //         rainText: "",
+                //         rainValue: "",
+                //         temp: "",
+                //         mm: "",
+                //         waterDrop: "",
+                //         rainArea: "",
+                //         windDirDeg: "",
+                //         windSpeed: "",
+                //       };
+                //       updateWeatherDetails(errorData);
+                //     }
+                //   })
+                //   .catch((error) => {
+                //     console.error("Promise.all error:", error);
+                //     const errorData = {
+                //       rainfallIcon: "",
+                //       rainText: "",
+                //       rainValue: "",
+                //       temp: "",
+                //       mm: "",
+                //       waterDrop: "",
+                //       rainArea: "",
+                //       windDirDeg: "",
+                //       windSpeed: "",
+                //     };
+                //     updateWeatherDetails(errorData);
+                //   });
+
+                // function updateWeatherDetails({
+                //   rainfallIcon,
+                //   rainText,
+                //   rainValue,
+                //   temp,
+                //   mm,
+                //   waterDrop,
+                //   rainArea,
+                //   windDirDeg,
+                //   windSpeed,
+                // }) {
+
+                //   const rainIcon = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
+                //   ? `${rainfallIcon}` 
+                //   : "";
+
+                // const rainIconStyle = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
+                //   ? ""
+                //   : "opacity: 0";
+                //   const formattedTemp = (temp !== undefined && temp !== null && temp !== "") 
+                //   ? `${temp} °C` 
+                //   : "";
+                //   const formattedRainArea = (rainArea !== undefined && rainArea !== null && rainArea !== "")
+                //       ? `${rainArea}% ของพื้นที่`
+                //       : ``;
+                //   const formattedWindSpeed = (windSpeed !== undefined && windSpeed !== null && windSpeed !== "") 
+                //   ? `${windSpeed} กม./ชม.` 
+                //   : "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน <br>";
+
+                //   const popupDetail = `
+                //     <div style="padding:0.5rem;">
+                //       <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
+                //       <span style="font-size: 14px;"></span>
+                
+                //       <img style="width: 30px; vertical-align: middle; ${rainIconStyle}" src="${rainIcon}" alt="Rainfall Icon" />
+
+                //       <span style="color: #a6a4a4; font-size: 16px;">${formattedTemp}</span>
+                //       <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
+                //       <span id="rainPer-pop"></span><span id="wind"></span></br>
+                //       <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${formattedRainArea}</span>
+                //       <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${formattedWindSpeed}</span><br />
+                
+                //       <span style="font-size: 12px;">ค่า PM2.5</span><br />
+                //       <span id="value" style="fontWeight: 'bold', fontSize: '30px'">
+                //         <span style="color: ${color}; font-weight: bold; font-size: 30px;">
+                //           ${pm25Formatted}
+                //         </span>
+                //       </span>
+                //       <span style="font-size: 10px;">µg./m3</span>
+                //       <span id="level">
+                //         <span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span><br />
+                //       </span>
+                //       <span id="update" style="font-size: 12px; color: #a6a6a6;">
+                //         อัพเดทล่าสุด ${date} ${time}
+                //       </span>
+                //     </div>
+                //   `;
+
+                //   const popupElement =
+                //     document.getElementById("popup-container");
+                //   if (popupElement) {
+                //     popupElement.innerHTML = popupDetail;
+                //   } else {
+                //     console.log("popup-container not found in DOM");
+                //   }
+
+                //   var popUp = new sphere.Popup(
+                //     { lon: lon, lat: lat },
+                //     {
+                //       title: `
+                //                         <span style='font-weight: 500; margin-left: 0.5rem;'> ตำแหน่งที่สนใจ</span>
+                //                         <span style='font-weight: 400; color: #a6a6a6;'>
+                //                             ${lat.toFixed(4)}, ${lon.toFixed(4)}
+                //                         </span>
+                //                     `,
+                //       detail: loadingHtml,
+                //       loadDetail: updateDetail,
+                //       size: { width: "100%" },
+                //       closable: true,
+                //     }
+                //   );
+
+                //   function updateDetail(element) {
+                //     setTimeout(function () {
+                //       element.innerHTML = popupDetail;
+                //     }, 1000);
+                //   }
+                //   map.Overlays.add(popUp);
+                // }
+              });
+          };
 
       map.Event.bind(sphere.EventName.Click, handleMapClick);
       setPm25ClickHandler(() => handleMapClick);
@@ -1552,11 +1679,14 @@ const MapPM = () => {
           }
         });
 
-        const distances = await Promise.all(routePromises);
+        const distances = await (routePromises);
 
         responseData.forEach((item, index) => {
           const { lat, lon, name, address, tel } = item;
           const distance = distances[index];
+          console.log('---- DISTANCE ----', distance);
+          
+          
 
           const googleMapUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
           const whereMapUrl = `https://where.gistda.or.th/route?dir=${latitude}-${longitude},${lat}-${lon}&result=true&swipe=1`;
@@ -1812,7 +1942,7 @@ const MapPM = () => {
           }
         });
 
-        const distances = await Promise.all(routePromises);
+        const distances = await (routePromises);
 
         responseData.forEach((item, index) => {
           const { lat, lon, name, address, tel } = item;
@@ -2073,7 +2203,7 @@ const MapPM = () => {
           }
         });
 
-        const distances = await Promise.all(routePromises);
+        const distances = await (routePromises);
 
         responseData.forEach((item, index) => {
           const { lat, lon, name, address, tel } = item;
@@ -2491,7 +2621,7 @@ const MapPM = () => {
                 html: `
                             <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                                 <span style="font-family: 'Prompt'; background-color: white; padding: 10px; border-radius: 15px;">${Item.name}</span><br/>
-                                <img src="src/Icon/Marker_Animation.gif" alt="Computer man" style="width:48px;height:48px;">
+                                <img src="/assets/Icon/Marker_Animation.gif" alt="Computer man" style="width:48px;height:48px;">
                             </div>
                             `,
                 offset: { x: 18, y: 21 },
@@ -2590,7 +2720,7 @@ const MapPM = () => {
                 }
               });
 
-              const distances = await Promise.all(routePromises);
+              const distances = await (routePromises);
 
               responseData.forEach((item, index) => {
                 const { lat, lon, name, address, tel } = item;
@@ -2837,7 +2967,7 @@ const MapPM = () => {
                 }
               });
 
-              const distances = await Promise.all(routePromises);
+              const distances = await (routePromises);
 
               responseData.forEach((item, index) => {
                 const { lat, lon, name, address, tel } = item;
@@ -3084,7 +3214,7 @@ const MapPM = () => {
                 }
               });
 
-              const distances = await Promise.all(routePromises);
+              const distances = await (routePromises);
 
               responseData.forEach((item, index) => {
                 const { lat, lon, name, address, tel } = item;
@@ -3435,10 +3565,35 @@ const MapPM = () => {
     map.zoom(currentZoom - 1);
   };
 
-  // const north = function() {
-  //     const map = sphereMapRef.current;
-  //     map.rotate(0, true);
-  // };
+  const compass = () => {
+      const map = sphereMapRef.current;
+      map.goTo({ pitch: 0, bearing: 0});
+    };
+    
+  useEffect(() => {
+    const map = sphereMapRef.current;
+    if (!map) return;
+  
+    const handleRotate = () => {
+  
+      const renderer = map.Renderer;
+      const transform = renderer?.transform;
+  
+      const bearingAngle = transform?.bearing
+      setbearingAngle(bearingAngle);
+    };
+  
+    if (typeof map.Event?.bind === 'function') {
+      map.Event.bind(sphere.EventName.Rotate, handleRotate);
+    }
+  
+    return () => {
+      if (typeof map.Event?.unbind === 'function') {
+        map.Event.unbind(sphere.EventName.Rotate, handleRotate);
+      }
+    };
+  
+  }, [sphereMapRef.current]);
 
   const StreetBase = () => {
     const map = sphereMapRef.current;
@@ -3800,6 +3955,44 @@ const MapPM = () => {
                 labelPlacement="start"
               />
             </FormGroup>
+
+            <Tooltip
+                          title="เข็มทิศ"
+                          arrow
+                          placement="left"
+                          TransitionComponent={Zoom}
+                          componentsProps={{
+                            tooltip: {
+                              sx: {
+                                bgcolor: "#00B2FF",
+                                fontFamily: "Prompt",
+                                "& .MuiTooltip-arrow": {
+                                  color: "#00B2FF",
+                                },
+                              },
+                            },
+                          }}
+                        >
+                          <IconButton
+                            className="location_pm"
+                            onClick={compass}
+                            sx={{
+                              margin: "0.5rem",
+                              boxShadow:
+                                "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                              color: "white",
+                              "&:hover": {
+                                color: "#00B2FF",
+                              },
+                            }}
+                          >
+                            <NavigationIcon 
+                              sx={{ 
+                                    transform: `rotate(${-bearingAngle}deg)`,
+                                    transition: 'transform 0.5s ease',
+                                }}/>
+                          </IconButton>
+                        </Tooltip>
 
             <FormGroup
               className="Zoom"

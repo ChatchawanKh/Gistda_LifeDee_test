@@ -19,7 +19,7 @@ import { Box, Typography, Button } from "@mui/material";
 import MediaCard from "../Card_hid.jsx";
 
 //LEGENDS
-import HIDTmdLegend from "/src/Icon/legend/HID_TMD_Legend.png";
+import HIDTmdLegend from "/assets/Icon/legend/HID_TMD_Legend.png";
 
 //weather icon
 import { renderToString } from "react-dom/server";
@@ -35,6 +35,7 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigationRoundedIcon from "@mui/icons-material/NavigationRounded";
 import WaterDropRoundedIcon from "@mui/icons-material/WaterDropRounded";
 import CloudOffTwoToneIcon from "@mui/icons-material/CloudOffTwoTone";
+// import { Popup } from "@mui/base/Unstable_Popup/Popup.js";
 // import { StrikethroughS } from "@mui/icons-material";
 // import { response } from "express";
 // import { Layers } from "@mui/icons-material";
@@ -57,9 +58,8 @@ const TMDControl = React.forwardRef((props, ref) => {
     }
   }, [dataInfo, dataInf]);
 
-  
   const TmdLegend = document.getElementById("legend");
-    if (TmdLegend) {
+  if (TmdLegend) {
     TmdLegend.src = HIDTmdLegend;
     TmdLegend.style.width = "355px";
     TmdLegend.style.position = "relative";
@@ -67,11 +67,14 @@ const TMDControl = React.forwardRef((props, ref) => {
     TmdLegend.style.left = "0";
     TmdLegend.style.right = "1rem";
     TmdLegend.style.zIndex = "10";
-    }
+  }
 
   const map = sphereMapRef.current;
+   
 
-  useEffect(() => {    
+  useEffect(() => {
+   
+
     const getLoc = async () => {
       try {
         const controller = new AbortController();
@@ -113,8 +116,8 @@ const TMDControl = React.forwardRef((props, ref) => {
           const hidTMDValue = heatIndexResponse.data.value;
           const hid = parseFloat(hidTMDValue);
 
-          const hidUpdateJson =
-            heatIndexResponse.data.catalogItems.features[0].attributes.Date;
+          const hidUpdateJson = heatIndexResponse.data?.catalogItems?.features?.[0]?.attributes?.Date;
+          
 
           const hidUnix = new Date(hidUpdateJson);
           const thaiWeekdays = [
@@ -136,9 +139,14 @@ const TMDControl = React.forwardRef((props, ref) => {
           const locationElement = document.getElementById("location");
           locationElement.innerHTML = `${tb} ${ap} ${pv}`;
 
-          let color, level, strokeColor, strokeWidth;
+          let color, level, strokeColor, strokeWidth,display;
 
-          if (hid <= 32.9) {
+          if (isNaN(hid)) {
+            color = "#999999";
+            level = "ไม่พบข้อมูล";
+            display = "none"
+          }
+            else if (hid <= 32.9) {
             color = "#97C332";
             level = "เฝ้าระวัง";
           } else if (hid >= 33 && hid <= 41.9) {
@@ -158,9 +166,9 @@ const TMDControl = React.forwardRef((props, ref) => {
           const valueElement = document.getElementById("value");
           const levelElement = document.getElementById("level");
 
-          titleElement.innerHTML = `<span style="font-size: 14px; font-weight: 500;">ดัชนีความร้อน โดย กรมอุตุ ฯ (°C)</span></br> `;
+          titleElement.innerHTML = `<span style="font-size: 14px; font-weight: 500; color:#f57542; ">ดัชนีความร้อน โดย กรมอุตุนิยมวิทยา (°C)</span></br> `;
           valueElement.innerHTML = `<span style="color: ${color}; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
-            text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">
+            text-shadow: 0 0 ${strokeWidth}px ${strokeColor}; display: ${display};">
             ${hid.toFixed(1)}
           </span>`;
 
@@ -181,7 +189,7 @@ const TMDControl = React.forwardRef((props, ref) => {
               </span>
             );
             fetch(
-              `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
+              `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
             )
               .then((response) => {
                 if (!response.ok) {
@@ -245,63 +253,61 @@ const TMDControl = React.forwardRef((props, ref) => {
                   }
                 }
 
-                const weatherElement =
-                      document.getElementById("weather");
-                    weatherElement.innerHTML = `
+                const weatherElement = document.getElementById("weather");
+                weatherElement.innerHTML = `
                       ${rainfallIcon ? `<img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}" alt="Rainfall Icon" />` : ReactDOMServer.renderToString(rainfallIcon)}
                       <span style="color: #a6a4a4; font-size: 16px;">${temp || ReactDOMServer.renderToString(forecastStatus)} °C</span>
                     `;
 
-                    // Update rainfall info
-                    const rain = document.getElementById("rainfall");
-                    rain.innerHTML = `
+                // Update rainfall info
+                const rain = document.getElementById("rainfall");
+                rain.innerHTML = `
                       <span style="font-size: 16px; color: #a6a4a4;">
                         ${ReactDOMServer.renderToString(rainText || forecastStatus)}
                         ${rainValue !== undefined ? rainValue : ReactDOMServer.renderToString(forecastStatus)} 
                         ${mm || ""}
                       </span>
                     `;
-                  })
-                  .catch((error) => {
-                    console.error(
-                      "There has been a problem with your fetch operation:",
-                      error
-                    );
+              })
+              .catch((error) => {
+                console.error(
+                  "There has been a problem with your fetch operation:",
+                  error
+                );
 
-                    const weatherElement =
-                      document.getElementById("weather");
-                    weatherElement.innerHTML = `
+                const weatherElement = document.getElementById("weather");
+                weatherElement.innerHTML = `
                       <span style="color: #a6a4a4; font-size: 16px;"></span>
                     `;
 
-                    const rain = document.getElementById("rainfall");
-                    rain.innerHTML = `
+                const rain = document.getElementById("rainfall");
+                rain.innerHTML = `
                       <span style="font-size: 16px; color: #a6a4a4;">
                         
                         </span>
                     `;
 
-                    const rainper = document.getElementById("rainPer");
-                    rainper.innerHTML = `
+                const rainper = document.getElementById("rainPer");
+                rainper.innerHTML = `
                       <span style="font-size: 16px; color: #a6a4a4;">
                         ${ReactDOMServer.renderToString(forecastStatus)}
                         </span>
                     `;
 
-                    const wind = document.getElementById("wind");
-                    wind.innerHTML = `
+                const wind = document.getElementById("wind");
+                wind.innerHTML = `
                       <span style="font-size: 16px; color: #a6a4a4;">
                         
                         </span>
                     `;
-                  });
+              });
           };
           fetchTemp();
 
           const fetchRain = () => {
             const culture = "th-TH";
             fetch(
-              `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
+              `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
             )
               .then((response) => {
                 if (!response.ok) {
@@ -385,7 +391,7 @@ const TMDControl = React.forwardRef((props, ref) => {
           //         function fetchTemp() {
           //           const culture = "th-TH";
           //           return fetch(
-          //             `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
+          //             `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
           //           )
           //             .then((response) => {
           //               if (!response.ok) {
@@ -443,7 +449,7 @@ const TMDControl = React.forwardRef((props, ref) => {
           //         function fetchRain() {
           //           const culture = "th-TH";
           //           return fetch(
-          //             `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
+          //             `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
           //           )
           //             .then((response) => {
           //               if (!response.ok) {
@@ -607,25 +613,23 @@ const TMDControl = React.forwardRef((props, ref) => {
           //                   <div style="padding:0.5rem;">
           //                       <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
           //                       <span style="font-size: 14px;"></span>
-                                
 
-          //                       <img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}" 
+          //                       <img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}"
           //                       alt="Rainfall Icon" /><span style="color: #a6a4a4; font-size: 16px;" >${temp} °C </span>
           //                       <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
           //                       <span id="rainPer-pop"></span><span id="wind"></span></br>
           //                       <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${rainArea}% ของพื้นที่</span>
           //                       <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${windSpeed} กม./ชม.</span><br />
 
-
           //                       <span style="font-size: 12px;">ดัชนีความร้อน °C</span><br />
-          //                       <span id='value' style={{ fontWeight: 'bold', fontSize: '30px' }}><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
+          //                       <span id='value' style={{ fontWeight: 'bold', fontSize: '30px' }}><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor};
           //                       text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">${hidCoor.toFixed(1)} </span></span>
-          //                       <span id="level"><span style="color: ${color}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
+          //                       <span id="level"><span style="color: ${color}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor};
           //                       text-shadow: 0 0 ${strokeWidth}px ${strokeColor};"> ${level}</span><br />
           //                       <span id="updateTMD" style="font-size: 12px; color: #a6a6a6;">
-          //                         อัพเดตล่าสุด วัน${weekday}ที่ ${hidUnix.getDate()} 
-          //                         ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)} 
-          //                         ${hidUnix.getFullYear() + 543} เวลา 
+          //                         อัพเดตล่าสุด วัน${weekday}ที่ ${hidUnix.getDate()}
+          //                         ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)}
+          //                         ${hidUnix.getFullYear() + 543} เวลา
           //                         ${hidUnix.getHours()}:${
           //                           hidUnix.getMinutes() < 10
           //                             ? "0" + hidUnix.getMinutes()
@@ -679,342 +683,167 @@ const TMDControl = React.forwardRef((props, ref) => {
     }
 
     // getLoc();
-    intervalRef.current = setInterval(getLoc, 5000);
+    // intervalRef.current = setInterval(getLoc, 5000);
+    intervalRef.current = setTimeout(getLoc, 5000);
 
   }, []);
 
-
   useEffect(() => {
-
     if (!window.sphere || !map) {
       console.error("Sphere SDK or map is not initialized.");
       return;
     }
-    
-    
+
+    let thBound = new sphere.Layer('0', {
+                    type: sphere.LayerType.WMS,
+                    url: "https://gistdaportal.gistda.or.th/data2/services/L05_Province_GISTDA_50k_nonlabel/MapServer/WMSServer",
+                    zoomRange: { min: 1, max: 15 },
+                    zIndex: 10,
+                    opacity: 0.8,
+                    id: 'L05_Province_GISTDA_50k_nonlabel'
+                })
+                map.Layers.add(thBound);
+
     const handleMapClick = async (event) => {
       if (!event) {
         console.error("Event is null or undefined.");
         return;
-      } 
+      }
 
-        const latTMD = event.lat;
-        const lonTMD = event.lon;
-        // console.log("lat:", latTMD, "lon:", lonTMD);
+      const latTMD = event.lat;
+      const lonTMD = event.lon;
 
-        const response = await axios.get(
-          "https://pm25.gistda.or.th/rest/getPm25byLocation",
-          {
-            params: {
-              lat: latTMD,
-              lng: lonTMD,
-            },
-          }
-        );
-
-        const pm25Data = response.data;
-        const tb = pm25Data.data?.loc?.["tb_tn"];
-        const ap = pm25Data.data?.loc?.["ap_tn"];
-        const pv = pm25Data.data?.loc?.["pv_tn"];
-
-        function fetchTemp() {
-                    const culture = "th-TH";
-                    const url = `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`;
-                    
-                    return fetch(url)
-                      .then((response) => {
-                        if (!response.ok) {
-                          throw new Error(`fetchTemp response not ok: ${response.statusText}`);
-                        }
-                        return response.json();
-                      })
-                      .then((data) => {
-                        if (!data.weather3Hour) {
-                          throw new Error("Missing weather3Hour in fetchTemp");
-                        }
-                  
-                        const { dryBlubTemperature, rainfall } = data.weather3Hour;
-                        const temp = dryBlubTemperature.toFixed(0);
-                  
-                        let rainfallIcon, rainText = "ฝนตก", rainValue = rainfall, mm = "มม.";
-                        if (rainfall < 0.1) {
-                          rainfallIcon = noRain;
-                          rainText = "ไม่มีฝนตก";
-                          rainValue = "";
-                          mm = "";
-                        } else if (rainfall <= 10) {
-                          rainfallIcon = lightRain;
-                        } else if (rainfall <= 35) {
-                          rainfallIcon = moderateRain;
-                        } else if (rainfall <= 90) {
-                          rainfallIcon = heavyRain;
-                        } else {
-                          rainfallIcon = veryHeavyRain;
-                        }
-                  
-                        return { rainfallIcon, rainText, rainValue, temp, mm };
-                      })
-                      .catch((error) => {
-                        console.error("fetchTemp error:", error);
-                        throw error;
-                      });
+      const pm25Promise = await axios.get(
+        "https://pm25.gistda.or.th/rest/getPm25byLocation",
+        {
+          params: {
+            lat: latTMD,
+            lng: lonTMD,
+          },
         }
+      );
 
-        function fetchRain() {
-          const culture = "th-TH";
-          const url = `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`;
+      const loctext = pm25Promise.data.data.loc.loctext;
+
+      const dataInfElement = document.getElementById("dataInf");
+      const dataDate = dataInfElement.dataset.date;
+      const apiTime = new Date(dataDate).getTime();
+
+      const heatIndexPromise = await axios.get(
+        "https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/heatindex_image_data/ImageServer/identify",
+        {
+          params: {
+            geometry: `{y:${latTMD},x:${lonTMD}}`,
+            geometryType: "esriGeometryPoint",
+            time: encodeURIComponent(apiTime),
+            returnGeometry: false,
+            returnCatalogItems: true,
+            returnPixelValues: true,
+            processAsMultidimensional: false,
+            maxItemCount: 10,
+            f: "pjson",
+          },
+        }
+      );
+
+      const hidCoorRaw = heatIndexPromise.data.value;
+      const hidCoor = Number(hidCoorRaw);
+      const hid = hidCoor.toFixed(1);
+      const hidUpdateJson =
+        heatIndexPromise.data.catalogItems.features[0].attributes.Date;
+
+      const hidUnix = new Date(hidUpdateJson);
+      const thaiWeekdays = [
+        "อาทิตย์",
+        "จันทร์",
+        "อังคาร",
+        "พุธ",
+        "พฤหัส",
+        "ศุกร์",
+        "เสาร์",
+      ];
+      const weekday = thaiWeekdays[hidUnix.getDay()];
+
+      // กำหนดสถานะ Heat Index
+      let textColor,
+        level,
+        strokeColor = "",
+        strokeWidth = "",
+        display = "";
+
+      if (isNaN(hid)) {
+        textColor = "#999999";
+        level = "ไม่พบข้อมูล";
+        display = "none"
+      }  
+        else if (hid <= 32.9) {
+        textColor = "#97C332";
+        level = "เฝ้าระวัง";
+      } else if (hid >= 33 && hid <= 41.9) {
+        textColor = "#FACF39";
+        strokeColor = "#00000099";
+        strokeWidth = "1";
+        level = "เตือนภัย";
+      } else if (hid >= 42 && hid <= 51.9) {
+        textColor = "#FC8C2A";
+        level = "อันตราย";
+      } else {
+        textColor = "#FC371E";
+        level = "อันตรายมาก";
+      }
+
+      const initialPopupContent = `
+        <div style="padding:0.5rem;">
+          <span style='font-weight: 600; font-size: 16px; display: ${display}'>${loctext}</span> <br />
+
+          <span id="weather_click"></span>
+          <span id="rainfall_click"></span>
           
-          return fetch(url)
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`Network response was not ok: ${response.statusText}`);
-              }
-              return response.json();
-            })
-            .then((data) => {
-              const forecastData = data[0];
-              if (forecastData && forecastData.weatherForecast7Day) {
-                const weatherForecast = forecastData.weatherForecast7Day;
-                const { rainArea, windSpeed, windDirection: windDir } = weatherForecast;
-        
-                const windDirDeg = renderToString(
-                  <NavigationRoundedIcon
-                    style={{
-                      color: "#758CA3",
-                      width: 18,
-                      verticalAlign: "middle",
-                      transform: `rotate(${windDir}deg)`,
-                    }}
-                  />
-                );
-        
-                const waterDrop = renderToString(
-                  <WaterDropRoundedIcon
-                    style={{
-                      color: "#56c8f5",
-                      width: 18,
-                      verticalAlign: "middle",
-                    }}
-                  />
-                );
-        
-                return { waterDrop, rainArea, windDirDeg, windSpeed };
-              } else {
-                console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
-                return {
-                  waterDrop: null,
-                  rainArea: null,
-                  windDirDeg: null,
-                  windSpeed: null,
-                };
-              }
-            })
-            .catch((error) => {
-              console.error("fetchRain error:", error);
-              throw error;
-            });
+          <span id="rainPer_click"></span>
+          <span id="wind_click"></span>
+
+          <span style="font-size: 12px;">ดัชนีความร้อน °C</span><br />
+          <span id='value' style="font-weight: bold; font-size: 30px;">
+            <span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
+            text-shadow: 0 0 ${strokeWidth}px ${strokeColor}; display: ${display};">${hid} </span>
+          </span>
+          <span id="level">
+            <span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
+            text-shadow: 0 0 ${strokeWidth}px ${strokeColor}; "> ${level}</span>
+          </span><br />
+
+          <span id="updateTMD" style="font-size: 12px; color: #a6a6a6; display: ${display}">
+            อัพเดตล่าสุด วัน${weekday}ที่ ${hidUnix.getDate()} 
+            ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)} 
+            ${hidUnix.getFullYear() + 543} เวลา 
+            ${hidUnix.getHours()}:${
+              hidUnix.getMinutes() < 10
+                ? "0" + hidUnix.getMinutes()
+                : hidUnix.getMinutes()
+            } น.
+          </span>
+        </div>
+      `;
+
+      var popUp = new sphere.Popup(
+        { lon: lonTMD, lat: latTMD },
+        {
+          title: `
+            <span style='font-weight: 500; margin-left: 0.5rem;'>ตำแหน่งที่สนใจ</span>
+            <span style='font-weight: 400; color: #a6a6a6;'>
+                ${latTMD.toFixed(4)}, ${lonTMD.toFixed(4)}
+            </span>
+          `,
+          detail: initialPopupContent,
+          size: { width: "100%" },
+          closable: true,
         }
+      );
 
-        const dataInfElement = document.getElementById("dataInf");
-        const dataDate = dataInfElement.dataset.date;
-        const apiTime = new Date(dataDate).getTime();
+      map.Overlays.add(popUp);
+    };
 
-        const heatIndexResponse = await axios.get(
-          "https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/heatindex_image_data/ImageServer/identify",
-          {
-            params: {
-              geometry: `{y:${latTMD},x:${lonTMD}}`,
-              geometryType: "esriGeometryPoint",
-              time: encodeURIComponent(apiTime),
-              returnGeometry: false,
-              returnCatalogItems: true,
-              returnPixelValues: true,
-              processAsMultidimensional: false,
-              maxItemCount: 10,
-              f: "pjson",
-            },
-          }
-        );
-
-        const hidTMDValueCoor = heatIndexResponse.data?.value;
-        const hidCoor = parseFloat(hidTMDValueCoor);
-  
-        const hidUpdateJson =
-          heatIndexResponse.data.catalogItems.features[0].attributes.Date;
-
-        const hidUnix = new Date(hidUpdateJson);
-        const thaiWeekdays = [
-          "อาทิตย์",
-          "จันทร์",
-          "อังคาร",
-          "พุธ",
-          "พฤหัส",
-          "ศุกร์",
-          "เสาร์",
-        ];
-        const weekday = thaiWeekdays[hidUnix.getDay()];
-
-        let textColor, level, strokeColor, strokeWidth;
-
-        if (hidCoor <= 32.9) {
-          textColor = "#97C332";
-          level = "เฝ้าระวัง";
-        } else if (hidCoor >= 33 && hidCoor <= 41.9) {
-          textColor = "#FACF39";
-          strokeColor = "#00000099";
-          strokeWidth = "1";
-          level = "เตือนภัย";
-        } else if (hidCoor >= 42 && hidCoor <= 51.9) {
-          textColor = "#FC8C2A";
-          level = "อันตราย";
-        } else {
-          textColor = "#FC371E";
-          level = "อันตรายมาก";
-        }
-
-        const loadingHtml = `
-            <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
-                <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
-                <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
-            </div>
-            <style>
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            </style>
-        `;
-
-        Promise.all([fetchTemp(), fetchRain()])
-                  .then(([tempData, rainData]) => {
-                    console.log("Promise.all resolved data:", {
-                      tempData,
-                      rainData,
-                    });
-                    if (tempData && rainData) {
-                      const combinedData = { ...tempData, ...rainData };
-                      updateWeatherDetails(combinedData);
-                    } else {
-                      console.error("Failed to fetch one or both data sources");
-
-                      const errorData = {
-                        rainfallIcon: "",
-                        rainText: "",
-                        rainValue: "",
-                        temp: "",
-                        mm: "",
-                        waterDrop: "",
-                        rainArea: "",
-                        windDirDeg: "",
-                        windSpeed: "",
-                      };
-                      updateWeatherDetails(errorData);
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Promise.all error:", error);
-                    const errorData = {
-                      rainfallIcon: "",
-                      rainText: "",
-                      rainValue: "",
-                      temp: "",
-                      mm: "",
-                      waterDrop: "",
-                      rainArea: "",
-                      windDirDeg: "",
-                      windSpeed: "",
-                    };
-                    updateWeatherDetails(errorData);
-                  });
-
-                function updateWeatherDetails({
-                  rainfallIcon,
-                  rainText,
-                  rainValue,
-                  temp,
-                  mm,
-                  waterDrop,
-                  rainArea,
-                  windDirDeg,
-                  windSpeed,
-                }) {
-                const rainIcon = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? `${rainfallIcon}` 
-                  : "";
-
-                const rainIconStyle = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? ""
-                  : "opacity: 0";
-                  const formattedTemp = (temp !== undefined && temp !== null && temp !== "") 
-                  ? `${temp} °C` 
-                  : "";
-                  const formattedRainArea = (rainArea !== undefined && rainArea !== null && rainArea !== "")
-                      ? `${rainArea}% ของพื้นที่`
-                      : ``;
-                  const formattedWindSpeed = (windSpeed !== undefined && windSpeed !== null && windSpeed !== "") 
-                  ? `${windSpeed} กม./ชม.` 
-                  : "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน <br>";
-
-          const popupDetail = `
-                  <div style="padding:0.5rem;">
-                      <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
-                      <span style="font-size: 14px;"></span>
-                
-                      <img style="width: 30px; vertical-align: middle; ${rainIconStyle}" src="${rainIcon}" alt="Rainfall Icon" />
-                      <span style="color: #a6a4a4; font-size: 16px;">${formattedTemp}</span>
-                      <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
-                      <span id="rainPer-pop"></span><span id="wind"></span></br>
-                      <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${formattedRainArea}</span>
-                      <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${formattedWindSpeed}</span><br />
-
-
-                      <span style="font-size: 12px;">ดัชนีความร้อน °C</span><br />
-                      <span id='value' style={{ fontWeight: 'bold', fontSize: '30px' }}><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
-                      text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">${hidCoor.toFixed(1)} </span></span>
-                      <span id="level"><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
-                      text-shadow: 0 0 ${strokeWidth}px ${strokeColor};"> ${level}</span><br />
-                      <span id="updateTMD" style="font-size: 12px; color: #a6a6a6;">
-                        อัพเดตล่าสุด วัน${weekday}ที่ ${hidUnix.getDate()} 
-                        ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)} 
-                        ${hidUnix.getFullYear() + 543} เวลา 
-                        ${hidUnix.getHours()}:${
-                          hidUnix.getMinutes() < 10
-                            ? "0" + hidUnix.getMinutes()
-                            : hidUnix.getMinutes()
-                        } น.
-                      </span>
-                  </div>
-                `;
-
-          var popUp = new sphere.Popup(
-            { lon: lonTMD, lat: latTMD },
-            {
-              title: `
-                <span style='font-weight: 500; margin-left: 0.5rem;'>ตำแหน่งที่สนใจ</span>
-                <span style='font-weight: 400; color: #a6a6a6;'>
-                    ${latTMD.toFixed(4)}, ${lonTMD.toFixed(4)}
-                </span>
-            `,
-              detail: loadingHtml,
-              loadDetail: updateDetail,
-              size: { width: "100%" },
-              closable: true,
-            }
-          );
-
-          // eslint-disable-next-line no-inner-declarations
-          function updateDetail(element) {
-            setTimeout(function () {
-              element.innerHTML = popupDetail;
-            }, 1000);
-          }
-          map.Overlays.add(popUp);
-        }
-          
-
-    }
     map.Event.bind(sphere.EventName.Click, handleMapClick);
-    
   }, [map]);
 
   const createLayer = (tmdTime, layerName = "heatindex_image_data") => {
@@ -1051,12 +880,10 @@ const TMDControl = React.forwardRef((props, ref) => {
     ];
 
     // Adjust date based on the step
-    today.setDate(today.getDate() - 1 + step);
+    today.setDate((today.getDate()) - 1 + step);
     const layerDay = String(today.getDate()).padStart(2, "0");
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const year = today.getFullYear();
-
-    console.log(layerDay, month, year);
 
     // getLoc(layerDay, month, year);
 
@@ -1075,7 +902,6 @@ const TMDControl = React.forwardRef((props, ref) => {
     if (layerAttr) {
       // Set the data-date attribute
       layerAttr.setAttribute("data-date", currentTime);
-      console.log(layerAttr);
 
       // Update the innerHTML
       layerAttr.innerHTML = `วันที่ ${layerDay}-${nextLayerDayFormatted} ${monthNames[today.getMonth()]} ${year + 543}`;
@@ -1135,7 +961,7 @@ const TMDControl = React.forwardRef((props, ref) => {
     } else {
       intervalRef.current = setInterval(() => {
         setActiveStep((prevActiveStep) => {
-          const newStep = prevActiveStep < 11 ? prevActiveStep + 1 : 1;
+          const newStep = prevActiveStep < 9 ? prevActiveStep + 1 : 1;
           updateLayer({ step: newStep });
 
           if (newStep > 10) {
@@ -1151,13 +977,11 @@ const TMDControl = React.forwardRef((props, ref) => {
   };
 
   const handleSlide = (newStep) => {
-    console.log("New step:", newStep);
     satlayRef.current = newStep;
 
     clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
       setActiveStep(() => {
-        console.log("Updating active step to:", newStep);
         updateLayer({ step: newStep });
         return newStep;
       });
@@ -1166,7 +990,7 @@ const TMDControl = React.forwardRef((props, ref) => {
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => {
-      const nextStep = Math.min(prevActiveStep + 1, 10);
+      const nextStep = Math.min(prevActiveStep + 1, 9);
       updateLayer({ step: nextStep });
       return nextStep;
     });
@@ -1183,7 +1007,6 @@ const TMDControl = React.forwardRef((props, ref) => {
 
   useEffect(() => {
     if (sphereMapRef.current) {
-      console.log("Directly calling updateLayer...");
       updateLayer({ step: 1 });
     }
   }, [sphereMapRef.current]);
@@ -1369,11 +1192,6 @@ const TMDControl = React.forwardRef((props, ref) => {
             <Typography
               id="dataInf"
               dataDate=""
-              // ref={(node) => {
-              //     dataInfRef.current = node;
-              //     if (typeof ref === 'function') ref(node); // Call the ref callback if it's a function
-              //     else if (ref) ref.current = node; // Set the ref object if it's an object
-              // }}
               className="dateTimeUpdate"
               variant="subtitle1"
               display="block"
@@ -1384,14 +1202,16 @@ const TMDControl = React.forwardRef((props, ref) => {
           </Box>
 
           <Slider
+            // size="small"
+            // aria-label="Small"
+            
             defaultValue={activeStep}
             shiftStep={1}
-            max={10}
+            max={9}
             min={1}
             step={1}
             marks
             onChange={(_, value) => handleSlide(value)}
-            // onChange={handleSlide}
 
             // onChange={(e, newValue) => {
             //   if (typeof newValue === "number") {
@@ -1402,11 +1222,13 @@ const TMDControl = React.forwardRef((props, ref) => {
 
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => value}
-            slots={{
-              valueLabel: (props) => (
-                <SliderValueLabel {...props} value={activeStep} />
-              ),
-            }}
+
+            // slots={{
+            //   valueLabel: (props) => (
+            //     <SliderValueLabel aria-label="Default" {...props} value={activeStep} />
+            //   ),
+            // }}
+
             sx={{
               height: "75px",
               padding: "0",
@@ -1436,7 +1258,7 @@ const TMDControl = React.forwardRef((props, ref) => {
 
           <MobileStepper
             variant="progress"
-            steps={10}
+            steps={9}
             position="static"
             activeStep={activeStep}
             sx={{
@@ -1477,13 +1299,13 @@ const TMDControl = React.forwardRef((props, ref) => {
               <Button
                 size="small"
                 onClick={handleNext}
-                disabled={activeStep === 10}
+                disabled={activeStep === 9}
               >
                 {theme.direction === "rtl" ? (
                   <NavigateBeforeIcon
                     sx={{
                       color:
-                        activeStep === 10
+                        activeStep === 9
                           ? "rgba(128, 128, 128, 0.5)"
                           : "#FF10900",
                       fontSize: "3rem",
@@ -1493,7 +1315,7 @@ const TMDControl = React.forwardRef((props, ref) => {
                   <NavigateNextIcon
                     sx={{
                       color:
-                        activeStep === 10
+                        activeStep === 9
                           ? "rgba(128, 128, 128, 0.5)"
                           : "#FF9900",
                       fontSize: "3rem",

@@ -14,8 +14,11 @@ import LinearDeterminate from './Component/LoadingPage.jsx';
 
 // Lazy load components
 const MapPM = lazy(() => import('./Component/PM25/MapPM'));
-const MapHID = lazy(() => import('./Component/HID/MapHID'));
+const MapHID = lazy(() => import('./Component/HID/MapHID.jsx'));
 const MapDangue = lazy(() => import('./Component/Dangue/MapDangue'));
+const MapRcpNKH = lazy(() => import('./Component/Rcp/MapRcpNKH'));
+const MapLam = lazy(() => import('./Component/LAMCH/MapLam.jsx'));
+const MapDrowning = lazy(() => import('./Component/Drowning/MapDrowning.jsx'));
 
 const router = createBrowserRouter([
   {
@@ -45,6 +48,30 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<LinearDeterminate />}>
         <MapDangue />
+      </Suspense>
+    )
+  },
+  {
+    path: 'rcp',
+    element: (
+      <Suspense fallback={<LinearDeterminate />}>
+        <MapRcpNKH />
+      </Suspense>
+    )
+  },
+  {
+    path: 'lamch',
+    element: (
+      <Suspense fallback={<LinearDeterminate />}>
+        <MapLam />
+      </Suspense>
+    )
+  },
+  {
+    path: 'drowning',
+    element: (
+      <Suspense fallback={<LinearDeterminate />}>
+        <MapDrowning />
       </Suspense>
     )
   },

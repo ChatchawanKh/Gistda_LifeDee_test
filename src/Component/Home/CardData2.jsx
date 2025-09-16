@@ -1,22 +1,17 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Highcharts, { color } from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import "./CardData2.css";
+import AnimatedSection from "./AnimatedSection";
 
 // Rain Icons
-import Rain1 from "/src/Icon/0_no_rain.svg";
-import Rain2 from "/src/Icon/1_light_rain.svg";
-import Rain3 from "/src/Icon/2_moderate_rain.svg";
-import Rain4 from "/src/Icon/3_heavy_rain.svg";
-import Rain5 from "/src/Icon/4_very_heavy.svg";
-
-//hid level
-import HID1 from "/src/Icon/hid_level_1.png";
-import HID2 from "/src/Icon/hid_level_2.png";
-import HID3 from "/src/Icon/hid_level_3.png";
-import HID4 from "/src/Icon/hid_level_4.png";
+import Rain1 from "/assets/Icon/0_no_rain.svg";
+import Rain2 from "/assets/Icon/1_light_rain.svg";
+import Rain3 from "/assets/Icon/2_moderate_rain.svg";
+import Rain4 from "/assets/Icon/3_heavy_rain.svg";
+import Rain5 from "/assets/Icon/4_very_heavy.svg";
 
 //MUI
 import AirRoundedIcon from "@mui/icons-material/AirRounded";
@@ -27,24 +22,19 @@ import SentimentDissatisfiedRoundedIcon from "@mui/icons-material/SentimentDissa
 import Button from "@mui/material/Button";
 
 //Logo
-import gistda_logo from "/src/Icon/Gistda_LOGO.png";
-import MeteoLogo from "/src/Icon/meteo.png";
-import moph_logo from "/src/Icon/moph_logo.png";
-import PcLogo from "/src/Icon/pc.png";
-import Sunset from "/src/Icon/sunset_4229285.png";
-import pm_card_bg from "/src/Icon/pm25_card_bg.png";
-import MHESI from "/src/Icon/MHESI.png";
+import gistda_logo from "/assets/Icon/Gistda_LOGO.png";
+import MeteoLogo from "/assets/Icon/meteo.png";
+import moph_logo from "/assets/Icon/moph_logo.png";
+import MHESI from "/assets/Icon/MHESI.png";
 
 // Format Date and Time
 import { format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 
-import FetchHeatIndexData from "./FetchHeatIndexData";
-import { Padding } from "@mui/icons-material";
-
 const CardData = () => {
   // State for location, PM25, weather, and rain data //
   const [location, setLocation] = useState({ tb: "", ap: "", pv: "" });
+  const [latlon, setLatlon] = useState({ lat: "", lon: "" });
   const [pm25, setPm25] = useState(null);
   const [updatepmTime, setUpdatepmTime] = useState("");
   const [weatherData, setWeatherData] = useState(null);
@@ -55,10 +45,8 @@ const CardData = () => {
   const [loading, setLoading] = useState(true);
   const [Error, setError] = useState(null);
 
-  const [loadingPM, setLoadingPM] = useState(true);
-  const [loadingAQI, setLoadingAQI] = useState(true);
-  const [loadingDNG, setLoadingDNG] = useState(true);
-  const [loadingHID, setLoadingHID] = useState(true);
+  const [adjustedUnixMs, setAdjustedUnixMs] = useState(null);
+  const [adjustedHour, setAdjustedHour] = useState(null);
 
   const navigate = useNavigate();
 
@@ -66,6 +54,8 @@ const CardData = () => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        setLatlon({ lat: latitude, lon: longitude });
+
         try {
           const pm25Response = await axios.get(
             `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${latitude}&lng=${longitude}`
@@ -123,7 +113,7 @@ const CardData = () => {
           setUpdatepmTime(`อัพเดทล่าสุด: ${date} ${time}`);
 
           setTimeout(() => {
-            setLoadingPM(false);
+            // setLoadingPM(false);
           }, 1500);
 
           // Fetch Data (Weather, AQI, Heat Index, Dengue)
@@ -131,6 +121,8 @@ const CardData = () => {
           fetchWeatherData(pv);
           fetchRainData(pv);
           AQIValues(latitude, longitude);
+          const unixTime = getAdjustedUnixTime(); // เรียกใช้และเก็บค่า
+          fetchHIDValues(unixTime); // ใช้ค่าทันที
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -158,11 +150,11 @@ const CardData = () => {
   const fetchWeatherData = async (pv) => {
     setLoading(true);
     await fetchData(
-      `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=th-TH`,
+      `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=th-TH`,
       (data) => {
         const temp = data.weather3Hour.dryBlubTemperature.toFixed(0);
         const rainfall = data.weather3Hour.rainfall;
-        console.log("rainfall", rainfall);
+        // console.log("rainfall", rainfall);
         const updateTimeWeather = data.weather3Hour.recordTime;
         setWeatherData(temp);
         setRainData(rainfall);
@@ -181,7 +173,7 @@ const CardData = () => {
   const fetchRainData = async (pv) => {
     setLoading(true);
     await fetchData(
-      `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=th-TH`,
+      `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=th-TH`,
       (data) => {
         const rainArea = data[0].weatherForecast7Day.rainArea;
         const windSpeed = data[0].weatherForecast7Day.windSpeed;
@@ -222,7 +214,7 @@ const CardData = () => {
       setAQI(null);
       setStation(null);
 
-      const response = await axios.get("https://172.27.173.43:4000/getAQI");
+      const response = await axios.get("https://life-dee-proxy-552507355198.asia-southeast1.run.app/getAQI");
       const stations = response.data.stations;
 
       let nearestStation = null;
@@ -261,28 +253,196 @@ const CardData = () => {
           setAQIDateUpdate(formattedDateTime);
           setStation(nearestStation.nameTH);
           setTimeout(() => {
-            setLoadingAQI(false);
+            // setLoadingAQI(false);
           }, 1500);
         } else {
           setErrorMessage("ไม่พบข้อมูล");
           setAQI("ไม่มีข้อมูล");
           setStation("ไม่มีข้อมูล");
-          setLoadingAQI(false);
+          // setLoadingAQI(false);
         }
       } else {
         setErrorMessage("ไม่มีสถานีที่อยู่ใกล้เคียง");
         setAQI("-");
         setStation("ไม่มีสถานีที่อยู่ใกล้เคียง");
-        setLoadingAQI(false);
+        // setLoadingAQI(false);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
       setErrorMessage("ไม่สามารถดึงข้อมูลAQI ได้");
       setAQI("-");
       setStation("-");
-      setLoadingAQI(false);
+      // setLoadingAQI(false);
     }
   };
+
+  // Varibles for HID //
+  const [HIDValue, setHIDValue] = useState(null);
+  const [HIDDateUpdate, setHIDDateUpdate] = useState(null);
+  const HIDDes = getHeatIndexLevel(HIDValue);
+
+  const getAdjustedUnixTime = () => {
+    const now = new Date();
+    const localDate = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    const hour = localDate.getUTCHours();
+    const baseHour = 1;
+    const interval = 3;
+
+    let adjustedHour;
+    if (hour < baseHour) {
+      adjustedHour = baseHour;
+    } else {
+      adjustedHour =
+        baseHour + Math.floor((hour - baseHour) / interval) * interval;
+    }
+
+    const adjustedDate = new Date(
+      Date.UTC(
+        localDate.getUTCFullYear(),
+        localDate.getUTCMonth(),
+        localDate.getUTCDate(),
+        adjustedHour - 7,
+        0,
+        0,
+        0
+      )
+    );
+
+    const ms = adjustedDate.getTime();
+    setAdjustedUnixMs(ms);
+    setAdjustedHour(adjustedHour);
+
+    return ms; // ✅ return ค่านี้ด้วย
+  };
+
+  const fetchHID = async (url, onSuccess, onError) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      onSuccess(data);
+    } catch (error) {
+      onError(error);
+    }
+  };
+  const formatUnixtoThaiDate = (unixMs) => {
+    const date = new Date(unixMs);
+
+    const days = [
+      "อาทิตย์",
+      "จันทร์",
+      "อังคาร",
+      "พุธ",
+      "พฤหัสบดี",
+      "ศุกร์",
+      "เสาร์",
+    ];
+    const months = [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12",
+    ];
+
+    const dayName = days[date.getDay()];
+    const dateNum = date.getDate();
+    const monthName = months[date.getMonth()];
+    const year = date.getFullYear() + 543;
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minute = String(date.getMinutes()).padStart(2, "0");
+
+    return `${dateNum}/${monthName}/${year} ${hour}:${minute} น.`;
+  };
+
+  const fetchHIDValues = async (adjustedUnixMs) => {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude: lat, longitude: lon } = position.coords;
+
+        await fetchHID(
+          `https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/heatindex_image_data/ImageServer/identify?geometry={x:${lon},y:${lat}}&time=${adjustedUnixMs}&geometryType=esriGeometryPoint&returnGeometry=false&returnCatalogItems=true&returnPixelValues=false&f=json`,
+          (data) => {
+            const HIDvalue = data.value;
+            const HIDdate = data.catalogItems.features[0].attributes.Date;
+            const numericValue = parseFloat(HIDvalue);
+
+            if (!isNaN(numericValue)) {
+              const HIDvalueFormat = parseFloat(numericValue.toFixed(1));
+              setHIDValue(HIDvalueFormat);
+            } else {
+              console.warn("Invalid HIDvalue:", HIDvalue);
+              setHIDValue(null);
+            }
+
+            // แปลงวันที่ภาษาไทย
+            const formattedDate = formatUnixtoThaiDate(HIDdate);
+            setHIDDateUpdate(formattedDate);
+
+            // console.log(HIDvalue);
+            // console.log(HIDdate);
+            // console.log(adjustedUnixMs);
+          },
+          (error) => {
+            setError(error);
+          }
+        );
+
+        setLoading(false);
+      },
+      (geoError) => {
+        console.error("Geolocation error:", geoError);
+        setError(geoError);
+        setLoading(false);
+      }
+    );
+  };
+
+  function getHeatIndexLevel(hiValue) {
+    if (hiValue >= 27 && hiValue <= 32) {
+      return {
+        level: "ระดับเฝ้าระวัง",
+        effect:
+          "อ่อนเพลีย เวียนศีรษะ คลื่นไส้ อาเจียน ปวดศีรษะ ปวดเมื่อยตามตัวจากการสัมผัสความร้อน หรือออกกำลังกาย/ทำงานท่ามกลางอากาศร้อน",
+        color: "#92D050",
+      };
+    } else if (hiValue > 32 && hiValue <= 41) {
+      return {
+        level: "ระดับเตือนภัย",
+        effect:
+          "เกิดอาการตะคริวจากความร้อน และอาจเกิดอาการเพลียแดด (Heat Exhaustion) หากสัมผัสความร้อนเป็นเวลานาน",
+        color: "#FCC314",
+      };
+    } else if (hiValue > 41 && hiValue <= 54) {
+      return {
+        level: "ระดับอันตราย",
+        effect:
+          "มีอาการตะคริวที่น่อง ต้นขา หน้าท้อง หรือไหล่ ทำให้ปวดเกร็ง มีอาการเพลียแดด และอาจเกิดภาวะลมแดด (Heat Stroke) ได้ หากสัมผัสความร้อนเป็นเวลานาน",
+        color: "#F69021",
+      };
+    } else if (hiValue > 54) {
+      return {
+        level: "ระดับอันตรายมาก",
+        effect:
+          "เกิดภาวะลมแดด (Heat Stroke) โดยมีอาการตัวร้อน เวียนศีรษะ หน้ามืด ช็อก ระบบอวัยวะต่าง ๆ ล้มเหลว และทำให้เสียชีวิตได้ หากสัมผัสความร้อนติดต่อกันหลายวัน",
+        color: "#F34B2D",
+      };
+    } else {
+      return {
+        level: "ต่ำกว่าเกณฑ์",
+        effect: "ไม่มีผลกระทบที่รุนแรงจากความร้อน",
+      };
+    }
+  }
 
   const formatDate = (date) => {
     const zonedDate = formatInTimeZone(date, "UTC", "yyyy-MM-dd");
@@ -295,7 +455,7 @@ const CardData = () => {
 
   const getPm25Color = (pm25) => {
     if (pm25 < 15) return "#2AB9C6";
-    if (pm25 <= 25) return "#06D001";
+    if (pm25 <= 25) return "#92D050";
     if (pm25 <= 37.5) return "#FCC314";
     if (pm25 <= 75) return "#F69021";
     return "#F34B2D";
@@ -320,6 +480,7 @@ const CardData = () => {
   };
 
   const getAQILevelDescription = (AQI) => {
+    if (AQI < 0) return "ไม่มีข้อมูลให้บริการในขณะนี้ ขออภัยในความไม่สะดวก";
     if (AQI < 26)
       return "คุณภาพอากาศดีมาก เหมาะสำหรับกิจกรรมกลางแจ้งและการท่องเที่ยว";
     if (AQI <= 50) return "คุณภาพอากาศดี สามารถทำกิจกรรมกลางแจ้งได้ตามปกติ";
@@ -329,13 +490,12 @@ const CardData = () => {
       return "เริ่มมีผลกระทบต่อสุขภาพ ใช้อุปกรณ์ป้องกันตนเองหากมีความจำเป็น";
     if (AQI >= 201)
       return "มีผลกระทบต่อสุขภาพ ประชาชนทุกคนควรงดกิจกรรมกลางแจ้ง";
-    return "ไม่มีข้อมูลให้บริการในขณะนี้ ขออภัยในความไม่สะดวก";
   };
 
   const getAqiColor = (aqi) => {
     if (aqi <= 25) return "#00B2C2"; // ดีมาก
     if (aqi <= 50) return "#92D050"; // ดี
-    if (aqi <= 100) return "#F4E022"; // ปานกลาง
+    if (aqi <= 100) return "#FECD30"; // ปานกลาง
     if (aqi <= 200) return "#FFA200"; // เริ่มมีผลกระทบต่อสุขภาพ
     return "#FF3B3B"; // มีผลกระทบต่อสุขภาพ
   };
@@ -449,12 +609,12 @@ const CardData = () => {
     },
     plotOptions: {
       areaspline: {
-        color: pmColor || "#32CD32", // Default to green if pmColor is null
+        color: pmColor || "#F5F5F5", // Default to green if pmColor is null
         fillColor: {
           linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
           stops: [
-            [0, pmColor || "#32CD32"], // Default to green
-            [1, `${pmColor || "#32CD32"}00`], // Transparent
+            [0, pmColor || "#F5F5F5"], // Default to green
+            [1, `${pmColor || "#F5F5F5"}00`], // Transparent
           ],
         },
         threshold: null,
@@ -503,7 +663,7 @@ const CardData = () => {
   return (
     <section className="card-data-container">
       <div className="card-data-box">
-        <div className="card-data-head">
+        <AnimatedSection className="card-data-head" delay="delay-1">
           <div className="card-data-header">
             <h1>บริการข้อมูลด้านสุขภาพ</h1>
             <div className="card-data-head-logo">
@@ -514,15 +674,15 @@ const CardData = () => {
               <img src={MeteoLogo} alt="meteo" />
             </div>
           </div>
-        </div>
+        </AnimatedSection>
 
         <div className="grid-card-data-container">
-          <div className="item1-card-data">
+          <AnimatedSection className="item1-card-data" delay="delay-2">
             {loading ? (
               <>
                 <CircularProgress sx={{ color: "#ffffff" }} />
                 <p style={{ color: "white", textAlign: "center" }}>
-                  กำลังโหลดข้อมูล
+                  กำลังโหลดข้อมูลพยากรณ์อากาศ
                 </p>
               </>
             ) : Error ? (
@@ -531,12 +691,11 @@ const CardData = () => {
                   sx={{ color: "white", width: "50px", height: "50px" }}
                 />
                 <p style={{ color: "white", textAlign: "center" }}>
-                  ไม่สามารถโหลดข้อมูลพยากรณ์อากาศได้ <br />
-                  โปรดลองอีกครั้ง
+                  ไม่สามารถโหลดข้อมูลพยากรณ์อากาศได้ โปรดลองอีกครั้ง
                 </p>
               </>
             ) : (
-              <>
+              <div className="weather-content-flex">
                 <div className="card-data-location">
                   <PlaceRoundedIcon sx={{ color: "#ffffff" }} />
                   <p>
@@ -550,17 +709,20 @@ const CardData = () => {
                   <span>{rainDateTime}</span>
                 </div>
                 <div className="rain-detail">
-                  <ThunderstormRoundedIcon
-                    sx={{ color: "#ffffff", paddingRight: "10px" }}
-                  />
-                  <p>โอกาสเกิดฝน {rainArea}% ของพื้นที่</p>
+                  <div className="rainvalue">
+                    <ThunderstormRoundedIcon
+                      sx={{ color: "#ffffff", paddingRight: "10px" }}
+                    />
+                    <p>โอกาสเกิดฝน {rainArea}% ของพื้นที่</p>
+                  </div>
+                  <div className="rainvalue">
+                    <AirRoundedIcon
+                      sx={{ color: "#ffffff", paddingRight: "10px" }}
+                    />
+                    <p>ความเร็วลม {windSpeed} กม./ชม.</p>
+                  </div>
                 </div>
-                <div className="rain-detail">
-                  <AirRoundedIcon
-                    sx={{ color: "#ffffff", paddingRight: "10px" }}
-                  />
-                  <p>ความเร็วลม {windSpeed} กม./ชม.</p>
-                </div>
+
                 <video
                   autoPlay
                   loop
@@ -570,17 +732,21 @@ const CardData = () => {
                 >
                   <source src={rainBG} type="video/mp4" />
                 </video>
-              </>
+              </div>
             )}
-          </div>
+          </AnimatedSection>
 
-          <div className="item2-card-data" onClick={() => navigate("/pm")}>
+          <AnimatedSection
+            className="item2-card-data"
+            delay="delay-3"
+            onClick={() => navigate("/pm")}
+          >
             <div className="card-text-data">
               <h1 style={{ color: "#303c46" }}>
                 ปริมาณฝุ่น PM2.5 (เฉลี่ย 24 ชั่วโมง)
               </h1>
               <p>GISTDA</p>
-              {/* <span>{updatepmTime}</span> */}
+              <span>{updatepmTime}</span>
               <div className="card-data-pm-data">
                 <div className="pm-chart" style={{ width: "70%" }}>
                   <HighchartsReact
@@ -619,54 +785,75 @@ const CardData = () => {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="item3-card-data" onClick={() => navigate("/hid")}>
+          </AnimatedSection>
+          <AnimatedSection
+            className="item3-card-data"
+            delay="delay-4"
+            onClick={() => navigate("/hid")}
+          >
             <div className="card-text-data">
               <h1 style={{ color: "#303c46" }}>ดัชนีความร้อน</h1>
               <p>กรมอุตุนิยมวิทยา</p>
-              {/* <span>{updatepmTime}</span> */}
-              <div style={{display: 'flex', gap:'20px', alignItems:'center', marginTop:'20px'}}>
-                <img src={HID2} alt="sun" style={{maxWidth:'80px'}} />
-                <h1
-                  
-                  style={{
-                    fontSize: "36px",
-                    lineHeight: "100%",
-                    textAlign: "Right",
-                    color:"#FFA200"
-                  }}
-                >
-                  39°C
-                </h1>
-              </div>
-              {/* <span>เมื่อสัมผัสความร้อนอาจทำให้ร่างกายอ่อนเพลีย</span> */}
-            </div>
-          </div>
-          <div className="item4-card-data" onClick={() => navigate("/dng")}>
-            <div className="card-text-data">
-              <h1 style={{ color: "#ffffff" }}>งานวิจัย</h1>
-              <span style={{ color: "#ffffff" }}>เช่น แบบจำลองโรคไข้เลือดออก แบบจำลองดัชนีความร้อน ฯลฯ</span>
-              {/* <h1
-                className="header-dengue"
+              <span>อัพเดทล่าสุด: {HIDDateUpdate}</span>
+              <h1
                 style={{
-                  fontSize: "56px",
+                  fontSize: "45px",
                   lineHeight: "100%",
-                  textAlign: "left",
-                  marginTop: "10px",
+                  color: HIDDes.color,
+                  padding: "10px 0px",
                 }}
               >
-                4 ราย
-              </h1> */}
+                {HIDValue}°C
+              </h1>
+              <span style={{ textAlign: "center" }}>{HIDDes.level}</span>
             </div>
-          </div>
-          <div className="item5-card-data" onClick={() => navigate("/pm")}>
+          </AnimatedSection>
+          <AnimatedSection
+            className="item4-card-data"
+            delay="delay-5"
+            onClick={() => navigate("/rcp")}
+          >
+            <div className="card-text-data">
+              <h1 style={{ color: "#ffffff" }}>งานวิจัย</h1>
+              <span style={{ color: "#ffffff" }}>
+                เช่น แบบจำลองโรคไข้เลือดออก แบบจำลองดัชนีความร้อน ฯลฯ
+              </span>
+
+              <div>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "#ffffff",
+                    fontWeight: "normal",
+                    fontFamily: "Prompt",
+                    fontSize: "16px",
+                    borderRadius: "10px",
+                    border: "1px solid #ffffff",
+                    marginTop: "20px",
+                    "&:hover": {
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #8DBAFF",
+                      color: "#000000",
+                    },
+                  }}
+                >
+                  ดูเพิ่มเติม
+                </Button>
+              </div>
+            </div>
+          </AnimatedSection>
+          <AnimatedSection
+            className="item5-card-data"
+            delay="delay-5"
+            onClick={() => navigate("/pm")}
+          >
             <div className="card-text-data">
               <h1 style={{ color: "#303c46" }}>AQI (รายชั่วโมง)</h1>
               <p>กรมควบคุมมลพิษ</p>
-              {/* <span>อัพเดทล่าสุด: {AQIDateUpdate}</span> */}
+              <span>อัพเดทล่าสุด: {AQIDateUpdate}</span>
               <h1
                 style={{
-                  fontSize: "60px",
+                  fontSize: "45px",
                   lineHeight: "100%",
                   color: AQIColor,
                   padding: "10px 0px",
@@ -676,7 +863,7 @@ const CardData = () => {
               </h1>
               <span style={{ textAlign: "center" }}>{AQIDes}</span>
             </div>
-          </div>
+          </AnimatedSection>
         </div>
       </div>
     </section>

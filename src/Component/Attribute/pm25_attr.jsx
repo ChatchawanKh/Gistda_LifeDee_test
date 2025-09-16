@@ -23,6 +23,7 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: "80%",
   maxWidth: 1200,
+  maxHeight: '75vh',
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -185,11 +186,11 @@ export default function TransitionsModal({ open, handleClose }) {
   ];
 
   const renderTable = (data) => (
-    <TableContainer component={Paper} sx={{ mt: 2 }}>
-      <Table>
+    <TableContainer component={Paper} sx={{ mt: 2, maxHeight: '50vh', }}>
+      <Table >
         <TableHead>
           <TableRow>
-            <TableCell>
+            <TableCell sx={{ fontSize: 14}}>
               <strong>ความหมายของสี</strong>
             </TableCell>
             <TableCell>
@@ -197,7 +198,7 @@ export default function TransitionsModal({ open, handleClose }) {
             </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody >
           {data.map((row, index) => (
             <TableRow key={index}>
               <TableCell>
@@ -242,7 +243,7 @@ export default function TransitionsModal({ open, handleClose }) {
           <Typography
             className="pm_attr"
             id="transition-modal-title"
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, fontSize: 14 }}
           >
             {tabIndex === 0 &&
               `ฝุ่นละอองขนาดไม่เกิน 2.5 ไมครอน (PM25) เป็นฝุ่นที่มีเส้นผ่านศูนย์กลางไม่เกิน 2.5 ไมครอน เกิดจาก

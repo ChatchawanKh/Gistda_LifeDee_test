@@ -1,5 +1,5 @@
 import React from 'react'
-import Error from '/src/Icon/404.svg';
+import Error from '/assets/Icon/404.svg';
 import ResponsiveAppBar from '../NavigationBar/navbar_home.jsx'
 import Footer from '../Home/Footer'
 

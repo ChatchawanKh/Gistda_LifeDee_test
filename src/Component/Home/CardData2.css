@@ -9,7 +9,7 @@
     padding-bottom: 4rem;
     font-family: 'Prompt', sans-serif;
     overflow: hidden;
-    background-color: #F5F5F5;
+    background-color: #ffffff;
 }
 
 .background-video-weather {
@@ -30,7 +30,7 @@
         opacity: 0;
     }
     to {
-        opacity: 0.3;
+        opacity: 0.4;
     }
 }
 
@@ -91,7 +91,6 @@
 }
 
 .card-data-location-n-weather {
-
     background: rgb(108,166,255);
     background: linear-gradient(180deg, rgba(108,166,255,1) 35%, rgb(149, 221, 255) 100%);
     border-radius: 20px;
@@ -179,6 +178,7 @@
 
 .rain-detail {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
@@ -190,6 +190,17 @@
         margin: 0;
         padding-left: 5px;
     }
+}
+
+.weather-content-flex {
+    display: flex;
+    flex-direction: column; /* จัดเรียงในแนวตั้ง */
+    justify-content: space-between; /* กระจายช่องว่างในแนวตั้ง */
+    height: 100%; /* หรือกำหนดความสูงชัดเจน เช่น 400px */
+}
+
+.rainvalue {
+    display: flex;
 }
 
 .card-text-data {
@@ -204,10 +215,10 @@
     }
     p {
         font-family: 'Prompt';
-        font-weight: 600;
-        font-size: 14px;
+        font-weight: 400;
+        font-size: 16px;
         padding: 0;
-        margin: 5px 0px 0px 0px;
+        margin: 0px 0px 0px 0px;
         text-align: left;
         color: #303c46;
     }
@@ -218,6 +229,7 @@
         padding: 0;
         margin: 5px 0px 0px 0px;
         text-align: left;
+        color: #303c46;
     }
 }
 
@@ -250,7 +262,7 @@
     align-items: center;
     position: relative;
     z-index: 1;
-    box-shadow: 2px 4px 12px #00000014;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 }
 
 .item2-card-data { 
@@ -291,8 +303,12 @@
     /* background-color: #F0F5FA; */
     display: flex;
     flex-direction: column;
-    background: rgb(108,166,255);
-    background: linear-gradient(180deg, rgba(108,166,255,1) 40%, rgb(149, 221, 255) 100%)
+    /* background-image: url('/assets/Icon/researchbg.png'); */
+    background-image: url('/assets/Icon/researchbg.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    transition: all 0.3s ease-in-out;
 }
 
 .item5-card-data { 
@@ -304,22 +320,28 @@
 
 .item2-card-data,
 .item3-card-data,
-.item4-card-data,
 .item5-card-data {
     background-color: #ffffff;
     transition: all 0.3s ease-in-out; /* เพิ่ม animation smooth */
-    box-shadow: 2px 4px 12px #00000014;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 }
 
 
 .item2-card-data:hover,
 .item3-card-data:hover,
-.item4-card-data:hover,
 .item5-card-data:hover {
   /* transform: scale(1.02); */
   cursor: pointer;
   /* border: 2px solid rgb(108,166,255); */
-  box-shadow: rgb(108,166,255, 0.4) 0px 4px 16px, rgb(108,166,255,0.3) 0px 8px 32px;
+  box-shadow: rgb(108,166,255, 0.4) 0px 4px 16px, rgb(108,166,255,0.4) 0px 8px 32px;
+}
+
+.item4-card-data:hover {
+    background: rgb(108,166,255);
+    background: linear-gradient(180deg, rgba(108,166,255,1) 40%, rgb(149, 221, 255) 100%);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    box-shadow: rgb(108,166,255, 0.4) 0px 4px 16px, rgb(108,166,255,0.4) 0px 8px 32px;
 }
 
 /* .item2-card-data:hover,
@@ -405,7 +427,7 @@
     .item5-card-data{
         /* border: 2px solid rgb(108,166,255); */
     cursor: pointer;
-    box-shadow: 2px 4px 12px #00000014;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
     }
     .card-text-data {
         h1 {
@@ -480,3 +502,24 @@
     }
 } */
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 1s ease forwards;
+}
+
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
+.delay-4 { animation-delay: 0.8s; }
+.delay-5 { animation-delay: 1s; }

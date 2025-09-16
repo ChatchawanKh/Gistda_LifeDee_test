@@ -106,7 +106,7 @@ const NKHControl = React.forwardRef((props, ref) => {
                     function fetchTemp() {
                       const culture = "th-TH";
                       fetch(
-                        `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
+                        `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
                       )
                         .then((response) => {
                           if (!response.ok) {
@@ -189,7 +189,7 @@ const NKHControl = React.forwardRef((props, ref) => {
                     function fetchRain() {
                       const culture = "th-TH";
                       fetch(
-                        `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
+                        `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
                       )
                         .then((response) => {
                           if (!response.ok) {
@@ -358,7 +358,7 @@ const NKHControl = React.forwardRef((props, ref) => {
                     function fetchTemp() {
                       const culture = "th-TH";
                       fetch(
-                        `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
+                        `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
                       )
                         .then((response) => {
                           if (!response.ok) {
@@ -441,7 +441,7 @@ const NKHControl = React.forwardRef((props, ref) => {
                     function fetchRain() {
                       const culture = "th-TH";
                       fetch(
-                        `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
+                        `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
                       )
                         .then((response) => {
                           if (!response.ok) {

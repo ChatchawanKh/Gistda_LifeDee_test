@@ -1,61 +1,69 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState, useEffect } from "react";
-import axios from 'axios';
-import "./MapHeat.css"
-import { renderToString } from 'react-dom/server';
+import axios from "axios";
+import "./MapHeat.css";
+import { renderToString } from "react-dom/server";
 
 //Mui infra
 import {
-    List, ListItemButton, Box, Chip,
-    Stack, Typography, CardContent, CardActions, Button
+  List,
+  ListItemButton,
+  Box,
+  Chip,
+  Stack,
+  Typography,
+  CardContent,
+  CardActions,
+  Button,
 } from "@mui/material";
-import Zoom from '@mui/material/Zoom';
-import Tooltip from '@mui/material/Tooltip';
-import { Popper } from '@mui/base/Popper';
-import Card from '@mui/material/Card';
-import { CardActionArea } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
-import SearchIcon from '@mui/icons-material/Search';
-import PhoneIcon from '@mui/icons-material/Phone';
-import StraightenIcon from '@mui/icons-material/Straighten';
-import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
-import Vaccines from '@mui/icons-material/Vaccines';
-import MedicalInformation from '@mui/icons-material/MedicalInformation';
-import InfoIcon from '@mui/icons-material/Info';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import Zoom from "@mui/material/Zoom";
+import Tooltip from "@mui/material/Tooltip";
+import { Popper } from "@mui/base/Popper";
+import Card from "@mui/material/Card";
+import { CardActionArea } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
+import PhoneIcon from "@mui/icons-material/Phone";
+import StraightenIcon from "@mui/icons-material/Straighten";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import Vaccines from "@mui/icons-material/Vaccines";
+import MedicalInformation from "@mui/icons-material/MedicalInformation";
+// import InfoIcon from '@mui/icons-material/Info';
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
+import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import NavigationIcon from "@mui/icons-material/Navigation";
 
 // import NavigationRoundedIcon from "@mui/icons-material/NavigationRounded";
 // import WaterDropRoundedIcon from "@mui/icons-material/WaterDropRounded";
 
 //Icon
-import IconButton from '@mui/material/IconButton';
-import FormGroup from '@mui/material/FormGroup';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
-import LayersIcon from '@mui/icons-material/Layers';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import Street from '/src/Icon/street.svg'
-import Satt from '/src/Icon/satt.svg'
-import ClearIcon from '@mui/icons-material/Clear';
-import WrongLocationIcon from '@mui/icons-material/WrongLocation';
-import GoogleIcon from '@mui/icons-material/Google';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
+import IconButton from "@mui/material/IconButton";
+import FormGroup from "@mui/material/FormGroup";
+import MyLocationIcon from "@mui/icons-material/MyLocation";
+import LayersIcon from "@mui/icons-material/Layers";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import Street from "/assets/Icon/street.svg";
+import Satt from "/assets/Icon/satt.svg";
+import ClearIcon from "@mui/icons-material/Clear";
+import WrongLocationIcon from "@mui/icons-material/WrongLocation";
+import GoogleIcon from "@mui/icons-material/Google";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import SatelliteAltIcon from "@mui/icons-material/SatelliteAlt";
 // import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
-import Tmd from '/src/Icon/meteo.png'
+import Tmd from "/assets/Icon/meteo.png";
 // import NavigationRoundedIcon from "@mui/icons-material/NavigationRounded";
 // import WaterDropRoundedIcon from "@mui/icons-material/WaterDropRounded";
 
 //Component
 // import MediaCard from './Card.jsx'
-import TMDControl from './TMDControl.jsx'
-import NKHControl from './NKHControl.jsx'
-import SatControl from './SatControl.jsx'
-import MiniDrawer from '../NavigationBar/SidebarHeat.jsx'
-import Dashboard from './DashboardHeat.jsx'
+import TMDControl from "./TMDControl.jsx";
+// import NKHControl from './NKHControl.jsx'
+import SatControl from "./SatControl.jsx";
+import MiniDrawer from "../NavigationBar/SidebarHeat.jsx";
+import Dashboard from "./DashboardHeat.jsx";
 
 //weather icon
 // import noRain from '../../weather/0_no_rain.svg';
@@ -65,349 +73,346 @@ import Dashboard from './DashboardHeat.jsx'
 // import veryHeavyRain from '../../weather/4_very_heavy.svg';
 // import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 
-
 const MapHeat = () => {
-    const mapRef = useRef(null);
-    const sphereMapRef = useRef(null);
+  const mapRef = useRef(null);
+  const sphereMapRef = useRef(null);
 
-    const [isLayerChecked, setisLayerChecked] = useState(true);
-    const [wmsLayer, setwmsLayer] = useState(null);
-    const [pm25ClickHandler, setPm25ClickHandler] = useState(null);
+  const [isLayerChecked, setisLayerChecked] = useState(true);
+  const [wmsLayer, setwmsLayer] = useState(null);
+  const [pm25ClickHandler, setPm25ClickHandler] = useState(null);
+  const [bearingAngle, setbearingAngle] = useState(0);
 
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "https://api.sphere.gistda.or.th/map/?key=F580F0C0ED264853B55FB58261D0E9E8";
-        script.async = true;
-        document.body.appendChild(script);
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src =
+      "https://api.sphere.gistda.or.th/map/?key=F580F0C0ED264853B55FB58261D0E9E8";
+    script.async = true;
+    document.body.appendChild(script);
 
-        script.onload = () => {
-            var sphere = window.sphere
-            var map = new window.sphere.Map({
-                placeholder: mapRef.current
-            });
-            sphereMapRef.current = map;
+    script.onload = () => {
+      var sphere = window.sphere;
+      var map = new window.sphere.Map({
+        placeholder: mapRef.current,
+      });
+      sphereMapRef.current = map;
 
-            map.Event.bind(sphere.EventName.Ready, async function () {
-                const uiElements = [
-                    map.Ui.Geolocation,
-                    map.Ui.Fullscreen,
-                    map.Ui.DPad,
-                    map.Ui.Zoombar,
-                    map.Ui.Toolbar,
-                    map.Ui.Scale,
-                    map.Ui.LayerSelector,
-                ];
-                uiElements.forEach(uiElement => uiElement.visible(false));
+      map.Event.bind(sphere.EventName.Ready, async function () {
+        const uiElements = [
+          map.Ui.Geolocation,
+          map.Ui.Fullscreen,
+          map.Ui.DPad,
+          map.Ui.Zoombar,
+          map.Ui.Toolbar,
+          map.Ui.Scale,
+          map.Ui.LayerSelector,
+        ];
+        uiElements.forEach((uiElement) => uiElement.visible(false));
 
+        let thBound = new sphere.Layer("0", {
+          type: sphere.LayerType.WMS,
+          url: "https://gistdaportal.gistda.or.th/data2/services/L05_Province_GISTDA_50k_nonlabel/MapServer/WMSServer",
+          zoomRange: { min: 1, max: 15 },
+          zIndex: 10,
+          opacity: 0.8,
+          id: "L05_Province_GISTDA_50k_nonlabel",
+        });
+        map.Layers.add(thBound);
 
-                let thBound = new sphere.Layer('0', {
-                    type: sphere.LayerType.WMS,
-                    url: "https://gistdaportal.gistda.or.th/data2/services/L05_Province_GISTDA_50k_nonlabel/MapServer/WMSServer",
-                    zoomRange: { min: 1, max: 15 },
-                    zIndex: 10,
-                    opacity: 0.8,
-                    id: 'L05_Province_GISTDA_50k_nonlabel'
-                })
-                map.Layers.add(thBound);
-                // console.log('Added thBound', thBound)
+        if (isLayerChecked) {
+          const pm25wms = new sphere.Layer("GK2_GEMS_L2_T-0_0045_AOD443", {
+            type: sphere.LayerType.WMS,
+            url: "https://pollution-app-33s3yn5pmq-as.a.run.app/mapservice/geoserver/airpollution/wms",
+            format: "image/png",
+            transparent: "true",
+            zoomRange: { min: 1, max: 15 },
+            zIndex: 5,
+            opacity: 0.75,
+            // id: 'layer_24pm25'
+          });
+          // map.Layers.add(pm25wms);
+          setwmsLayer(pm25wms);
 
+          // const handleMapClick = (location) => {
+          //     const lat = location.lat;
+          //     const lon = location.lon;
 
-                if (isLayerChecked) {
-                    const pm25wms = new sphere.Layer('GK2_GEMS_L2_T-0_0045_AOD443', {
-                        type: sphere.LayerType.WMS,
-                        url: "https://pollution-app-33s3yn5pmq-as.a.run.app/mapservice/geoserver/airpollution/wms",
-                        format: 'image/png',
-                        transparent: 'true',
-                        zoomRange: { min: 1, max: 15 },
-                        zIndex: 5,
-                        opacity: 0.75,
-                        // id: 'layer_24pm25'
-                    });
-                    // map.Layers.add(pm25wms);
-                    setwmsLayer(pm25wms);
+          //     axios.get(
+          //         `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${lat}&lng=${lon}`
+          //     )
+          //     .then((response) => {
+          //         const data = response.data.data;
+          //         const pm25 = data["pm25"];
+          //         const tb = data.loc["tb_tn"];
+          //         const ap = data.loc["ap_tn"];
+          //         const pv = data.loc["pv_tn"];
+          //         const date = data.datetimeThai["dateThai"];
+          //         const time = data.datetimeThai["timeThai"];
 
-                    // const handleMapClick = (location) => {
-                    //     const lat = location.lat;
-                    //     const lon = location.lon;
+          //         function fetchTemp() {
+          //         console.log("fetchTemp called");
+          //         const culture = "th-TH";
+          //         return fetch(
+          //             `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
+          //         )
+          //             .then((response) => {
+          //             if (!response.ok) {
+          //                 throw new Error(
+          //                 `fetchTemp response not ok: ${response.statusText}`
+          //                 );
+          //             }
+          //             return response.json();
+          //             })
+          //             .then((data) => {
+          //             //   console.log("fetchTemp response data:", data);
+          //             if (!data.weather3Hour)
+          //                 throw new Error("Missing weather3Hour in fetchTemp");
+          //             const { dryBlubTemperature, rainfall } =
+          //                 data.weather3Hour;
+          //             const temp = dryBlubTemperature.toFixed(0);
 
-                    //     axios.get(
-                    //         `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${lat}&lng=${lon}`
-                    //     )
-                    //     .then((response) => {
-                    //         const data = response.data.data;
-                    //         const pm25 = data["pm25"];
-                    //         const tb = data.loc["tb_tn"];
-                    //         const ap = data.loc["ap_tn"];
-                    //         const pv = data.loc["pv_tn"];
-                    //         const date = data.datetimeThai["dateThai"];
-                    //         const time = data.datetimeThai["timeThai"];
+          //             let rainfallIcon, rainText, rainValue, mm;
+          //             if (rainfall < 0.1) {
+          //                 rainfallIcon = noRain;
+          //                 rainText = "ไม่มีฝนตก";
+          //                 rainValue = "";
+          //                 mm = "";
+          //             } else if (rainfall <= 10) {
+          //                 rainfallIcon = lightRain;
+          //                 rainText = "ฝนตก";
+          //                 rainValue = rainfall;
+          //                 mm = "มม.";
+          //             } else if (rainfall <= 35) {
+          //                 rainfallIcon = moderateRain;
+          //                 rainText = "ฝนตก";
+          //                 rainValue = rainfall;
+          //                 mm = "มม.";
+          //             } else if (rainfall <= 90) {
+          //                 rainfallIcon = heavyRain;
+          //                 rainText = "ฝนตก";
+          //                 rainValue = rainfall;
+          //                 mm = "มม.";
+          //             } else {
+          //                 rainfallIcon = veryHeavyRain;
+          //                 rainText = "ฝนตก";
+          //                 rainValue = rainfall;
+          //                 mm = "มม.";
+          //             }
 
-                    //         function fetchTemp() {
-                    //         console.log("fetchTemp called");
-                    //         const culture = "th-TH";
-                    //         return fetch(
-                    //             `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
-                    //         )
-                    //             .then((response) => {
-                    //             if (!response.ok) {
-                    //                 throw new Error(
-                    //                 `fetchTemp response not ok: ${response.statusText}`
-                    //                 );
-                    //             }
-                    //             return response.json();
-                    //             })
-                    //             .then((data) => {
-                    //             //   console.log("fetchTemp response data:", data);
-                    //             if (!data.weather3Hour)
-                    //                 throw new Error("Missing weather3Hour in fetchTemp");
-                    //             const { dryBlubTemperature, rainfall } =
-                    //                 data.weather3Hour;
-                    //             const temp = dryBlubTemperature.toFixed(0);
+          //             return { rainfallIcon, rainText, rainValue, temp, mm };
+          //             })
+          //             .catch((error) => {
+          //             console.error("fetchTemp error:", error);
+          //             throw error; // Re-throw error for Promise.all
+          //             });
+          //         }
 
-                    //             let rainfallIcon, rainText, rainValue, mm;
-                    //             if (rainfall < 0.1) {
-                    //                 rainfallIcon = noRain;
-                    //                 rainText = "ไม่มีฝนตก";
-                    //                 rainValue = "";
-                    //                 mm = "";
-                    //             } else if (rainfall <= 10) {
-                    //                 rainfallIcon = lightRain;
-                    //                 rainText = "ฝนตก";
-                    //                 rainValue = rainfall;
-                    //                 mm = "มม.";
-                    //             } else if (rainfall <= 35) {
-                    //                 rainfallIcon = moderateRain;
-                    //                 rainText = "ฝนตก";
-                    //                 rainValue = rainfall;
-                    //                 mm = "มม.";
-                    //             } else if (rainfall <= 90) {
-                    //                 rainfallIcon = heavyRain;
-                    //                 rainText = "ฝนตก";
-                    //                 rainValue = rainfall;
-                    //                 mm = "มม.";
-                    //             } else {
-                    //                 rainfallIcon = veryHeavyRain;
-                    //                 rainText = "ฝนตก";
-                    //                 rainValue = rainfall;
-                    //                 mm = "มม.";
-                    //             }
+          //         function fetchRain() {
+          //             const culture = "th-TH";
+          //             return fetch(`https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`)
+          //             .then((response) => {
+          //                 if (!response.ok) {
+          //                 throw new Error("Network response was not ok: " + response.statusText);
+          //                 }
+          //                 return response.json();
+          //             })
+          //             .then((data) => {
+          //                 const forecastData = data[0];
 
-                    //             return { rainfallIcon, rainText, rainValue, temp, mm };
-                    //             })
-                    //             .catch((error) => {
-                    //             console.error("fetchTemp error:", error);
-                    //             throw error; // Re-throw error for Promise.all
-                    //             });
-                    //         }
+          //                 if (forecastData && forecastData.weatherForecast7Day) {
+          //                 const weatherForecast = forecastData.weatherForecast7Day;
+          //                 const rainArea = weatherForecast.rainArea;
+          //                 const windSpeed = weatherForecast.windSpeed;
+          //                 const windDir = weatherForecast.windDirection;
 
-                    //         function fetchRain() {
-                    //             const culture = "th-TH";
-                    //             return fetch(`https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`)
-                    //             .then((response) => {
-                    //                 if (!response.ok) {
-                    //                 throw new Error("Network response was not ok: " + response.statusText);
-                    //                 }
-                    //                 return response.json();
-                    //             })
-                    //             .then((data) => {
-                    //                 const forecastData = data[0];
-                            
-                    //                 if (forecastData && forecastData.weatherForecast7Day) {
-                    //                 const weatherForecast = forecastData.weatherForecast7Day;
-                    //                 const rainArea = weatherForecast.rainArea;
-                    //                 const windSpeed = weatherForecast.windSpeed;
-                    //                 const windDir = weatherForecast.windDirection;
-                            
-                    //                 const windDirDeg = renderToString(
-                    //                     <NavigationRoundedIcon
-                    //                     style={{
-                    //                         color: "#758CA3",
-                    //                         width: 18,
-                    //                         verticalAlign: "middle",
-                    //                         transform: `rotate(${windDir}deg)`,
-                    //                     }}
-                    //                     />
-                    //                 );
-                            
-                    //                 const waterDrop = renderToString(
-                    //                     <WaterDropRoundedIcon
-                    //                     style={{
-                    //                         color: "#56c8f5",
-                    //                         width: 18,
-                    //                         verticalAlign: "middle",
-                    //                     }}
-                    //                     />
-                    //                 );
-                            
-                    //                 return { waterDrop, rainArea, windDirDeg, windSpeed };
-                    //                 } else {
-                    //                 console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
-                    //                 return { waterDrop: null, rainArea: null, windDirDeg: null, windSpeed: null };
-                    //                 }
-                    //             })
-                    //             .catch((error) => {
-                    //                 console.error("fetchRain error:", error);
-                    //                 throw error;
-                    //             });
-                    //         }
-                            
-                    //         //   เกณฑ์อุตุ ฯ
-                    //         let color;
-                    //         let level;
-                    //         if (pm25 >= 27 <= 32.9) {
-                    //             color = "#97C332";
-                    //             level = "เฝ้าระวัง";
-                    //         } else if (pm25 >= 33 && pm25 <= 41.9) {
-                    //             color = "#FBF343";
-                    //             level = "เตือนภัย";
-                    //         } else if (pm25 >= 42 && pm25 <= 51.9) {
-                    //             color = "#FC8C2A";
-                    //             level = "อันตราย";
-                    //         } else {
-                    //             color = "#FC371E";
-                    //             level = "อันตรายมาก";
-                    //         }
+          //                 const windDirDeg = renderToString(
+          //                     <NavigationRoundedIcon
+          //                     style={{
+          //                         color: "#758CA3",
+          //                         width: 18,
+          //                         verticalAlign: "middle",
+          //                         transform: `rotate(${windDir}deg)`,
+          //                     }}
+          //                     />
+          //                 );
 
-                    //         const pm25Formatted = pm25 % 1 === 0 ? pm25 : pm25.toFixed(1);
+          //                 const waterDrop = renderToString(
+          //                     <WaterDropRoundedIcon
+          //                     style={{
+          //                         color: "#56c8f5",
+          //                         width: 18,
+          //                         verticalAlign: "middle",
+          //                     }}
+          //                     />
+          //                 );
 
-                    //         const loadingHtml = `
-                    //                                     <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
-                    //                                         <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
-                    //                                         <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
-                    //                                     </div>
-                    //                                     <style>
-                    //                                         @keyframes spin {
-                    //                                             0% { transform: rotate(0deg); }
-                    //                                             100% { transform: rotate(360deg); }
-                    //                                         }
-                    //                                     </style>
-                    //                                 `;
+          //                 return { waterDrop, rainArea, windDirDeg, windSpeed };
+          //                 } else {
+          //                 console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
+          //                 return { waterDrop: null, rainArea: null, windDirDeg: null, windSpeed: null };
+          //                 }
+          //             })
+          //             .catch((error) => {
+          //                 console.error("fetchRain error:", error);
+          //                 throw error;
+          //             });
+          //         }
 
-                    //         Promise.all([fetchTemp(), fetchRain()])
-                    //         .then(([tempData, rainData]) => {
-                    //             console.log("Promise.all resolved data:", {
-                    //             tempData,
-                    //             rainData,
-                    //             });
-                    //             if (tempData && rainData) {
-                    //             const combinedData = { ...tempData, ...rainData };
-                    //             updateWeatherDetails(combinedData);
-                    //             } else {
-                    //             console.error("Failed to fetch one or both data sources");
-                    //             }
-                    //         })
-                    //         .catch((error) => {
-                    //             console.error("Promise.all error:", error);
-                    //         });
+          //         //   เกณฑ์อุตุ ฯ
+          //         let color;
+          //         let level;
+          //         if (pm25 >= 27 <= 32.9) {
+          //             color = "#97C332";
+          //             level = "เฝ้าระวัง";
+          //         } else if (pm25 >= 33 && pm25 <= 41.9) {
+          //             color = "#FBF343";
+          //             level = "เตือนภัย";
+          //         } else if (pm25 >= 42 && pm25 <= 51.9) {
+          //             color = "#FC8C2A";
+          //             level = "อันตราย";
+          //         } else {
+          //             color = "#FC371E";
+          //             level = "อันตรายมาก";
+          //         }
 
-                    //         function updateWeatherDetails({
-                    //         rainfallIcon,
-                    //         rainText,
-                    //         rainValue,
-                    //         temp,
-                    //         mm,
-                    //         waterDrop,
-                    //         rainArea,
-                    //         windDirDeg,
-                    //         windSpeed,
-                    //         }) {
-                    //         const popupDetail = `
-                    //                                 <div style="padding:0.5rem;">
-                    //                                     <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
-                    //                                     <span style="font-size: 14px;"></span>
-                                                    
-                    //                                     <img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}" 
-                    //                                         alt="Rainfall Icon" /><span style="color: #a6a4a4; font-size: 16px;" >${temp} °C </span>
-                    //                                     <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
-                    //                                     <span id="rainPer-pop"></span><span id="wind"></span></br>
-                    //                                     <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${rainArea}% ของพื้นที่</span>
-                    //                                     <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${windSpeed} กม./ชม.</span><br />
-                                                        
-                    //                                     <span style="font-size: 12px;">ค่าดัชนีความร้อน (°C)</span><br />
-                    //                                     <span id='value' style={{ fontWeight: 'bold', fontSize: '30px' }}><span style="color: ${color}; font-weight: bold; font-size: 30px;">${pm25Formatted} </span></span>
-                    //                                     <span style="font-size: 10px;">µg./m3</span>
-                    //                                     <span id="level"><span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span><br />
-                    //                                     <span id="update" style="font-size: 12px; color: #a6a6a6;">อัพเดทล่าสุด ${date} ${time}</span>
-                    //                                 </div>
-                    //                             `;
+          //         const pm25Formatted = pm25 % 1 === 0 ? pm25 : pm25.toFixed(1);
 
-                    //         const popupElement =
-                    //             document.getElementById("popup-container");
-                    //         if (popupElement) {
-                    //             popupElement.innerHTML = popupDetail;
-                    //         } else {
-                    //             console.log("popup-container not found in DOM");
-                    //         }
+          //         const loadingHtml = `
+          //                                     <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
+          //                                         <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
+          //                                         <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
+          //                                     </div>
+          //                                     <style>
+          //                                         @keyframes spin {
+          //                                             0% { transform: rotate(0deg); }
+          //                                             100% { transform: rotate(360deg); }
+          //                                         }
+          //                                     </style>
+          //                                 `;
 
-                    //         var popUp = new sphere.Popup(
-                    //             { lon: lon, lat: lat },
-                    //             {
-                    //             title: `
-                    //                                 <span style='font-weight: 500; margin-left: 0.5rem;'> ตำแหน่งที่สนใจ</span>
-                    //                                 <span style='font-weight: 400; color: #a6a6a6;'>
-                    //                                     ${lat.toFixed(4)}, ${lon.toFixed(4)}
-                    //                                 </span>
-                    //                             `,
-                    //             detail: loadingHtml,
-                    //             loadDetail: updateDetail,
-                    //             size: { width: "100%" },
-                    //             closable: true,
-                    //             }
-                    //         );
+          //         Promise.all([fetchTemp(), fetchRain()])
+          //         .then(([tempData, rainData]) => {
+          //             console.log("Promise.all resolved data:", {
+          //             tempData,
+          //             rainData,
+          //             });
+          //             if (tempData && rainData) {
+          //             const combinedData = { ...tempData, ...rainData };
+          //             updateWeatherDetails(combinedData);
+          //             } else {
+          //             console.error("Failed to fetch one or both data sources");
+          //             }
+          //         })
+          //         .catch((error) => {
+          //             console.error("Promise.all error:", error);
+          //         });
 
-                    //         function updateDetail(element) {
-                    //             setTimeout(function () {
-                    //             element.innerHTML = popupDetail;
-                    //             }, 1000);
-                    //         }
-                    //         map.Overlays.add(popUp);
-                    //         }
-                    //     });
-                    // };
+          //         function updateWeatherDetails({
+          //         rainfallIcon,
+          //         rainText,
+          //         rainValue,
+          //         temp,
+          //         mm,
+          //         waterDrop,
+          //         rainArea,
+          //         windDirDeg,
+          //         windSpeed,
+          //         }) {
+          //         const popupDetail = `
+          //                                 <div style="padding:0.5rem;">
+          //                                     <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
+          //                                     <span style="font-size: 14px;"></span>
 
-                    // map.Event.bind(sphere.EventName.Click, handleMapClick);
-                    // setPm25ClickHandler(() => handleMapClick);
+          //                                     <img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}"
+          //                                         alt="Rainfall Icon" /><span style="color: #a6a4a4; font-size: 16px;" >${temp} °C </span>
+          //                                     <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
+          //                                     <span id="rainPer-pop"></span><span id="wind"></span></br>
+          //                                     <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${rainArea}% ของพื้นที่</span>
+          //                                     <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${windSpeed} กม./ชม.</span><br />
 
-                } else {
-                    if (wmsLayer) {
-                        map.Layers.remove(wmsLayer);
-                        setwmsLayer(null);
-                    }
+          //                                     <span style="font-size: 12px;">ค่าดัชนีความร้อน (°C)</span><br />
+          //                                     <span id='value' style={{ fontWeight: 'bold', fontSize: '30px' }}><span style="color: ${color}; font-weight: bold; font-size: 30px;">${pm25Formatted} </span></span>
+          //                                     <span style="font-size: 10px;">µg./m3</span>
+          //                                     <span id="level"><span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span><br />
+          //                                     <span id="update" style="font-size: 12px; color: #a6a6a6;">อัพเดทล่าสุด ${date} ${time}</span>
+          //                                 </div>
+          //                             `;
 
-                    if (pm25ClickHandler) {
-                        map.Event.unbind(sphere.EventName.Click, pm25ClickHandler);
-                        setPm25ClickHandler(null);
-                    }
-                }
+          //         const popupElement =
+          //             document.getElementById("popup-container");
+          //         if (popupElement) {
+          //             popupElement.innerHTML = popupDetail;
+          //         } else {
+          //             console.log("popup-container not found in DOM");
+          //         }
 
-                if (map && map.Ui && map.Ui.Geolocation) {
-                    map.Ui.Geolocation.trigger();
-                } else {
-                    console.error('Geolocation control is not available.');
-                }
-            });
-        };
+          //         var popUp = new sphere.Popup(
+          //             { lon: lon, lat: lat },
+          //             {
+          //             title: `
+          //                                 <span style='font-weight: 500; margin-left: 0.5rem;'> ตำแหน่งที่สนใจ</span>
+          //                                 <span style='font-weight: 400; color: #a6a6a6;'>
+          //                                     ${lat.toFixed(4)}, ${lon.toFixed(4)}
+          //                                 </span>
+          //                             `,
+          //             detail: loadingHtml,
+          //             loadDetail: updateDetail,
+          //             size: { width: "100%" },
+          //             closable: true,
+          //             }
+          //         );
 
-        document.body.appendChild(script);
-        return () => {
-            document.body.removeChild(script);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sphereMapRef]);
+          //         function updateDetail(element) {
+          //             setTimeout(function () {
+          //             element.innerHTML = popupDetail;
+          //             }, 1000);
+          //         }
+          //         map.Overlays.add(popUp);
+          //         }
+          //     });
+          // };
 
-    let loadingCardAdded = false;
+          // map.Event.bind(sphere.EventName.Click, handleMapClick);
+          // setPm25ClickHandler(() => handleMapClick);
+        } else {
+          if (wmsLayer) {
+            map.Layers.remove(wmsLayer);
+            setwmsLayer(null);
+          }
 
-    const insertAllhospital = async () => {
-        const map = sphereMapRef.current;
-        map.Overlays.clear();
+          if (pm25ClickHandler) {
+            map.Event.unbind(sphere.EventName.Click, pm25ClickHandler);
+            setPm25ClickHandler(null);
+          }
+        }
 
-        // Function to show the loading card
-        const showLoadingCard = () => {
-            if (loadingCardAdded) {
-                return;
-            }
+        if (map && map.Ui && map.Ui.Geolocation) {
+          map.Ui.Geolocation.trigger();
+        } else {
+          console.error("Geolocation control is not available.");
+        }
+      });
+    };
 
-            const loadingAllHtml = `
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sphereMapRef]);
+
+  let loadingCardAdded = false;
+
+  const insertAllhospital = async () => {
+    const map = sphereMapRef.current;
+    map.Overlays.clear();
+
+    // Function to show the loading card
+    const showLoadingCard = () => {
+      if (loadingCardAdded) {
+        return;
+      }
+
+      const loadingAllHtml = `
             <div class="all" style="
                 position: absolute;
                 top: 20%;
@@ -441,34 +446,29 @@ const MapHeat = () => {
             </style>
         `;
 
-            document.body.insertAdjacentHTML('beforeend', loadingAllHtml);
-            loadingCardAdded = true;
+      document.body.insertAdjacentHTML("beforeend", loadingAllHtml);
+      loadingCardAdded = true;
 
-            // Remove the loading card after a delay
-            setTimeout(() => {
-                const loadingCardAllElements = document.getElementsByClassName('all');
-                while (loadingCardAllElements.length > 0) {
-                    loadingCardAllElements[0].remove();
-                }
-                loadingCardAdded = false;
-            }, 4500);
-        };
-
-        showLoadingCard();
-
-        await Promise.all([
-            insertHospital(),
-            insertClinic(),
-            insertHealthSt()
-        ]);
+      // Remove the loading card after a delay
+      setTimeout(() => {
+        const loadingCardAllElements = document.getElementsByClassName("all");
+        while (loadingCardAllElements.length > 0) {
+          loadingCardAllElements[0].remove();
+        }
+        loadingCardAdded = false;
+      }, 4500);
     };
 
+    showLoadingCard();
 
-    const insertHospital = async () => {
-        const map = sphereMapRef.current;
-        map.Overlays.clear();
+    await Promise.all([insertHospital(), insertClinic(), insertHealthSt()]);
+  };
 
-        const loadingHtml = `
+  const insertHospital = async () => {
+    const map = sphereMapRef.current;
+    map.Overlays.clear();
+
+    const loadingHtml = `
             <div id="loading-card" style="position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); z-index: 15; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
                 <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
                     <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
@@ -482,157 +482,181 @@ const MapHeat = () => {
                 </style>
             </div>
         `;
-        document.body.insertAdjacentHTML('beforeend', loadingHtml);
+    document.body.insertAdjacentHTML("beforeend", loadingHtml);
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            const { latitude, longitude } = position.coords;
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
 
-            try {
-                const poiResponse = await axios.get(`https://api.sphere.gistda.or.th/services/poi/search?lon=${longitude}&lat=${latitude}&limit=20&tag=โรงพยาบาล&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                const responseData = poiResponse.data.data;
-                console.log(responseData);
+      try {
+        const poiResponse = await axios.get(
+          `https://api.sphere.gistda.or.th/services/poi/search?lon=${longitude}&lat=${latitude}&limit=20&tag=โรงพยาบาล&key=F580F0C0ED264853B55FB58261D0E9E8`
+        );
+        const responseData = poiResponse.data.data;
+        console.log(responseData);
 
-                const routePromises = responseData.map(async (item) => {
-                    const { lat, lon } = item;
+        const routePromises = responseData.map(async (item) => {
+          const { lat, lon } = item;
 
-                    try {
-                        const routeResponse = await axios.get(`https://api.sphere.gistda.or.th/services/route/route?flon=${longitude}&flat=${latitude}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                        return routeResponse.data.data.distance;
-                    } catch (error) {
-                        console.error('Error fetching route data:', error);
-                        return null;
-                    }
-                });
+          try {
+            const routeResponse = await axios.get(
+              `https://api.sphere.gistda.or.th/services/route/route?flon=${longitude}&flat=${latitude}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`
+            );
+            return routeResponse.data.data.distance;
+          } catch (error) {
+            console.error("Error fetching route data:", error);
+            return null;
+          }
+        });
 
-                const distances = await Promise.all(routePromises);
+        const distances = await routePromises;
 
-                responseData.forEach((item, index) => {
-                    const { lat, lon, name, address, tel } = item;
-                    const distance = distances[index];
+        responseData.forEach((item, index) => {
+          const { lat, lon, name, address, tel } = item;
+          const distance = distances[index];
 
-                    const googleMapUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
-                    const whereMapUrl = `https://where.gistda.or.th/route?dir=${latitude}-${longitude},${lat}-${lon}&result=true&swipe=1`;
+          const googleMapUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
+          const whereMapUrl = `https://where.gistda.or.th/route?dir=${latitude}-${longitude},${lat}-${lon}&result=true&swipe=1`;
 
-                    const cardHtml = renderToString(
-                        <CardContent
-                            spacing={1}
-                            style={{
-                                position: 'absolute',
-                                left: '50%',
-                                transform: 'translate(-50%, -4.5em)',
-                                transition: 'opacity 0.3s',
-                                display: 'flex',
-                                whiteSpace: 'nowrap',
-                                borderRadius: '5px',
-                                padding: '20px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                border: '2px solid #FF6968',
-                            }}
-                        >
-                            <Typography component="div">
-                                <Box style={{ fontWeight: 'bold', margin: 1 }}>{name}</Box>
-                                <Box style={{ fontWeight: 'light', margin: 1 }}>{address}</Box>
-                                <Box
-                                    sx={{
-                                        fontWeight: 'light',
-                                        m: 1,
-                                        color: '#FF6968',
-                                        verticalAlign: 'middle',
-                                        WebkitLineClamp: 1,
-                                        WebkitBoxOrient: 'vertical',
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    {tel && (
-                                        <>
-                                            <PhoneIcon style={{ color: '#FF6968', width: '20px', verticalAlign: 'middle' }} />
-                                            &nbsp;{tel}
-                                            <br />
-                                        </>
-                                    )}
-                                </Box>
-                                {distance !== null && (
-                                    <Box style={{ fontWeight: 'light', margin: 1 }}>
-                                        <StraightenIcon style={{ color: '#FF6968', width: '20px', verticalAlign: 'middle' }} />
-                                        &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
-                                    </Box>
-                                )}
-                                <CardActions style={{ display: 'flex' }}>
-                                    <Box style={{ display: 'flex', margin: '5px' }}>
-                                        <Button
-                                            href={whereMapUrl}
-                                            target="_blank"
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                maxWidth: '180px',
-                                                height: '20px',
-                                                padding: '0.5rem',
-                                                borderRadius: '15px',
-                                                backgroundColor: 'white',
-                                                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                textDecoration: 'none',
-                                            }}
-                                        >
-                                            <img
-                                                src="https://where.gistda.or.th/favicon.ico"
-                                                alt="Favicon"
-                                                style={{
-                                                    width: '1.5em',
-                                                    borderRadius: '50%',
-                                                    padding: '2px',
-                                                    boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                }}
-                                            />
-                                            <span style={{ margin: '10px', color: '#FF6968' }}>WHERE</span>
-                                        </Button>
-                                    </Box>
-                                    <Box style={{ display: 'flex', margin: '5px' }}>
-                                        <Button
-                                            href={googleMapUrl}
-                                            target="_blank"
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                maxWidth: '180px',
-                                                height: '20px',
-                                                padding: '0.5rem',
-                                                borderRadius: '15px',
-                                                backgroundColor: 'white',
-                                                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                textDecoration: 'none',
-                                            }}
-                                        >
-                                            <GoogleIcon
-                                                style={{
-                                                    color: 'white',
-                                                    borderRadius: '50%',
-                                                    padding: '2px',
-                                                    backgroundColor: '#FF6968',
-                                                    boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                }}
-                                            />
-                                            <span style={{ margin: '10px', color: '#FF6968' }}>Google Map</span>
-                                        </Button>
-                                    </Box>
-                                </CardActions>
-                            </Typography>
-                        </CardContent>
-                    );
+          const cardHtml = renderToString(
+            <CardContent
+              spacing={1}
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translate(-50%, -4.5em)",
+                transition: "opacity 0.3s",
+                display: "flex",
+                whiteSpace: "nowrap",
+                borderRadius: "5px",
+                padding: "20px",
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                border: "2px solid #FF6968",
+              }}
+            >
+              <Typography component="div">
+                <Box style={{ fontWeight: "bold", margin: 1 }}>{name}</Box>
+                <Box style={{ fontWeight: "light", margin: 1 }}>{address}</Box>
+                <Box
+                  sx={{
+                    fontWeight: "light",
+                    m: 1,
+                    color: "#FF6968",
+                    verticalAlign: "middle",
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {tel && (
+                    <>
+                      <PhoneIcon
+                        style={{
+                          color: "#FF6968",
+                          width: "20px",
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      &nbsp;{tel}
+                      <br />
+                    </>
+                  )}
+                </Box>
+                {distance !== null && (
+                  <Box style={{ fontWeight: "light", margin: 1 }}>
+                    <StraightenIcon
+                      style={{
+                        color: "#FF6968",
+                        width: "20px",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
+                  </Box>
+                )}
+                <CardActions style={{ display: "flex" }}>
+                  <Box style={{ display: "flex", margin: "5px" }}>
+                    <Button
+                      href={whereMapUrl}
+                      target="_blank"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        maxWidth: "180px",
+                        height: "20px",
+                        padding: "0.5rem",
+                        borderRadius: "15px",
+                        backgroundColor: "white",
+                        boxShadow:
+                          "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <img
+                        src="https://where.gistda.or.th/favicon.ico"
+                        alt="Favicon"
+                        style={{
+                          width: "1.5em",
+                          borderRadius: "50%",
+                          padding: "2px",
+                          boxShadow:
+                            "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                        }}
+                      />
+                      <span style={{ margin: "10px", color: "#FF6968" }}>
+                        WHERE
+                      </span>
+                    </Button>
+                  </Box>
+                  <Box style={{ display: "flex", margin: "5px" }}>
+                    <Button
+                      href={googleMapUrl}
+                      target="_blank"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        maxWidth: "180px",
+                        height: "20px",
+                        padding: "0.5rem",
+                        borderRadius: "15px",
+                        backgroundColor: "white",
+                        boxShadow:
+                          "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <GoogleIcon
+                        style={{
+                          color: "white",
+                          borderRadius: "50%",
+                          padding: "2px",
+                          backgroundColor: "#FF6968",
+                          boxShadow:
+                            "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                        }}
+                      />
+                      <span style={{ margin: "10px", color: "#FF6968" }}>
+                        Google Map
+                      </span>
+                    </Button>
+                  </Box>
+                </CardActions>
+              </Typography>
+            </CardContent>
+          );
 
-                    const iconHtml = renderToString(
-                        <LocalHospitalIcon
-                            style={{
-                                color: 'white',
-                                borderRadius: '50%',
-                                backgroundColor: '#FF6968',
-                                padding: '2px',
-                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                            }}
-                        />
-                    );
+          const iconHtml = renderToString(
+            <LocalHospitalIcon
+              style={{
+                color: "white",
+                borderRadius: "50%",
+                backgroundColor: "#FF6968",
+                padding: "2px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              }}
+            />
+          );
 
-                    const markerHtml = `
+          const markerHtml = `
                         <style>
                             .marker-container {
                                 position: relative;
@@ -669,42 +693,42 @@ const MapHeat = () => {
                         </div>
                     `;
 
-                    const marker = new window.sphere.Marker(
-                        { lat, lon },
-                        {
-                            icon: {
-                                html: markerHtml,
-                                offset: { x: 18, y: 21 },
-                            },
-                        }
-                    );
-
-                    map.Overlays.add(marker);
-                });
-
-                map.goTo({ center: { lat: latitude, lon: longitude }, zoom: 13 });
-
-                const loadingCard = document.getElementById('loading-card');
-                if (loadingCard) {
-                    loadingCard.remove();
-                }
-            } catch (error) {
-                console.error('Error fetching POI data:', error);
-
-                const loadingCard = document.getElementById('loading-card');
-                if (loadingCard) {
-                    loadingCard.remove();
-                }
+          const marker = new window.sphere.Marker(
+            { lat, lon },
+            {
+              icon: {
+                html: markerHtml,
+                offset: { x: 18, y: 21 },
+              },
             }
+          );
+
+          map.Overlays.add(marker);
         });
-    };
 
-    const insertClinic = async () => {
-        const map = sphereMapRef.current;
-        map.Overlays.clear();
+        map.goTo({ center: { lat: latitude, lon: longitude }, zoom: 13 });
 
-        // Show the loading card
-        const loadingHtml = `
+        const loadingCard = document.getElementById("loading-card");
+        if (loadingCard) {
+          loadingCard.remove();
+        }
+      } catch (error) {
+        console.error("Error fetching POI data:", error);
+
+        const loadingCard = document.getElementById("loading-card");
+        if (loadingCard) {
+          loadingCard.remove();
+        }
+      }
+    });
+  };
+
+  const insertClinic = async () => {
+    const map = sphereMapRef.current;
+    map.Overlays.clear();
+
+    // Show the loading card
+    const loadingHtml = `
             <div id="loading-card" style="position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); z-index: 15; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
                 <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
                     <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
@@ -718,157 +742,181 @@ const MapHeat = () => {
                 </style>
             </div>
         `;
-        document.body.insertAdjacentHTML('beforeend', loadingHtml);
+    document.body.insertAdjacentHTML("beforeend", loadingHtml);
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            const { latitude, longitude } = position.coords;
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
 
-            try {
-                const poiResponse = await axios.get(`https://api.sphere.gistda.or.th/services/poi/search?lon=${longitude}&lat=${latitude}&limit=20&tag=Poly%20Clinic&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                const responseData = poiResponse.data.data;
-                console.log(responseData);
+      try {
+        const poiResponse = await axios.get(
+          `https://api.sphere.gistda.or.th/services/poi/search?lon=${longitude}&lat=${latitude}&limit=20&tag=Poly%20Clinic&key=F580F0C0ED264853B55FB58261D0E9E8`
+        );
+        const responseData = poiResponse.data.data;
+        console.log(responseData);
 
-                const routePromises = responseData.map(async (item) => {
-                    const { lat, lon } = item;
+        const routePromises = responseData.map(async (item) => {
+          const { lat, lon } = item;
 
-                    try {
-                        const routeResponse = await axios.get(`https://api.sphere.gistda.or.th/services/route/route?flon=${longitude}&flat=${latitude}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                        return routeResponse.data.data.distance;
-                    } catch (error) {
-                        console.error('Error fetching route data:', error);
-                        return null;
-                    }
-                });
+          try {
+            const routeResponse = await axios.get(
+              `https://api.sphere.gistda.or.th/services/route/route?flon=${longitude}&flat=${latitude}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`
+            );
+            return routeResponse.data.data.distance;
+          } catch (error) {
+            console.error("Error fetching route data:", error);
+            return null;
+          }
+        });
 
-                const distances = await Promise.all(routePromises);
+        const distances = await routePromises;
 
-                responseData.forEach((item, index) => {
-                    const { lat, lon, name, address, tel } = item;
-                    const distance = distances[index];
+        responseData.forEach((item, index) => {
+          const { lat, lon, name, address, tel } = item;
+          const distance = distances[index];
 
-                    const googleMapUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
-                    const whereMapUrl = `https://where.gistda.or.th/route?dir=${latitude}-${longitude},${lat}-${lon}&result=true&swipe=1`;
+          const googleMapUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
+          const whereMapUrl = `https://where.gistda.or.th/route?dir=${latitude}-${longitude},${lat}-${lon}&result=true&swipe=1`;
 
-                    const cardHtml = renderToString(
-                        <CardContent
-                            spacing={1}
-                            style={{
-                                position: 'absolute',
-                                left: '50%',
-                                transform: 'translate(-50%, -4.5em)',
-                                transition: 'opacity 0.3s',
-                                display: 'flex',
-                                whiteSpace: 'nowrap',
-                                borderRadius: '5px',
-                                padding: '20px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                border: '2px solid #1DBEB8',
-                            }}
-                        >
-                            <Typography component="div">
-                                <Box style={{ fontWeight: 'bold', margin: 1 }}>{name}</Box>
-                                <Box style={{ fontWeight: 'light', margin: 1 }}>{address}</Box>
-                                <Box
-                                    sx={{
-                                        fontWeight: 'light',
-                                        m: 1,
-                                        color: '#1DBEB8',
-                                        verticalAlign: 'middle',
-                                        WebkitLineClamp: 1,
-                                        WebkitBoxOrient: 'vertical',
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    {tel && (
-                                        <>
-                                            <PhoneIcon style={{ color: '#1DBEB8', width: '20px', verticalAlign: 'middle' }} />
-                                            &nbsp;{tel}
-                                            <br />
-                                        </>
-                                    )}
-                                </Box>
-                                {distance !== null && (
-                                    <Box style={{ fontWeight: 'light', margin: 1 }}>
-                                        <StraightenIcon style={{ color: '#1DBEB8', width: '20px', verticalAlign: 'middle' }} />
-                                        &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
-                                    </Box>
-                                )}
-                                <CardActions style={{ display: 'flex' }}>
-                                    <Box style={{ display: 'flex', margin: '5px' }}>
-                                        <Button
-                                            href={whereMapUrl}
-                                            target="_blank"
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                maxWidth: '180px',
-                                                height: '20px',
-                                                padding: '0.5rem',
-                                                borderRadius: '15px',
-                                                backgroundColor: 'white',
-                                                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                textDecoration: 'none',
-                                            }}
-                                        >
-                                            <img
-                                                src="https://where.gistda.or.th/favicon.ico"
-                                                alt="Favicon"
-                                                style={{
-                                                    width: '1.5em',
-                                                    borderRadius: '50%',
-                                                    padding: '2px',
-                                                    boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                }}
-                                            />
-                                            <span style={{ margin: '10px', color: '#1DBEB8' }}>WHERE</span>
-                                        </Button>
-                                    </Box>
-                                    <Box style={{ display: 'flex', margin: '5px' }}>
-                                        <Button
-                                            href={googleMapUrl}
-                                            target="_blank"
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                maxWidth: '180px',
-                                                height: '20px',
-                                                padding: '0.5rem',
-                                                borderRadius: '15px',
-                                                backgroundColor: 'white',
-                                                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                textDecoration: 'none',
-                                            }}
-                                        >
-                                            <GoogleIcon
-                                                style={{
-                                                    color: 'white',
-                                                    borderRadius: '50%',
-                                                    padding: '2px',
-                                                    backgroundColor: '#1DBEB8',
-                                                    boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                }}
-                                            />
-                                            <span style={{ margin: '10px', color: '#1DBEB8' }}>Google Map</span>
-                                        </Button>
-                                    </Box>
-                                </CardActions>
-                            </Typography>
-                        </CardContent>
-                    );
+          const cardHtml = renderToString(
+            <CardContent
+              spacing={1}
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translate(-50%, -4.5em)",
+                transition: "opacity 0.3s",
+                display: "flex",
+                whiteSpace: "nowrap",
+                borderRadius: "5px",
+                padding: "20px",
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                border: "2px solid #1DBEB8",
+              }}
+            >
+              <Typography component="div">
+                <Box style={{ fontWeight: "bold", margin: 1 }}>{name}</Box>
+                <Box style={{ fontWeight: "light", margin: 1 }}>{address}</Box>
+                <Box
+                  sx={{
+                    fontWeight: "light",
+                    m: 1,
+                    color: "#1DBEB8",
+                    verticalAlign: "middle",
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {tel && (
+                    <>
+                      <PhoneIcon
+                        style={{
+                          color: "#1DBEB8",
+                          width: "20px",
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      &nbsp;{tel}
+                      <br />
+                    </>
+                  )}
+                </Box>
+                {distance !== null && (
+                  <Box style={{ fontWeight: "light", margin: 1 }}>
+                    <StraightenIcon
+                      style={{
+                        color: "#1DBEB8",
+                        width: "20px",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
+                  </Box>
+                )}
+                <CardActions style={{ display: "flex" }}>
+                  <Box style={{ display: "flex", margin: "5px" }}>
+                    <Button
+                      href={whereMapUrl}
+                      target="_blank"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        maxWidth: "180px",
+                        height: "20px",
+                        padding: "0.5rem",
+                        borderRadius: "15px",
+                        backgroundColor: "white",
+                        boxShadow:
+                          "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <img
+                        src="https://where.gistda.or.th/favicon.ico"
+                        alt="Favicon"
+                        style={{
+                          width: "1.5em",
+                          borderRadius: "50%",
+                          padding: "2px",
+                          boxShadow:
+                            "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                        }}
+                      />
+                      <span style={{ margin: "10px", color: "#1DBEB8" }}>
+                        WHERE
+                      </span>
+                    </Button>
+                  </Box>
+                  <Box style={{ display: "flex", margin: "5px" }}>
+                    <Button
+                      href={googleMapUrl}
+                      target="_blank"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        maxWidth: "180px",
+                        height: "20px",
+                        padding: "0.5rem",
+                        borderRadius: "15px",
+                        backgroundColor: "white",
+                        boxShadow:
+                          "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <GoogleIcon
+                        style={{
+                          color: "white",
+                          borderRadius: "50%",
+                          padding: "2px",
+                          backgroundColor: "#1DBEB8",
+                          boxShadow:
+                            "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                        }}
+                      />
+                      <span style={{ margin: "10px", color: "#1DBEB8" }}>
+                        Google Map
+                      </span>
+                    </Button>
+                  </Box>
+                </CardActions>
+              </Typography>
+            </CardContent>
+          );
 
-                    const iconHtml = renderToString(
-                        <Vaccines
-                            style={{
-                                color: 'white',
-                                borderRadius: '50%',
-                                backgroundColor: '#1DBEB8',
-                                padding: '2px',
-                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                            }}
-                        />
-                    );
+          const iconHtml = renderToString(
+            <Vaccines
+              style={{
+                color: "white",
+                borderRadius: "50%",
+                backgroundColor: "#1DBEB8",
+                padding: "2px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              }}
+            />
+          );
 
-                    const markerHtml = `
+          const markerHtml = `
                         <style>
                             .marker-container {
                                 position: relative;
@@ -905,43 +953,43 @@ const MapHeat = () => {
                         </div>
                     `;
 
-                    const marker = new window.sphere.Marker(
-                        { lat, lon },
-                        {
-                            icon: {
-                                html: markerHtml,
-                                offset: { x: 18, y: 21 },
-                            },
-                        }
-                    );
-
-                    map.Overlays.add(marker);
-                });
-
-                map.goTo({ center: { lat: latitude, lon: longitude }, zoom: 13 });
-
-                // Remove the loading card once markers are added
-                const loadingCard = document.getElementById('loading-card');
-                if (loadingCard) {
-                    loadingCard.remove();
-                }
-            } catch (error) {
-                console.error('Error fetching POI data:', error);
-
-                // Remove the loading card in case of an error
-                const loadingCard = document.getElementById('loading-card');
-                if (loadingCard) {
-                    loadingCard.remove();
-                }
+          const marker = new window.sphere.Marker(
+            { lat, lon },
+            {
+              icon: {
+                html: markerHtml,
+                offset: { x: 18, y: 21 },
+              },
             }
+          );
+
+          map.Overlays.add(marker);
         });
-    };
 
-    const insertHealthSt = async () => {
-        const map = sphereMapRef.current;
-        map.Overlays.clear();
+        map.goTo({ center: { lat: latitude, lon: longitude }, zoom: 13 });
 
-        const loadingHtml = `
+        // Remove the loading card once markers are added
+        const loadingCard = document.getElementById("loading-card");
+        if (loadingCard) {
+          loadingCard.remove();
+        }
+      } catch (error) {
+        console.error("Error fetching POI data:", error);
+
+        // Remove the loading card in case of an error
+        const loadingCard = document.getElementById("loading-card");
+        if (loadingCard) {
+          loadingCard.remove();
+        }
+      }
+    });
+  };
+
+  const insertHealthSt = async () => {
+    const map = sphereMapRef.current;
+    map.Overlays.clear();
+
+    const loadingHtml = `
             <div id="loading-card" style="position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); z-index: 15; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
                 <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
                     <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
@@ -955,157 +1003,181 @@ const MapHeat = () => {
                 </style>
             </div>
         `;
-        document.body.insertAdjacentHTML('beforeend', loadingHtml);
+    document.body.insertAdjacentHTML("beforeend", loadingHtml);
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            const { latitude, longitude } = position.coords;
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
 
-            try {
-                const poiResponse = await axios.get(`https://api.sphere.gistda.or.th/services/poi/search?lon=${longitude}&lat=${latitude}&limit=20&tag=Public%20Health%20Center&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                const responseData = poiResponse.data.data;
-                console.log(responseData);
+      try {
+        const poiResponse = await axios.get(
+          `https://api.sphere.gistda.or.th/services/poi/search?lon=${longitude}&lat=${latitude}&limit=20&tag=Public%20Health%20Center&key=F580F0C0ED264853B55FB58261D0E9E8`
+        );
+        const responseData = poiResponse.data.data;
+        console.log(responseData);
 
-                const routePromises = responseData.map(async (item) => {
-                    const { lat, lon } = item;
+        const routePromises = responseData.map(async (item) => {
+          const { lat, lon } = item;
 
-                    try {
-                        const routeResponse = await axios.get(`https://api.sphere.gistda.or.th/services/route/route?flon=${longitude}&flat=${latitude}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                        return routeResponse.data.data.distance;
-                    } catch (error) {
-                        console.error('Error fetching route data:', error);
-                        return null;
-                    }
-                });
+          try {
+            const routeResponse = await axios.get(
+              `https://api.sphere.gistda.or.th/services/route/route?flon=${longitude}&flat=${latitude}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`
+            );
+            return routeResponse.data.data.distance;
+          } catch (error) {
+            console.error("Error fetching route data:", error);
+            return null;
+          }
+        });
 
-                const distances = await Promise.all(routePromises);
+        const distances = await routePromises;
 
-                responseData.forEach((item, index) => {
-                    const { lat, lon, name, address, tel } = item;
-                    const distance = distances[index];
+        responseData.forEach((item, index) => {
+          const { lat, lon, name, address, tel } = item;
+          const distance = distances[index];
 
-                    const googleMapUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
-                    const whereMapUrl = `https://where.gistda.or.th/route?dir=${latitude}-${longitude},${lat}-${lon}&result=true&swipe=1`;
+          const googleMapUrl = `https://www.google.com/maps/dir/${latitude},${longitude}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
+          const whereMapUrl = `https://where.gistda.or.th/route?dir=${latitude}-${longitude},${lat}-${lon}&result=true&swipe=1`;
 
-                    const cardHtml = renderToString(
-                        <CardContent
-                            spacing={1}
-                            style={{
-                                transform: 'translate(-50%, -4.5em)',
-                                position: 'absolute',
-                                left: '50%',
-                                transition: 'opacity 0.3s',
-                                display: 'flex',
-                                whiteSpace: 'nowrap',
-                                borderRadius: 15,
-                                padding: '20px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                border: '2px solid #8DBAFF',
-                            }}
-                        >
-                            <Typography component="div">
-                                <Box style={{ fontWeight: 'bold', margin: 1 }}>{name}</Box>
-                                <Box style={{ fontWeight: 'light', margin: 1 }}>{address}</Box>
-                                <Box
-                                    sx={{
-                                        fontWeight: 'light',
-                                        m: 1,
-                                        color: '#8DBAFF',
-                                        verticalAlign: 'middle',
-                                        WebkitLineClamp: 1,
-                                        WebkitBoxOrient: 'vertical',
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    {tel && (
-                                        <>
-                                            <PhoneIcon style={{ color: '#8DBAFF', width: '20px', verticalAlign: 'middle' }} />
-                                            &nbsp;{tel}
-                                            <br />
-                                        </>
-                                    )}
-                                </Box>
-                                {distance !== null && (
-                                    <Box style={{ fontWeight: 'light', margin: 1 }}>
-                                        <StraightenIcon style={{ color: '#8DBAFF', width: '20px', verticalAlign: 'middle' }} />
-                                        &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
-                                    </Box>
-                                )}
-                                <CardActions style={{ display: 'flex' }}>
-                                    <Box style={{ display: 'flex', margin: '5px' }}>
-                                        <Button
-                                            href={whereMapUrl}
-                                            target="_blank"
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                maxWidth: '180px',
-                                                height: '30px',
-                                                padding: '0.5rem',
-                                                borderRadius: '15px',
-                                                backgroundColor: 'white',
-                                                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                textDecoration: 'none',
-                                            }}
-                                        >
-                                            <img
-                                                src="https://where.gistda.or.th/favicon.ico"
-                                                alt="Favicon"
-                                                style={{
-                                                    width: '1.5em',
-                                                    borderRadius: '50%',
-                                                    padding: '2px',
-                                                    boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                }}
-                                            />
-                                            <span style={{ margin: '10px', color: '#5686E1' }}>WHERE</span>
-                                        </Button>
-                                    </Box>
-                                    <Box style={{ display: 'flex', margin: '5px' }}>
-                                        <Button
-                                            href={googleMapUrl}
-                                            target="_blank"
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                maxWidth: '180px',
-                                                height: '30px',
-                                                padding: '0.5rem',
-                                                borderRadius: '15px',
-                                                backgroundColor: 'white',
-                                                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                textDecoration: 'none',
-                                            }}
-                                        >
-                                            <GoogleIcon
-                                                style={{
-                                                    color: 'white',
-                                                    borderRadius: '50%',
-                                                    padding: '2px',
-                                                    backgroundColor: '#5686E1',
-                                                    boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                }}
-                                            />
-                                            <span style={{ margin: '10px', color: '#5686E1' }}>Google Map</span>
-                                        </Button>
-                                    </Box>
-                                </CardActions>
-                            </Typography>
-                        </CardContent>
-                    );
+          const cardHtml = renderToString(
+            <CardContent
+              spacing={1}
+              style={{
+                transform: "translate(-50%, -4.5em)",
+                position: "absolute",
+                left: "50%",
+                transition: "opacity 0.3s",
+                display: "flex",
+                whiteSpace: "nowrap",
+                borderRadius: 15,
+                padding: "20px",
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                border: "2px solid #8DBAFF",
+              }}
+            >
+              <Typography component="div">
+                <Box style={{ fontWeight: "bold", margin: 1 }}>{name}</Box>
+                <Box style={{ fontWeight: "light", margin: 1 }}>{address}</Box>
+                <Box
+                  sx={{
+                    fontWeight: "light",
+                    m: 1,
+                    color: "#8DBAFF",
+                    verticalAlign: "middle",
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {tel && (
+                    <>
+                      <PhoneIcon
+                        style={{
+                          color: "#8DBAFF",
+                          width: "20px",
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      &nbsp;{tel}
+                      <br />
+                    </>
+                  )}
+                </Box>
+                {distance !== null && (
+                  <Box style={{ fontWeight: "light", margin: 1 }}>
+                    <StraightenIcon
+                      style={{
+                        color: "#8DBAFF",
+                        width: "20px",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
+                  </Box>
+                )}
+                <CardActions style={{ display: "flex" }}>
+                  <Box style={{ display: "flex", margin: "5px" }}>
+                    <Button
+                      href={whereMapUrl}
+                      target="_blank"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        maxWidth: "180px",
+                        height: "30px",
+                        padding: "0.5rem",
+                        borderRadius: "15px",
+                        backgroundColor: "white",
+                        boxShadow:
+                          "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <img
+                        src="https://where.gistda.or.th/favicon.ico"
+                        alt="Favicon"
+                        style={{
+                          width: "1.5em",
+                          borderRadius: "50%",
+                          padding: "2px",
+                          boxShadow:
+                            "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                        }}
+                      />
+                      <span style={{ margin: "10px", color: "#5686E1" }}>
+                        WHERE
+                      </span>
+                    </Button>
+                  </Box>
+                  <Box style={{ display: "flex", margin: "5px" }}>
+                    <Button
+                      href={googleMapUrl}
+                      target="_blank"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        maxWidth: "180px",
+                        height: "30px",
+                        padding: "0.5rem",
+                        borderRadius: "15px",
+                        backgroundColor: "white",
+                        boxShadow:
+                          "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <GoogleIcon
+                        style={{
+                          color: "white",
+                          borderRadius: "50%",
+                          padding: "2px",
+                          backgroundColor: "#5686E1",
+                          boxShadow:
+                            "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                        }}
+                      />
+                      <span style={{ margin: "10px", color: "#5686E1" }}>
+                        Google Map
+                      </span>
+                    </Button>
+                  </Box>
+                </CardActions>
+              </Typography>
+            </CardContent>
+          );
 
-                    const iconHtml = renderToString(
-                        <MedicalInformation
-                            style={{
-                                color: 'white',
-                                borderRadius: '50%',
-                                backgroundColor: '#2196F3',
-                                padding: '2px',
-                                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                            }}
-                        />
-                    );
+          const iconHtml = renderToString(
+            <MedicalInformation
+              style={{
+                color: "white",
+                borderRadius: "50%",
+                backgroundColor: "#2196F3",
+                padding: "2px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              }}
+            />
+          );
 
-                    const markerHtml = `
+          const markerHtml = `
                         <style>
                             .marker-container {
                                 position: relative;
@@ -1142,200 +1214,201 @@ const MapHeat = () => {
                         </div>
                     `;
 
-                    
-
-                    const marker = new window.sphere.Marker(
-                        { lat, lon },
-                        {
-                            icon: {
-                                html: markerHtml,
-                                offset: { x: 18, y: 21 },
-                            },
-                        }
-                    );
-
-                    map.Overlays.add(marker);
-                });
-
-                map.goTo({ center: { lat: latitude, lon: longitude }, zoom: 13 });
-
-                // Remove the loading card once markers are added
-                const loadingCard = document.getElementById('loading-card');
-                if (loadingCard) {
-                    loadingCard.remove();
-                }
-            } catch (error) {
-                console.error('Error fetching POI data:', error);
-
-                // Remove the loading card in case of an error
-                const loadingCard = document.getElementById('loading-card');
-                if (loadingCard) {
-                    loadingCard.remove();
-                }
+          const marker = new window.sphere.Marker(
+            { lat, lon },
+            {
+              icon: {
+                html: markerHtml,
+                offset: { x: 18, y: 21 },
+              },
             }
+          );
+
+          map.Overlays.add(marker);
         });
-    };
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+        map.goTo({ center: { lat: latitude, lon: longitude }, zoom: 13 });
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////// Geo Tool  ///////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////// Search Bar ///////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    const searchRef = useRef(null);
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(-1);
-
-    const handleSearch = async () => {
-        const sug = 'https://api.sphere.gistda.or.th/services/search/suggest?';
-        const search = 'https://api.sphere.gistda.or.th/services/search/search?';
-        const inputValue = searchRef.current.value.trim();
-
-        if (!inputValue) {
-            setSuggestions([]);
-            setShowSuggestions(false);
-            return;
+        // Remove the loading card once markers are added
+        const loadingCard = document.getElementById("loading-card");
+        if (loadingCard) {
+          loadingCard.remove();
         }
+      } catch (error) {
+        console.error("Error fetching POI data:", error);
 
-        try {
-            // Fetch addresses
-            const addressResponse = await axios.get(search, {
-                params: {
-                    keyword: inputValue,
-                    limit: 6,
-                    sdx: true,
-                    key: 'F580F0C0ED264853B55FB58261D0E9E8'
-                }
-            });
-            const addressData = addressResponse.data.data;
-            const addresses = addressData.map(item => item.address);
-
-            // Fetch suggestions
-            const sugResponse = await axios.get(sug, {
-                params: {
-                    keyword: inputValue,
-                    limit: 6,
-                    sdx: true,
-                    key: 'F580F0C0ED264853B55FB58261D0E9E8'
-                }
-            });
-            const sugData = sugResponse.data.data;
-
-            // Combine suggestions with addresses
-            const combinedSuggestions = sugData.map((item, index) => ({
-                ...item,
-                address: addresses[index] || ''
-            }));
-
-            // Update state with combined suggestions
-            setSuggestions(combinedSuggestions);
-            setShowSuggestions(true);
-            setSelectedIndex(-1);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setSuggestions([]);
-            setShowSuggestions(false);
+        // Remove the loading card in case of an error
+        const loadingCard = document.getElementById("loading-card");
+        if (loadingCard) {
+          loadingCard.remove();
         }
-    };
+      }
+    });
+  };
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'ArrowDown') {
-            event.preventDefault();
-            setSelectedIndex(prevIndex => (prevIndex + 1) % suggestions.length);
-        } else if (event.key === 'ArrowUp') {
-            event.preventDefault();
-            setSelectedIndex(prevIndex => (prevIndex - 1 + suggestions.length) % suggestions.length);
-        } else if (event.key === 'Enter') {
-            event.preventDefault();
-            if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
-                const selectedItem = suggestions[selectedIndex];
-                searchRef.current.value = selectedItem.name;
-                navigate(selectedItem.name);
-                setSuggestions([]);
-                setShowSuggestions(false);
-            }
-        }
-    };
+  ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    useEffect(() => {
-        const currentElement = searchRef.current;
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////// Geo Tool  ///////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////
 
-        if (currentElement) {
-            currentElement.addEventListener('keydown', handleKeyDown);
-        }
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////// Search Bar ///////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  const searchRef = useRef(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
-        return () => {
-            if (currentElement) {
-                currentElement.removeEventListener('keydown', handleKeyDown);
-            }
-        };
-    }, [suggestions, selectedIndex, handleKeyDown]);
+  const handleSearch = async () => {
+    const sug = "https://api.sphere.gistda.or.th/services/search/suggest?";
+    const search = "https://api.sphere.gistda.or.th/services/search/search?";
+    const inputValue = searchRef.current.value.trim();
 
-    // Handle clear button click
-    const handleClearClick = () => {
+    if (!inputValue) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      // Fetch addresses
+      const addressResponse = await axios.get(search, {
+        params: {
+          keyword: inputValue,
+          limit: 6,
+          sdx: true,
+          key: "F580F0C0ED264853B55FB58261D0E9E8",
+        },
+      });
+      const addressData = addressResponse.data.data;
+      const addresses = addressData.map((item) => item.address);
+
+      // Fetch suggestions
+      const sugResponse = await axios.get(sug, {
+        params: {
+          keyword: inputValue,
+          limit: 6,
+          sdx: true,
+          key: "F580F0C0ED264853B55FB58261D0E9E8",
+        },
+      });
+      const sugData = sugResponse.data.data;
+
+      // Combine suggestions with addresses
+      const combinedSuggestions = sugData.map((item, index) => ({
+        ...item,
+        address: addresses[index] || "",
+      }));
+
+      // Update state with combined suggestions
+      setSuggestions(combinedSuggestions);
+      setShowSuggestions(true);
+      setSelectedIndex(-1);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setSelectedIndex((prevIndex) => (prevIndex + 1) % suggestions.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setSelectedIndex(
+        (prevIndex) => (prevIndex - 1 + suggestions.length) % suggestions.length
+      );
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+        const selectedItem = suggestions[selectedIndex];
+        searchRef.current.value = selectedItem.name;
+        navigate(selectedItem.name);
         setSuggestions([]);
         setShowSuggestions(false);
-        if (searchRef.current) {
-            searchRef.current.value = '';
-        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const currentElement = searchRef.current;
+
+    if (currentElement) {
+      currentElement.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      if (currentElement) {
+        currentElement.removeEventListener("keydown", handleKeyDown);
+      }
     };
+  }, [suggestions, selectedIndex, handleKeyDown]);
 
-    const handleSuggestionClick = (itemName) => {
-        searchRef.current.value = itemName;
-        navigate(itemName);
-        setSuggestions([]);
-        setShowSuggestions(false);
-    };
+  // Handle clear button click
+  const handleClearClick = () => {
+    setSuggestions([]);
+    setShowSuggestions(false);
+    if (searchRef.current) {
+      searchRef.current.value = "";
+    }
+  };
 
-    const navigate = (itemName) => {
-        const loc = `${itemName}`;
-        const API = 'https://api.sphere.gistda.or.th/services/search/search?';
+  const handleSuggestionClick = (itemName) => {
+    searchRef.current.value = itemName;
+    navigate(itemName);
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
 
-        axios.get(API, {
-            params: {
-                keyword: loc,
-                limit: 6,
-                showdistance: true,
-                key: 'F580F0C0ED264853B55FB58261D0E9E8'
-            }
-        })
-            .then(response => {
-                const responseData = response.data.data;
+  const navigate = (itemName) => {
+    const loc = `${itemName}`;
+    const API = "https://api.sphere.gistda.or.th/services/search/search?";
 
-                if (responseData.length > 0) {
-                    const Item = responseData[0];
-                    const searchLat = Item.lat;
-                    const searchLon = Item.lon;
+    axios
+      .get(API, {
+        params: {
+          keyword: loc,
+          limit: 6,
+          showdistance: true,
+          key: "F580F0C0ED264853B55FB58261D0E9E8",
+        },
+      })
+      .then((response) => {
+        const responseData = response.data.data;
 
-                    const map = sphereMapRef.current;
+        if (responseData.length > 0) {
+          const Item = responseData[0];
+          const searchLat = Item.lat;
+          const searchLon = Item.lon;
 
-                    var marker = new window.sphere.Marker({ lat: searchLat, lon: searchLon },
-                        {
-                            icon: {
-                                html: `
+          const map = sphereMapRef.current;
+
+          var marker = new window.sphere.Marker(
+            { lat: searchLat, lon: searchLon },
+            {
+              icon: {
+                html: `
                                 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                                     <span style="font-family: 'Prompt'; background-color: white; padding: 10px; border-radius: 15px;">${Item.name}</span><br/>
-                                    <img src="src/Icon/Marker_Animation.gif" alt="Computer man" style="width:48px;height:48px;">
+                                    <img src="/assets/Icon/Marker_Animation.gif" alt="Computer man" style="width:48px;height:48px;">
                                 </div>
                                 `,
-                                offset: { x: 18, y: 21 }
-                            },
+                offset: { x: 18, y: 21 },
+              },
+            }
+          );
+          map.Overlays.add(marker);
+          map.goTo({ center: { lat: searchLat, lon: searchLon }, zoom: 13 });
 
-                        }
-                    );
-                map.Overlays.add(marker);
-                map.goTo({ center: { lat: searchLat, lon: searchLon }, zoom: 13 });
+          const showLoadingCard = () => {
+            if (loadingCardAdded) {
+              return;
+            }
 
-                const showLoadingCard = () => {
-                    if (loadingCardAdded) {
-                        return;
-                    }
-        
-                    const loadingAllHtml = `
+            const loadingAllHtml = `
                     <div class="all" style="
                         position: absolute;
                         top: 20%;
@@ -1368,1181 +1441,1344 @@ const MapHeat = () => {
                         }
                     </style>
                 `;
-        
-                    document.body.insertAdjacentHTML('beforeend', loadingAllHtml);
-                    loadingCardAdded = true;
-        
-                    // Remove the loading card after a delay
-                    setTimeout(() => {
-                        const loadingCardAllElements = document.getElementsByClassName('all');
-                        while (loadingCardAllElements.length > 0) {
-                            loadingCardAllElements[0].remove();
-                        }
-                        loadingCardAdded = false;
-                    }, 4500);
-                };
-                showLoadingCard();
-                
-                navigator.geolocation.getCurrentPosition(async () => {
-                    // const { searchLat, searchLon } = position.coords;
-                    const map = sphereMapRef.current;
-        
-                    try {
-                        const poiResponse = await axios.get(`https://api.sphere.gistda.or.th/services/poi/search?lon=${searchLon}&lat=${searchLat}&limit=20&tag=โรงพยาบาล&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                        const responseData = poiResponse.data.data;
-                        console.log(responseData);
-                        console.log(searchLon, searchLat);
-                        
-        
-                        const routePromises = responseData.map(async (item) => {
-                            const { lat, lon } = item;
-        
-                            try {
-                                const routeResponse = await axios.get(`https://api.sphere.gistda.or.th/services/route/route?flon=${searchLon}&flat=${searchLat}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                                return routeResponse.data.data.distance;
-                            } catch (error) {
-                                console.error('Error fetching route data:', error);
-                                return null;
-                            }
-                        });
-        
-                        const distances = await Promise.all(routePromises);
-        
-                        responseData.forEach((item, index) => {
-                            const { lat, lon, name, address, tel } = item;
-                            const distance = distances[index];
-        
-                            const googleMapUrl = `https://www.google.com/maps/dir/${searchLat},${searchLon}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
-                            const whereMapUrl = `https://where.gistda.or.th/route?dir=${searchLat}-${searchLon},${lat}-${lon}&result=true&swipe=1`;
-        
-                            const cardHtml = renderToString(
-                                <CardContent
-                                    spacing={1}
-                                    style={{
-                                        position: 'absolute',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -4.5em)',
-                                        transition: 'opacity 0.3s',
-                                        display: 'flex',
-                                        whiteSpace: 'nowrap',
-                                        borderRadius: '5px',
-                                        padding: '20px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                        border: '2px solid #FF6968',
-                                    }}
-                                >
-                                    <Typography component="div">
-                                        <Box style={{ fontWeight: 'bold', margin: 1 }}>{name}</Box>
-                                        <Box style={{ fontWeight: 'light', margin: 1 }}>{address}</Box>
-                                        <Box
-                                            sx={{
-                                                fontWeight: 'light',
-                                                m: 1,
-                                                color: '#FF6968',
-                                                verticalAlign: 'middle',
-                                                WebkitLineClamp: 1,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                            }}
-                                        >
-                                            {tel && (
-                                                <>
-                                                    <PhoneIcon style={{ color: '#FF6968', width: '20px', verticalAlign: 'middle' }} />
-                                                    &nbsp;{tel}
-                                                    <br />
-                                                </>
-                                            )}
-                                        </Box>
-                                        {distance !== null && (
-                                            <Box style={{ fontWeight: 'light', margin: 1 }}>
-                                                <StraightenIcon style={{ color: '#FF6968', width: '20px', verticalAlign: 'middle' }} />
-                                                &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
-                                            </Box>
-                                        )}
-                                        <CardActions style={{ display: 'flex' }}>
-                                            <Box style={{ display: 'flex', margin: '5px' }}>
-                                                <Button
-                                                    href={whereMapUrl}
-                                                    target="_blank"
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        maxWidth: '180px',
-                                                        height: '20px',
-                                                        padding: '0.5rem',
-                                                        borderRadius: '15px',
-                                                        backgroundColor: 'white',
-                                                        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                        textDecoration: 'none',
-                                                    }}
-                                                >
-                                                    <img
-                                                        src="https://where.gistda.or.th/favicon.ico"
-                                                        alt="Favicon"
-                                                        style={{
-                                                            width: '1.5em',
-                                                            borderRadius: '50%',
-                                                            padding: '2px',
-                                                            boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                        }}
-                                                    />
-                                                    <span style={{ margin: '10px', color: '#FF6968' }}>WHERE</span>
-                                                </Button>
-                                            </Box>
-                                            <Box style={{ display: 'flex', margin: '5px' }}>
-                                                <Button
-                                                    href={googleMapUrl}
-                                                    target="_blank"
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        maxWidth: '180px',
-                                                        height: '20px',
-                                                        padding: '0.5rem',
-                                                        borderRadius: '15px',
-                                                        backgroundColor: 'white',
-                                                        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                        textDecoration: 'none',
-                                                    }}
-                                                >
-                                                    <GoogleIcon
-                                                        style={{
-                                                            color: 'white',
-                                                            borderRadius: '50%',
-                                                            padding: '2px',
-                                                            backgroundColor: '#FF6968',
-                                                            boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                        }}
-                                                    />
-                                                    <span style={{ margin: '10px', color: '#FF6968' }}>Google Map</span>
-                                                </Button>
-                                            </Box>
-                                        </CardActions>
-                                    </Typography>
-                                </CardContent>
-                            );
-        
-                            const iconHtml = renderToString(
-                                <LocalHospitalIcon
-                                    style={{
-                                        color: 'white',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#FF6968',
-                                        padding: '2px',
-                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                                    }}
-                                />
-                            );
-        
-                            const markerHtml = `
-                                <style>
-                                    .marker-container {
-                                        position: relative;
-                                        display: inline-block;
-                                        z-index: 20;
-                                    }
-        
-                                    .card-container {
-                                        visibility: hidden;
-                                        z-index: 100;
-                                        top: -10em;
-                                        position: absolute;
-                                        left: 50%;
-                                        transform: translateX(-50%);
-                                        transition: 0.25s ease-in-out;
-                                    }
-        
-                                    .marker-container:hover .card-container {
-                                        visibility: visible;
-                                        position: absolute;
-                                        z-index: 9999;
-                                    }
-                                </style>
-        
-                                <div class='marker-container'>
-                                    <div class='marker-icon'>
-                                        ${iconHtml}
-                                    </div>
-                                    <div class='card-container'>
-                                        <div class='hover-card' style="z-index: 1000">
-                                            ${cardHtml}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-        
-                            const marker = new window.sphere.Marker(
-                                { lat, lon },
-                                {
-                                    icon: {
-                                        html: markerHtml,
-                                        offset: { x: 18, y: 21 },
-                                    },
-                                }
-                            );
-        
-                            map.Overlays.add(marker);
-                        });
 
+            document.body.insertAdjacentHTML("beforeend", loadingAllHtml);
+            loadingCardAdded = true;
 
-        
-                        map.goTo({ center: { lat: searchLat, lon: searchLon }, zoom: 13 });
-        
-                        const loadingCard = document.getElementById('loading-card');
-                        if (loadingCard) {
-                            loadingCard.remove();
-                        }
-                    } catch (error) {
-                        console.error('Error fetching POI data:', error);
-        
-                        const loadingCard = document.getElementById('loading-card');
-                        if (loadingCard) {
-                            loadingCard.remove();
-                        }
-                    }
-                });
+            // Remove the loading card after a delay
+            setTimeout(() => {
+              const loadingCardAllElements =
+                document.getElementsByClassName("all");
+              while (loadingCardAllElements.length > 0) {
+                loadingCardAllElements[0].remove();
+              }
+              loadingCardAdded = false;
+            }, 4500);
+          };
+          showLoadingCard();
 
-                navigator.geolocation.getCurrentPosition(async () => {
-                    // const { searchLat, searchLon } = position.coords;
-                    const map = sphereMapRef.current;
-        
-                    try {
-                        const poiResponse = await axios.get(`https://api.sphere.gistda.or.th/services/poi/search?lon=${searchLon}&lat=${searchLat}&limit=20&tag=Poly%20Clinic&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                        const responseData = poiResponse.data.data;
-                        console.log(responseData);
-                        console.log(searchLon, searchLat);
-                        
-        
-                        const routePromises = responseData.map(async (item) => {
-                            const { lat, lon } = item;
-        
-                            try {
-                                const routeResponse = await axios.get(`https://api.sphere.gistda.or.th/services/route/route?flon=${searchLon}&flat=${searchLat}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                                return routeResponse.data.data.distance;
-                            } catch (error) {
-                                console.error('Error fetching route data:', error);
-                                return null;
-                            }
-                        });
-        
-                        const distances = await Promise.all(routePromises);
-        
-                        responseData.forEach((item, index) => {
-                            const { lat, lon, name, address, tel } = item;
-                            const distance = distances[index];
-        
-                            const googleMapUrl = `https://www.google.com/maps/dir/${searchLat},${searchLon}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
-                            const whereMapUrl = `https://where.gistda.or.th/route?dir=${searchLat}-${searchLon},${lat}-${lon}&result=true&swipe=1`;
-        
-                            const cardHtml = renderToString(
-                                <CardContent
-                                    spacing={1}
-                                    style={{
-                                        position: 'absolute',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -4.5em)',
-                                        transition: 'opacity 0.3s',
-                                        display: 'flex',
-                                        whiteSpace: 'nowrap',
-                                        borderRadius: '5px',
-                                        padding: '20px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                        border: '2px solid #1DBEB8',
-                                    }}
-                                >
-                                    <Typography component="div">
-                                        <Box style={{ fontWeight: 'bold', margin: 1 }}>{name}</Box>
-                                        <Box style={{ fontWeight: 'light', margin: 1 }}>{address}</Box>
-                                        <Box
-                                            sx={{
-                                                fontWeight: 'light',
-                                                m: 1,
-                                                color: '#1DBEB8',
-                                                verticalAlign: 'middle',
-                                                WebkitLineClamp: 1,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                            }}
-                                        >
-                                            {tel && (
-                                                <>
-                                                    <PhoneIcon style={{ color: '#1DBEB8', width: '20px', verticalAlign: 'middle' }} />
-                                                    &nbsp;{tel}
-                                                    <br />
-                                                </>
-                                            )}
-                                        </Box>
-                                        {distance !== null && (
-                                            <Box style={{ fontWeight: 'light', margin: 1 }}>
-                                                <StraightenIcon style={{ color: '#1DBEB8', width: '20px', verticalAlign: 'middle' }} />
-                                                &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
-                                            </Box>
-                                        )}
-                                        <CardActions style={{ display: 'flex' }}>
-                                            <Box style={{ display: 'flex', margin: '5px' }}>
-                                                <Button
-                                                    href={whereMapUrl}
-                                                    target="_blank"
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        maxWidth: '180px',
-                                                        height: '20px',
-                                                        padding: '0.5rem',
-                                                        borderRadius: '15px',
-                                                        backgroundColor: 'white',
-                                                        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                        textDecoration: 'none',
-                                                    }}
-                                                >
-                                                    <img
-                                                        src="https://where.gistda.or.th/favicon.ico"
-                                                        alt="Favicon"
-                                                        style={{
-                                                            width: '1.5em',
-                                                            borderRadius: '50%',
-                                                            padding: '2px',
-                                                            boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                        }}
-                                                    />
-                                                    <span style={{ margin: '10px', color: '#1DBEB8' }}>WHERE</span>
-                                                </Button>
-                                            </Box>
-                                            <Box style={{ display: 'flex', margin: '5px' }}>
-                                                <Button
-                                                    href={googleMapUrl}
-                                                    target="_blank"
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        maxWidth: '180px',
-                                                        height: '20px',
-                                                        padding: '0.5rem',
-                                                        borderRadius: '15px',
-                                                        backgroundColor: 'white',
-                                                        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                        textDecoration: 'none',
-                                                    }}
-                                                >
-                                                    <GoogleIcon
-                                                        style={{
-                                                            color: 'white',
-                                                            borderRadius: '50%',
-                                                            padding: '2px',
-                                                            backgroundColor: '#1DBEB8',
-                                                            boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                        }}
-                                                    />
-                                                    <span style={{ margin: '10px', color: '#1DBEB8' }}>Google Map</span>
-                                                </Button>
-                                            </Box>
-                                        </CardActions>
-                                    </Typography>
-                                </CardContent>
-                            );
-        
-                            const iconHtml = renderToString(
-                                <Vaccines
-                                    style={{
-                                        color: 'white',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#1DBEB8',
-                                        padding: '2px',
-                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                                    }}
-                                />
-                            );
-        
-                            const markerHtml = `
-                                <style>
-                                    .marker-container {
-                                        position: relative;
-                                        display: inline-block;
-                                        z-index: 20;
-                                    }
-        
-                                    .card-container {
-                                        visibility: hidden;
-                                        z-index: 100;
-                                        top: -10em;
-                                        position: absolute;
-                                        left: 50%;
-                                        transform: translateX(-50%);
-                                        transition: 0.25s ease-in-out;
-                                    }
-        
-                                    .marker-container:hover .card-container {
-                                        visibility: visible;
-                                        position: absolute;
-                                        z-index: 9999;
-                                    }
-                                </style>
-        
-                                <div class='marker-container'>
-                                    <div class='marker-icon'>
-                                        ${iconHtml}
-                                    </div>
-                                    <div class='card-container'>
-                                        <div class='hover-card' style="z-index: 1000">
-                                            ${cardHtml}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-        
-                            const marker = new window.sphere.Marker(
-                                { lat, lon },
-                                {
-                                    icon: {
-                                        html: markerHtml,
-                                        offset: { x: 18, y: 21 },
-                                    },
-                                }
-                            );
-        
-                            map.Overlays.add(marker);
-                        });
+          navigator.geolocation.getCurrentPosition(async () => {
+            // const { searchLat, searchLon } = position.coords;
+            const map = sphereMapRef.current;
 
-
-        
-                        map.goTo({ center: { lat: searchLat, lon: searchLon }, zoom: 13 });
-        
-                        const loadingCard = document.getElementById('loading-card');
-                        if (loadingCard) {
-                            loadingCard.remove();
-                        }
-                    } catch (error) {
-                        console.error('Error fetching POI data:', error);
-        
-                        const loadingCard = document.getElementById('loading-card');
-                        if (loadingCard) {
-                            loadingCard.remove();
-                        }
-                    }
-                });
-
-                navigator.geolocation.getCurrentPosition(async () => {
-                    // const { searchLat, searchLon } = position.coords;
-                    const map = sphereMapRef.current;
-        
-                    try {
-                        const poiResponse = await axios.get(`https://api.sphere.gistda.or.th/services/poi/search?lon=${searchLon}&lat=${searchLat}&limit=20&tag=Public%20Health%20Center&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                        const responseData = poiResponse.data.data;
-                        console.log(responseData);
-                        console.log(searchLon, searchLat);
-                        
-        
-                        const routePromises = responseData.map(async (item) => {
-                            const { lat, lon } = item;
-        
-                            try {
-                                const routeResponse = await axios.get(`https://api.sphere.gistda.or.th/services/route/route?flon=${searchLon}&flat=${searchLat}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`);
-                                return routeResponse.data.data.distance;
-                            } catch (error) {
-                                console.error('Error fetching route data:', error);
-                                return null;
-                            }
-                        });
-        
-                        const distances = await Promise.all(routePromises);
-        
-                        responseData.forEach((item, index) => {
-                            const { lat, lon, name, address, tel } = item;
-                            const distance = distances[index];
-        
-                            const googleMapUrl = `https://www.google.com/maps/dir/${searchLat},${searchLon}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
-                            const whereMapUrl = `https://where.gistda.or.th/route?dir=${searchLat}-${searchLon},${lat}-${lon}&result=true&swipe=1`;
-        
-                            const cardHtml = renderToString(
-                                <CardContent
-                                    spacing={1}
-                                    style={{
-                                        transform: 'translate(-50%, -4.5em)',
-                                        position: 'absolute',
-                                        left: '50%',
-                                        transition: 'opacity 0.3s',
-                                        display: 'flex',
-                                        whiteSpace: 'nowrap',
-                                        borderRadius: 15,
-                                        padding: '20px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                        border: '2px solid #8DBAFF',
-                                    }}
-                                >
-                                    <Typography component="div">
-                                        <Box style={{ fontWeight: 'bold', margin: 1 }}>{name}</Box>
-                                        <Box style={{ fontWeight: 'light', margin: 1 }}>{address}</Box>
-                                        <Box
-                                            sx={{
-                                                fontWeight: 'light',
-                                                m: 1,
-                                                color: '#8DBAFF',
-                                                verticalAlign: 'middle',
-                                                WebkitLineClamp: 1,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden',
-                                            }}
-                                        >
-                                            {tel && (
-                                                <>
-                                                    <PhoneIcon style={{ color: '#8DBAFF', width: '20px', verticalAlign: 'middle' }} />
-                                                    &nbsp;{tel}
-                                                    <br />
-                                                </>
-                                            )}
-                                        </Box>
-                                        {distance !== null && (
-                                            <Box style={{ fontWeight: 'light', margin: 1 }}>
-                                                <StraightenIcon style={{ color: '#8DBAFF', width: '20px', verticalAlign: 'middle' }} />
-                                                &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
-                                            </Box>
-                                        )}
-                                        <CardActions style={{ display: 'flex' }}>
-                                            <Box style={{ display: 'flex', margin: '5px' }}>
-                                                <Button
-                                                    href={whereMapUrl}
-                                                    target="_blank"
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        maxWidth: '180px',
-                                                        height: '30px',
-                                                        padding: '0.5rem',
-                                                        borderRadius: '15px',
-                                                        backgroundColor: 'white',
-                                                        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                        textDecoration: 'none',
-                                                    }}
-                                                >
-                                                    <img
-                                                        src="https://where.gistda.or.th/favicon.ico"
-                                                        alt="Favicon"
-                                                        style={{
-                                                            width: '1.5em',
-                                                            borderRadius: '50%',
-                                                            padding: '2px',
-                                                            boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                        }}
-                                                    />
-                                                    <span style={{ margin: '10px', color: '#5686E1' }}>WHERE</span>
-                                                </Button>
-                                            </Box>
-                                            <Box style={{ display: 'flex', margin: '5px' }}>
-                                                <Button
-                                                    href={googleMapUrl}
-                                                    target="_blank"
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        maxWidth: '180px',
-                                                        height: '30px',
-                                                        padding: '0.5rem',
-                                                        borderRadius: '15px',
-                                                        backgroundColor: 'white',
-                                                        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)',
-                                                        textDecoration: 'none',
-                                                    }}
-                                                >
-                                                    <GoogleIcon
-                                                        style={{
-                                                            color: 'white',
-                                                            borderRadius: '50%',
-                                                            padding: '2px',
-                                                            backgroundColor: '#5686E1',
-                                                            boxShadow: 'inset 4px 4px 4px rgba(255, 255, 255, 0.7)',
-                                                        }}
-                                                    />
-                                                    <span style={{ margin: '10px', color: '#5686E1' }}>Google Map</span>
-                                                </Button>
-                                            </Box>
-                                        </CardActions>
-                                    </Typography>
-                                </CardContent>
-                            );
-        
-                            const iconHtml = renderToString(
-                                <MedicalInformation
-                                    style={{
-                                        color: 'white',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#2196F3',
-                                        padding: '2px',
-                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                                    }}
-                                />
-                            );
-        
-                            const markerHtml = `
-                                <style>
-                                    .marker-container {
-                                        position: relative;
-                                        display: inline-block;
-                                        z-index: 20;
-                                    }
-        
-                                    .card-container {
-                                        visibility: hidden;
-                                        z-index: 100;
-                                        top: -10em;
-                                        position: absolute;
-                                        left: 50%;
-                                        transform: translateX(-50%);
-                                        transition: 0.25s ease-in-out;
-                                    }
-        
-                                    .marker-container:hover .card-container {
-                                        visibility: visible;
-                                        position: absolute;
-                                        z-index: 9999;
-                                    }
-                                </style>
-        
-                                <div class='marker-container'>
-                                    <div class='marker-icon'>
-                                        ${iconHtml}
-                                    </div>
-                                    <div class='card-container'>
-                                        <div class='hover-card' style="z-index: 1000">
-                                            ${cardHtml}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-        
-                            const marker = new window.sphere.Marker(
-                                { lat, lon },
-                                {
-                                    icon: {
-                                        html: markerHtml,
-                                        offset: { x: 18, y: 21 },
-                                    },
-                                }
-                            );
-        
-                            map.Overlays.add(marker);
-                        });
-
-
-        
-                        map.goTo({ center: { lat: searchLat, lon: searchLon }, zoom: 13 });
-        
-                        const loadingCard = document.getElementById('loading-card');
-                        if (loadingCard) {
-                            loadingCard.remove();
-                        }
-                    } catch (error) {
-                        console.error('Error fetching POI data:', error);
-        
-                        const loadingCard = document.getElementById('loading-card');
-                        if (loadingCard) {
-                            loadingCard.remove();
-                        }
-                    }
-                });
-
-            } else {
-                console.error('Selected item not found in the response data');
-            }
-
-
-
-            })
-            .catch(error => console.error('Error navigating:', error));
-    };
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////// Search Bar ///////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    const remove = () => {
-        const map = sphereMapRef.current;
-        map.Overlays.clear();
-    };
-
-    const location = () => {
-        const map = sphereMapRef.current;
-        map.Ui.Geolocation.trigger();
-
-        if (map && map.Ui && map.Ui.Geolocation) {
             try {
-                map.Ui.Geolocation.trigger();
-            } catch (error) {
-                console.error('Geolocation trigger error:', error);
-            }
-        } else {
-            console.error('Geolocation functionality is not available.');
-        }
-        setTimeout(() => {
-            // locStatus();
-        }, 2500);
-    };
+              const poiResponse = await axios.get(
+                `https://api.sphere.gistda.or.th/services/poi/search?lon=${searchLon}&lat=${searchLat}&limit=20&tag=โรงพยาบาล&key=F580F0C0ED264853B55FB58261D0E9E8`
+              );
+              const responseData = poiResponse.data.data;
+              console.log(responseData);
+              console.log(searchLon, searchLat);
 
-    // const locStatus = () => {
-    //     const map = sphereMapRef.current;
+              const routePromises = responseData.map(async (item) => {
+                const { lat, lon } = item;
 
-    //     var location = map.location();
-    //     console.log(location);
-    //     var latitude = location.lat
-    //     var longitude = location.lon
-    //     console.log(latitude, longitude);
+                try {
+                  const routeResponse = await axios.get(
+                    `https://api.sphere.gistda.or.th/services/route/route?flon=${searchLon}&flat=${searchLat}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`
+                  );
+                  return routeResponse.data.data.distance;
+                } catch (error) {
+                  console.error("Error fetching route data:", error);
+                  return null;
+                }
+              });
 
-    //     axios.get(`https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${latitude}&lng=${longitude}`)
-    //         .then(response => {
-    //             const data = response.data.data
-    //             const tb = data.loc['tb_tn']
-    //             const ap = data.loc['ap_tn']
+              const distances = await routePromises;
 
-    //             const pv = data.loc['pv_tn']
+              responseData.forEach((item, index) => {
+                const { lat, lon, name, address, tel } = item;
+                const distance = distances[index];
 
-    //             const pm25 = data['pm25']
+                const googleMapUrl = `https://www.google.com/maps/dir/${searchLat},${searchLon}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
+                const whereMapUrl = `https://where.gistda.or.th/route?dir=${searchLat}-${searchLon},${lat}-${lon}&result=true&swipe=1`;
 
-    //             // update sect
-    //             const date = data.datetimeThai['dateThai']
-    //             const time = data.datetimeThai['timeThai']
-
-    //             // update sect
-    //             document.getElementById('location').innerHTML = `${tb} ${ap} ${pv}`;
-    //             document.getElementById('update').innerHTML = `อัพเดทล่าสุด ${date} ${time}`;
-
-    //             ///////////////////////////////////////////////////////////////////////////////////////////////
-    //             ///////////////////////////////////////// Text Color  /////////////////////////////////////////
-    //             ///////////////////////////////////////////////////////////////////////////////////////////////
-    //             let color;
-    //             if (pm25 < 15) {
-    //                 color = '#4FAFBF'; // Very Good air quality
-    //             } else if (pm25 > 15 && pm25 <= 25) {
-    //                 color = '#9FCF62';
-    //             } else if (pm25 > 25 && pm25 <= 37.5) {
-    //                 color = '#F1E151'; // Good
-    //             } else if (pm25 > 37.5 && pm25 <= 75) {
-    //                 color = '#F1A53B'; // Moderate
-    //             } else {
-    //                 color = '#EB4E47'; // Unhealthy for sensitive group
-    //             }
-
-    //             let level;
-    //             if (pm25 < 15) {
-    //                 level = 'ดีมาก'; // Very Good air quality
-    //             } else if (pm25 > 15 && pm25 <= 25) {
-    //                 level = 'ดี';
-    //             } else if (pm25 > 25 && pm25 <= 37.5) {
-    //                 level = 'ปานกลาง'; // Good
-    //             } else if (pm25 > 37.5 && pm25 <= 75) {
-    //                 level = 'เริ่มมีผล'; // Moderate
-    //             } else {
-    //                 level = 'มีผล'; // Unhealthy for sensitive group
-    //             }
-    //             ///////////////////////////////////////////////////////////////////////////////////////////////
-    //             ///////////////////////////////////////// Text Color  /////////////////////////////////////////
-    //             ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    //             const pm25Formatted = pm25.toFixed(2);
-    //             const valueElement = document.getElementById('value');
-    //             valueElement.innerHTML = `
-    //                                                             <span style="font-size: 12px; font-weight: 500;">ค่า PM2.5</span>
-    //                                                             <br />
-    //                                                             <span style="color: ${color};">
-    //                                                                 ${pm25Formatted} <span style="font-size: 10px; font-weight: 500; color: #000;">µg./m³</span>
-    //                                                             </span>
-    //                                                         `;
-    //             document.getElementById('level').innerHTML = `<span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span>`
-    //         })
-    // }
-
-
-    const thZoom = () => {
-        const map = sphereMapRef.current;
-        map.goTo({
-            center: { lon: 100.590204861417, lat: 13.861545245028843 },
-            zoom: 4.8
-        });
-    };
-
-
-    const zoomin = () => {
-        const map = sphereMapRef.current;
-        const currentZoom = map.zoom();
-        map.zoom(currentZoom + 1)
-    };
-
-    const zoomout = () => {
-        const map = sphereMapRef.current;
-        const currentZoom = map.zoom();
-        map.zoom(currentZoom - 1)
-    };
-
-    const StreetBase = () => {
-        const map = sphereMapRef.current;
-        map.Layers.setBase(window.sphere.Layers.STREETS);
-    };
-
-    const HybridBase = () => {
-        const map = sphereMapRef.current;
-        map.Layers.setBase(window.sphere.Layers.HYBRID);
-    };
-
-    const [anchorEl, setAnchorEl] = useState(null);
-    const popperRef = useRef(null);
-
-    const handleClick = (event) => {
-        setAnchorEl(anchorEl ? null : event.currentTarget);
-    };
-
-    // Handle click outside to close the popper
-    const handleClickOutside = (event) => {
-        if (popperRef.current && !popperRef.current.contains(event.target) && !event.currentTarget.contains(event.target)) {
-            setAnchorEl(null);
-        }
-    };
-
-    useEffect(() => {
-        if (anchorEl) {
-            document.addEventListener('mousedown', handleClickOutside);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [anchorEl]);
-
-    const open = Boolean(anchorEl);
-    const id = open ? 'simple-popper' : undefined;
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////// Geo Tool  ///////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    const [activeComponent, setActiveComponent] = React.useState('TMD');
-
-    const clearWMSLayers = () => {
-        const map = sphereMapRef.current;
-        map.Layers.clear();
-    };
-
-    const [openSidebar, setopenSidebar] = useState(false);
-    const [openDashboard, setopenDashboard] = useState(false);
-
-    const toggleSidebar = () => {
-        setopenSidebar(prev => !prev);
-        if (!openSidebar) setopenDashboard(false); // Close Dashboard when Sidebar opens
-    };
-
-    const toggleDashboard = () => {
-        setopenDashboard(prev => !prev);
-        if (!openDashboard) setopenSidebar(false); // Close Sidebar when Dashboard opens
-    };
-
-    const [data, setData] = useState('');
-    const handleData = (newData) => {
-        setData(newData);
-    };
-
-
-    return (
-        <>
-            <div 
-                id="map" 
-                ref={mapRef}
-                style={{
-                    width: "100%",
-                }}>
-
-                {activeComponent === 'TMD' && <TMDControl sphereMapRef={sphereMapRef} dataInf={handleData} />}
-                {activeComponent === 'Satellite' && <SatControl sphereMapRef={sphereMapRef} dataInf={handleData} />}
-                {activeComponent === 'Model' && <NKHControl sphereMapRef={sphereMapRef} dataInf={handleData} />}
-                {/* <MediaCard /> */}
-                <MiniDrawer openSidebar={openSidebar} toggleSidebar={toggleSidebar} />
-                <Dashboard openDashboard={openDashboard} toggleDashboard={toggleDashboard} data={data} />
-
-                <div style={{
-                    position: 'absolute',
-                    right: '1em',
-                    top: '1em',
-                    zIndex: '10'
-                }}>
-                    <div className="healthStack">
-                        <Stack className='Stack' sx={{ position: 'absolute', zIndex: 10, top: '0.5rem', right: 420 }}
-                            direction="row" spacing={1}>
-
-                            <Chip
-                                onClick={insertAllhospital}
-                                size="medium"
-                                sx={{
-                                    bgcolor: 'white',
-                                    color: 'black',
-                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)',
-                                }}
-                                label="สถานพยาบาลทั้งหมด"
-                            />
-                            <Chip size="medium"
-                                onClick={insertHospital}
-                                sx={{
-                                    bgcolor: 'white',
-                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)'
-                                }}
-                                label="โรงพยาบาล"
-                                icon={
-                                    <LocalHospitalIcon
-                                        style={{
-                                            color: 'white',
-                                            borderRadius: '50%',
-                                            padding: '2px',
-                                            backgroundColor: '#FF6968',
-                                        }}
-                                    />
-                                }
-                            />
-                            <Chip
-                                onClick={insertClinic}
-                                size="medium"
-                                sx={{
-                                    bgcolor: 'white',
-                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)'
-                                }}
-                                icon={<Vaccines
-                                    style={{
-                                        color: 'white',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#1DBEB8',
-                                        padding: '2px',
-                                    }} />}
-                                label="คลินิก" />
-
-                            <Chip
-                                onClick={insertHealthSt}
-                                size="medium"
-                                sx={{
-                                    bgcolor: 'white',
-                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)'
-                                }}
-                                icon={<MedicalInformation
-                                    style={{
-                                        color: 'white',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#2196F3',
-                                        padding: '2px',
-                                    }} />}
-                                label="สถานีอนามัย" />
-                        </Stack>
-                    </div>
-                    <Paper
-                        component="form"
+                const cardHtml = renderToString(
+                  <CardContent
+                    spacing={1}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      transform: "translate(-50%, -4.5em)",
+                      transition: "opacity 0.3s",
+                      display: "flex",
+                      whiteSpace: "nowrap",
+                      borderRadius: "5px",
+                      padding: "20px",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid #FF6968",
+                    }}
+                  >
+                    <Typography component="div">
+                      <Box style={{ fontWeight: "bold", margin: 1 }}>
+                        {name}
+                      </Box>
+                      <Box style={{ fontWeight: "light", margin: 1 }}>
+                        {address}
+                      </Box>
+                      <Box
                         sx={{
-                            p: '2px 4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            width: 400,
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)',
-                            borderRadius: '24px',
+                          fontWeight: "light",
+                          m: 1,
+                          color: "#FF6968",
+                          verticalAlign: "middle",
+                          WebkitLineClamp: 1,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
                         }}
-                    >
-                        <InputBase
-                            id='result'
-                            type="text"
-                            inputRef={searchRef}
-                            sx={{ ml: 1, flex: 1, fontFamily: 'Prompt' }}
-                            placeholder="ระบุคำค้นหา เช่น ชื่อสถานที่"
-                            inputProps={{ 'aria-label': 'ระบุคำค้นหา เช่น ชื่อสถานที่' }}
-                            onChange={handleSearch}
-                        />
-                        <Tooltip
-                            title="ล้าง"
-                            arrow
-                            placement="bottom"
-                            TransitionComponent={Zoom}
-                            componentsProps={{
-                                tooltip: {
-                                    sx: {
-                                        color: 'black',
-                                        bgcolor: 'white',
-                                        fontFamily: 'Prompt',
-                                        '& .MuiTooltip-arrow': {
-                                            color: 'white',
-                                        },
-                                    },
-                                },
+                      >
+                        {tel && (
+                          <>
+                            <PhoneIcon
+                              style={{
+                                color: "#FF6968",
+                                width: "20px",
+                                verticalAlign: "middle",
+                              }}
+                            />
+                            &nbsp;{tel}
+                            <br />
+                          </>
+                        )}
+                      </Box>
+                      {distance !== null && (
+                        <Box style={{ fontWeight: "light", margin: 1 }}>
+                          <StraightenIcon
+                            style={{
+                              color: "#FF6968",
+                              width: "20px",
+                              verticalAlign: "middle",
                             }}
-                        >
-                            <IconButton
-                                onClick={handleClearClick}
-                            >
-                                <ClearIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                            title="ค้นหา"
-                            arrow
-                            placement="bottom"
-                            TransitionComponent={Zoom}
-                            componentsProps={{
-                                tooltip: {
-                                    sx: {
-                                        color: 'black',
-                                        bgcolor: 'white',
-                                        fontFamily: 'Prompt',
-                                        '& .MuiTooltip-arrow': {
-                                            color: 'white',
-                                        },
-                                    },
-                                },
+                          />
+                          &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
+                        </Box>
+                      )}
+                      <CardActions style={{ display: "flex" }}>
+                        <Box style={{ display: "flex", margin: "5px" }}>
+                          <Button
+                            href={whereMapUrl}
+                            target="_blank"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              maxWidth: "180px",
+                              height: "20px",
+                              padding: "0.5rem",
+                              borderRadius: "15px",
+                              backgroundColor: "white",
+                              boxShadow:
+                                "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                              textDecoration: "none",
                             }}
-                        >
-                            <IconButton
-                                onClick={handleSearch}
-                                id='myBtn'
-                                type="button"
-                                sx={{ p: '10px' }}
-                                aria-label="search">
-                                <SearchIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Paper>
-                    {showSuggestions && (
-                        <Paper sx={{ borderRadius: '25px', width: 400, marginTop: '0.5rem', boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)' }}>
-                            <Box
-                                sx={{
-                                    // overflowY: 'auto',
-                                    maxHeight: '100vh'
-                                }}
-                            >
-                                {suggestions.length > 0 ? (
-                                    <List id='place'>
-                                        {suggestions.map((item, index) => (
-                                            <ListItemButton
-                                                onClick={() => handleSuggestionClick(item.name)}
-                                                key={index}
-                                                selected={index === selectedIndex}
-                                            >
+                          >
+                            <img
+                              src="https://where.gistda.or.th/favicon.ico"
+                              alt="Favicon"
+                              style={{
+                                width: "1.5em",
+                                borderRadius: "50%",
+                                padding: "2px",
+                                boxShadow:
+                                  "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                              }}
+                            />
+                            <span style={{ margin: "10px", color: "#FF6968" }}>
+                              WHERE
+                            </span>
+                          </Button>
+                        </Box>
+                        <Box style={{ display: "flex", margin: "5px" }}>
+                          <Button
+                            href={googleMapUrl}
+                            target="_blank"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              maxWidth: "180px",
+                              height: "20px",
+                              padding: "0.5rem",
+                              borderRadius: "15px",
+                              backgroundColor: "white",
+                              boxShadow:
+                                "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                              textDecoration: "none",
+                            }}
+                          >
+                            <GoogleIcon
+                              style={{
+                                color: "white",
+                                borderRadius: "50%",
+                                padding: "2px",
+                                backgroundColor: "#FF6968",
+                                boxShadow:
+                                  "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                              }}
+                            />
+                            <span style={{ margin: "10px", color: "#FF6968" }}>
+                              Google Map
+                            </span>
+                          </Button>
+                        </Box>
+                      </CardActions>
+                    </Typography>
+                  </CardContent>
+                );
 
-                                                <div 
-                                                style={{ 
-                                                    display: 'flex', 
-                                                    alignItems: 'center', 
-                                                    marginTop: '0.25rem' 
-                                                }}>
-                                                    <PlaceOutlinedIcon sx={{ color: '#747474' }} fontSize="medium" />
+                const iconHtml = renderToString(
+                  <LocalHospitalIcon
+                    style={{
+                      color: "white",
+                      borderRadius: "50%",
+                      backgroundColor: "#FF6968",
+                      padding: "2px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                    }}
+                  />
+                );
 
-                                                    <div
-                                                        style={{
-                                                            marginLeft: '0.5rem',
-                                                            whiteSpace: 'nowrap',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis',
-                                                            maxWidth: '340px'
-                                                        }}
-                                                    >
-                                                        <span style={{ fontSize: '16px' }}>{item.name}</span>&nbsp;
-                                                        <span style={{ fontSize: '16px', color: '#747474' }}>{item.address}</span>
-                                                    </div>
-                                                </div>
-                                            </ListItemButton>
-                                        ))}
-                                    </List>
-                                ) : (
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        height: '3em',
-                                        padding: '0.5rem',
-                                        textAlign: 'center',
-                                        fontSize: '16px'
-                                    }}>
-                                        <p style={{ margin: 0 }}>ไม่พบข้อมูล</p>
+                const markerHtml = `
+                                <style>
+                                    .marker-container {
+                                        position: relative;
+                                        display: inline-block;
+                                        z-index: 20;
+                                    }
+        
+                                    .card-container {
+                                        visibility: hidden;
+                                        z-index: 100;
+                                        top: -10em;
+                                        position: absolute;
+                                        left: 50%;
+                                        transform: translateX(-50%);
+                                        transition: 0.25s ease-in-out;
+                                    }
+        
+                                    .marker-container:hover .card-container {
+                                        visibility: visible;
+                                        position: absolute;
+                                        z-index: 9999;
+                                    }
+                                </style>
+        
+                                <div class='marker-container'>
+                                    <div class='marker-icon'>
+                                        ${iconHtml}
                                     </div>
+                                    <div class='card-container'>
+                                        <div class='hover-card' style="z-index: 1000">
+                                            ${cardHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
 
-                                )}
-                            </Box>
-                        </Paper>
-                    )}
-                </div>
-                <Box className='Box-Heat' 
-                sx={{ 
-                    zIndex: '10',
-                    marginTop: "-1.5%", 
-                    justifyContent: 'space-between' 
-                    }}>
-                    <SpeedDial
-                        className="heatModel"
-                        ariaLabel="SpeedDial basic example"
-                        icon={<LocalFireDepartmentIcon sx={{ width: '60px' }} />}
-                        direction="left"
+                const marker = new window.sphere.Marker(
+                  { lat, lon },
+                  {
+                    icon: {
+                      html: markerHtml,
+                      offset: { x: 18, y: 21 },
+                    },
+                  }
+                );
+
+                map.Overlays.add(marker);
+              });
+
+              map.goTo({
+                center: { lat: searchLat, lon: searchLon },
+                zoom: 13,
+              });
+
+              const loadingCard = document.getElementById("loading-card");
+              if (loadingCard) {
+                loadingCard.remove();
+              }
+            } catch (error) {
+              console.error("Error fetching POI data:", error);
+
+              const loadingCard = document.getElementById("loading-card");
+              if (loadingCard) {
+                loadingCard.remove();
+              }
+            }
+          });
+
+          navigator.geolocation.getCurrentPosition(async () => {
+            // const { searchLat, searchLon } = position.coords;
+            const map = sphereMapRef.current;
+
+            try {
+              const poiResponse = await axios.get(
+                `https://api.sphere.gistda.or.th/services/poi/search?lon=${searchLon}&lat=${searchLat}&limit=20&tag=Poly%20Clinic&key=F580F0C0ED264853B55FB58261D0E9E8`
+              );
+              const responseData = poiResponse.data.data;
+              console.log(responseData);
+              console.log(searchLon, searchLat);
+
+              const routePromises = responseData.map(async (item) => {
+                const { lat, lon } = item;
+
+                try {
+                  const routeResponse = await axios.get(
+                    `https://api.sphere.gistda.or.th/services/route/route?flon=${searchLon}&flat=${searchLat}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`
+                  );
+                  return routeResponse.data.data.distance;
+                } catch (error) {
+                  console.error("Error fetching route data:", error);
+                  return null;
+                }
+              });
+
+              const distances = await routePromises;
+
+              responseData.forEach((item, index) => {
+                const { lat, lon, name, address, tel } = item;
+                const distance = distances[index];
+
+                const googleMapUrl = `https://www.google.com/maps/dir/${searchLat},${searchLon}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
+                const whereMapUrl = `https://where.gistda.or.th/route?dir=${searchLat}-${searchLon},${lat}-${lon}&result=true&swipe=1`;
+
+                const cardHtml = renderToString(
+                  <CardContent
+                    spacing={1}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      transform: "translate(-50%, -4.5em)",
+                      transition: "opacity 0.3s",
+                      display: "flex",
+                      whiteSpace: "nowrap",
+                      borderRadius: "5px",
+                      padding: "20px",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid #1DBEB8",
+                    }}
+                  >
+                    <Typography component="div">
+                      <Box style={{ fontWeight: "bold", margin: 1 }}>
+                        {name}
+                      </Box>
+                      <Box style={{ fontWeight: "light", margin: 1 }}>
+                        {address}
+                      </Box>
+                      <Box
                         sx={{
-                            marginRight: '0rem',
-                            '& .MuiFab-primary': {
-                                borderRadius: '50%',
-                                width: 60,
-                                height: 60,
-                                background: 'linear-gradient(145deg, #FF4500 3.3%, #FF6F00 45.86%, #DDA0DD 90%)',
-                                color: '#FFFFFF'
-
-                            },
-                            '&:hover .MuiFab-primary': {
-                                boxShadow: '0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6)',
-                                transition: 'box-shadow 0.5s ease-in-out',
-                                animation: 'blinkShadow 2.5s infinite'
-                            },
+                          fontWeight: "light",
+                          m: 1,
+                          color: "#1DBEB8",
+                          verticalAlign: "middle",
+                          WebkitLineClamp: 1,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
                         }}
+                      >
+                        {tel && (
+                          <>
+                            <PhoneIcon
+                              style={{
+                                color: "#1DBEB8",
+                                width: "20px",
+                                verticalAlign: "middle",
+                              }}
+                            />
+                            &nbsp;{tel}
+                            <br />
+                          </>
+                        )}
+                      </Box>
+                      {distance !== null && (
+                        <Box style={{ fontWeight: "light", margin: 1 }}>
+                          <StraightenIcon
+                            style={{
+                              color: "#1DBEB8",
+                              width: "20px",
+                              verticalAlign: "middle",
+                            }}
+                          />
+                          &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
+                        </Box>
+                      )}
+                      <CardActions style={{ display: "flex" }}>
+                        <Box style={{ display: "flex", margin: "5px" }}>
+                          <Button
+                            href={whereMapUrl}
+                            target="_blank"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              maxWidth: "180px",
+                              height: "20px",
+                              padding: "0.5rem",
+                              borderRadius: "15px",
+                              backgroundColor: "white",
+                              boxShadow:
+                                "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                              textDecoration: "none",
+                            }}
+                          >
+                            <img
+                              src="https://where.gistda.or.th/favicon.ico"
+                              alt="Favicon"
+                              style={{
+                                width: "1.5em",
+                                borderRadius: "50%",
+                                padding: "2px",
+                                boxShadow:
+                                  "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                              }}
+                            />
+                            <span style={{ margin: "10px", color: "#1DBEB8" }}>
+                              WHERE
+                            </span>
+                          </Button>
+                        </Box>
+                        <Box style={{ display: "flex", margin: "5px" }}>
+                          <Button
+                            href={googleMapUrl}
+                            target="_blank"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              maxWidth: "180px",
+                              height: "20px",
+                              padding: "0.5rem",
+                              borderRadius: "15px",
+                              backgroundColor: "white",
+                              boxShadow:
+                                "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                              textDecoration: "none",
+                            }}
+                          >
+                            <GoogleIcon
+                              style={{
+                                color: "white",
+                                borderRadius: "50%",
+                                padding: "2px",
+                                backgroundColor: "#1DBEB8",
+                                boxShadow:
+                                  "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                              }}
+                            />
+                            <span style={{ margin: "10px", color: "#1DBEB8" }}>
+                              Google Map
+                            </span>
+                          </Button>
+                        </Box>
+                      </CardActions>
+                    </Typography>
+                  </CardContent>
+                );
 
-                        componentsProps={{
-                            tooltip: {
-                                sx: {
-                                    color: '#FF9900',
-                                    bgcolor: 'white',
-                                    fontFamily: 'Prompt',
-                                    '& .MuiTooltip-arrow': {
-                                        color: 'white',
-                                    },
-                                },
-                            },
+                const iconHtml = renderToString(
+                  <Vaccines
+                    style={{
+                      color: "white",
+                      borderRadius: "50%",
+                      backgroundColor: "#1DBEB8",
+                      padding: "2px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                    }}
+                  />
+                );
+
+                const markerHtml = `
+                                <style>
+                                    .marker-container {
+                                        position: relative;
+                                        display: inline-block;
+                                        z-index: 20;
+                                    }
+        
+                                    .card-container {
+                                        visibility: hidden;
+                                        z-index: 100;
+                                        top: -10em;
+                                        position: absolute;
+                                        left: 50%;
+                                        transform: translateX(-50%);
+                                        transition: 0.25s ease-in-out;
+                                    }
+        
+                                    .marker-container:hover .card-container {
+                                        visibility: visible;
+                                        position: absolute;
+                                        z-index: 9999;
+                                    }
+                                </style>
+        
+                                <div class='marker-container'>
+                                    <div class='marker-icon'>
+                                        ${iconHtml}
+                                    </div>
+                                    <div class='card-container'>
+                                        <div class='hover-card' style="z-index: 1000">
+                                            ${cardHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                const marker = new window.sphere.Marker(
+                  { lat, lon },
+                  {
+                    icon: {
+                      html: markerHtml,
+                      offset: { x: 18, y: 21 },
+                    },
+                  }
+                );
+
+                map.Overlays.add(marker);
+              });
+
+              map.goTo({
+                center: { lat: searchLat, lon: searchLon },
+                zoom: 13,
+              });
+
+              const loadingCard = document.getElementById("loading-card");
+              if (loadingCard) {
+                loadingCard.remove();
+              }
+            } catch (error) {
+              console.error("Error fetching POI data:", error);
+
+              const loadingCard = document.getElementById("loading-card");
+              if (loadingCard) {
+                loadingCard.remove();
+              }
+            }
+          });
+
+          navigator.geolocation.getCurrentPosition(async () => {
+            // const { searchLat, searchLon } = position.coords;
+            const map = sphereMapRef.current;
+
+            try {
+              const poiResponse = await axios.get(
+                `https://api.sphere.gistda.or.th/services/poi/search?lon=${searchLon}&lat=${searchLat}&limit=20&tag=Public%20Health%20Center&key=F580F0C0ED264853B55FB58261D0E9E8`
+              );
+              const responseData = poiResponse.data.data;
+              console.log(responseData);
+              console.log(searchLon, searchLat);
+
+              const routePromises = responseData.map(async (item) => {
+                const { lat, lon } = item;
+
+                try {
+                  const routeResponse = await axios.get(
+                    `https://api.sphere.gistda.or.th/services/route/route?flon=${searchLon}&flat=${searchLat}&tlon=${lon}&tlat=${lat}&mode=d&key=F580F0C0ED264853B55FB58261D0E9E8`
+                  );
+                  return routeResponse.data.data.distance;
+                } catch (error) {
+                  console.error("Error fetching route data:", error);
+                  return null;
+                }
+              });
+
+              const distances = await routePromises;
+
+              responseData.forEach((item, index) => {
+                const { lat, lon, name, address, tel } = item;
+                const distance = distances[index];
+
+                const googleMapUrl = `https://www.google.com/maps/dir/${searchLat},${searchLon}/${lat},${lon}/@${lat},${lon},8z/data=!3m2!1e3!4b1!4m2!4m1!3e0`;
+                const whereMapUrl = `https://where.gistda.or.th/route?dir=${searchLat}-${searchLon},${lat}-${lon}&result=true&swipe=1`;
+
+                const cardHtml = renderToString(
+                  <CardContent
+                    spacing={1}
+                    style={{
+                      transform: "translate(-50%, -4.5em)",
+                      position: "absolute",
+                      left: "50%",
+                      transition: "opacity 0.3s",
+                      display: "flex",
+                      whiteSpace: "nowrap",
+                      borderRadius: 15,
+                      padding: "20px",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid #8DBAFF",
+                    }}
+                  >
+                    <Typography component="div">
+                      <Box style={{ fontWeight: "bold", margin: 1 }}>
+                        {name}
+                      </Box>
+                      <Box style={{ fontWeight: "light", margin: 1 }}>
+                        {address}
+                      </Box>
+                      <Box
+                        sx={{
+                          fontWeight: "light",
+                          m: 1,
+                          color: "#8DBAFF",
+                          verticalAlign: "middle",
+                          WebkitLineClamp: 1,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
                         }}
-                    >
-                        <SpeedDialAction
-                            onClick={() => { clearWMSLayers(); setActiveComponent('TMD'); }}
-                            className={`HIDtmd ${activeComponent === 'TMD' ? 'active' : ''}`}
-                            key="tmd"
-                            icon={
-                                <img style={{ width: '25px' }} src={Tmd} />
-                            }
-                            tooltipTitle="กรมอุตุนิยมวิทยา"
-                            componentsProps={{
-                                tooltip: {
-                                    sx: {
-                                        color: '#FF9900',
-                                        bgcolor: '#fff',
-                                        fontFamily: 'Prompt',
-                                        '& .MuiTooltip-arrow': {
-                                            color: '#FF9900',
-                                        },
-                                    },
-                                },
+                      >
+                        {tel && (
+                          <>
+                            <PhoneIcon
+                              style={{
+                                color: "#8DBAFF",
+                                width: "20px",
+                                verticalAlign: "middle",
+                              }}
+                            />
+                            &nbsp;{tel}
+                            <br />
+                          </>
+                        )}
+                      </Box>
+                      {distance !== null && (
+                        <Box style={{ fontWeight: "light", margin: 1 }}>
+                          <StraightenIcon
+                            style={{
+                              color: "#8DBAFF",
+                              width: "20px",
+                              verticalAlign: "middle",
                             }}
-                        />
-
-                        <SpeedDialAction
-                            onClick={() => { clearWMSLayers(); setActiveComponent('Satellite'); }}
-                            className={`HIDsat ${activeComponent === 'Satellite' ? 'active' : ''}`}
-                            key="satellite"
-                            icon={<SatelliteAltIcon />}
-                            tooltipTitle="ดาวเทียม"
-                            componentsProps={{
-                                tooltip: {
-                                    sx: {
-                                        color: '#FF9900',
-                                        bgcolor: '#fff',
-                                        fontFamily: 'Prompt',
-                                        '& .MuiTooltip-arrow': {
-                                            color: '#FF9900',
-                                        },
-                                    },
-                                },
+                          />
+                          &nbsp;{(distance / 1000).toFixed(2)} กิโลเมตร
+                        </Box>
+                      )}
+                      <CardActions style={{ display: "flex" }}>
+                        <Box style={{ display: "flex", margin: "5px" }}>
+                          <Button
+                            href={whereMapUrl}
+                            target="_blank"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              maxWidth: "180px",
+                              height: "30px",
+                              padding: "0.5rem",
+                              borderRadius: "15px",
+                              backgroundColor: "white",
+                              boxShadow:
+                                "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                              textDecoration: "none",
                             }}
-                        />
+                          >
+                            <img
+                              src="https://where.gistda.or.th/favicon.ico"
+                              alt="Favicon"
+                              style={{
+                                width: "1.5em",
+                                borderRadius: "50%",
+                                padding: "2px",
+                                boxShadow:
+                                  "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                              }}
+                            />
+                            <span style={{ margin: "10px", color: "#5686E1" }}>
+                              WHERE
+                            </span>
+                          </Button>
+                        </Box>
+                        <Box style={{ display: "flex", margin: "5px" }}>
+                          <Button
+                            href={googleMapUrl}
+                            target="_blank"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              maxWidth: "180px",
+                              height: "30px",
+                              padding: "0.5rem",
+                              borderRadius: "15px",
+                              backgroundColor: "white",
+                              boxShadow:
+                                "0px 4px 4px rgba(0, 0, 0, 0.25), inset -4px -4px 4px rgba(197, 197, 197, 0.25)",
+                              textDecoration: "none",
+                            }}
+                          >
+                            <GoogleIcon
+                              style={{
+                                color: "white",
+                                borderRadius: "50%",
+                                padding: "2px",
+                                backgroundColor: "#5686E1",
+                                boxShadow:
+                                  "inset 4px 4px 4px rgba(255, 255, 255, 0.7)",
+                              }}
+                            />
+                            <span style={{ margin: "10px", color: "#5686E1" }}>
+                              Google Map
+                            </span>
+                          </Button>
+                        </Box>
+                      </CardActions>
+                    </Typography>
+                  </CardContent>
+                );
 
-                        {/* <SpeedDialAction
+                const iconHtml = renderToString(
+                  <MedicalInformation
+                    style={{
+                      color: "white",
+                      borderRadius: "50%",
+                      backgroundColor: "#2196F3",
+                      padding: "2px",
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                    }}
+                  />
+                );
+
+                const markerHtml = `
+                                <style>
+                                    .marker-container {
+                                        position: relative;
+                                        display: inline-block;
+                                        z-index: 20;
+                                    }
+        
+                                    .card-container {
+                                        visibility: hidden;
+                                        z-index: 100;
+                                        top: -10em;
+                                        position: absolute;
+                                        left: 50%;
+                                        transform: translateX(-50%);
+                                        transition: 0.25s ease-in-out;
+                                    }
+        
+                                    .marker-container:hover .card-container {
+                                        visibility: visible;
+                                        position: absolute;
+                                        z-index: 9999;
+                                    }
+                                </style>
+        
+                                <div class='marker-container'>
+                                    <div class='marker-icon'>
+                                        ${iconHtml}
+                                    </div>
+                                    <div class='card-container'>
+                                        <div class='hover-card' style="z-index: 1000">
+                                            ${cardHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                const marker = new window.sphere.Marker(
+                  { lat, lon },
+                  {
+                    icon: {
+                      html: markerHtml,
+                      offset: { x: 18, y: 21 },
+                    },
+                  }
+                );
+
+                map.Overlays.add(marker);
+              });
+
+              map.goTo({
+                center: { lat: searchLat, lon: searchLon },
+                zoom: 13,
+              });
+
+              const loadingCard = document.getElementById("loading-card");
+              if (loadingCard) {
+                loadingCard.remove();
+              }
+            } catch (error) {
+              console.error("Error fetching POI data:", error);
+
+              const loadingCard = document.getElementById("loading-card");
+              if (loadingCard) {
+                loadingCard.remove();
+              }
+            }
+          });
+        } else {
+          console.error("Selected item not found in the response data");
+        }
+      })
+      .catch((error) => console.error("Error navigating:", error));
+  };
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////// Search Bar ///////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+
+  const remove = () => {
+    const map = sphereMapRef.current;
+    map.Overlays.clear();
+  };
+
+  const location = () => {
+    const map = sphereMapRef.current;
+    map.Ui.Geolocation.trigger();
+
+    if (map && map.Ui && map.Ui.Geolocation) {
+      try {
+        map.Ui.Geolocation.trigger();
+      } catch (error) {
+        console.error("Geolocation trigger error:", error);
+      }
+    } else {
+      console.error("Geolocation functionality is not available.");
+    }
+    setTimeout(() => {
+      // locStatus();
+    }, 2500);
+  };
+
+  // const locStatus = () => {
+  //     const map = sphereMapRef.current;
+
+  //     var location = map.location();
+  //     console.log(location);
+  //     var latitude = location.lat
+  //     var longitude = location.lon
+  //     console.log(latitude, longitude);
+
+  //     axios.get(`https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${latitude}&lng=${longitude}`)
+  //         .then(response => {
+  //             const data = response.data.data
+  //             const tb = data.loc['tb_tn']
+  //             const ap = data.loc['ap_tn']
+
+  //             const pv = data.loc['pv_tn']
+
+  //             const pm25 = data['pm25']
+
+  //             // update sect
+  //             const date = data.datetimeThai['dateThai']
+  //             const time = data.datetimeThai['timeThai']
+
+  //             // update sect
+  //             document.getElementById('location').innerHTML = `${tb} ${ap} ${pv}`;
+  //             document.getElementById('update').innerHTML = `อัพเดทล่าสุด ${date} ${time}`;
+
+  //             ///////////////////////////////////////////////////////////////////////////////////////////////
+  //             ///////////////////////////////////////// Text Color  /////////////////////////////////////////
+  //             ///////////////////////////////////////////////////////////////////////////////////////////////
+  //             let color;
+  //             if (pm25 < 15) {
+  //                 color = '#4FAFBF'; // Very Good air quality
+  //             } else if (pm25 > 15 && pm25 <= 25) {
+  //                 color = '#9FCF62';
+  //             } else if (pm25 > 25 && pm25 <= 37.5) {
+  //                 color = '#F1E151'; // Good
+  //             } else if (pm25 > 37.5 && pm25 <= 75) {
+  //                 color = '#F1A53B'; // Moderate
+  //             } else {
+  //                 color = '#EB4E47'; // Unhealthy for sensitive group
+  //             }
+
+  //             let level;
+  //             if (pm25 < 15) {
+  //                 level = 'ดีมาก'; // Very Good air quality
+  //             } else if (pm25 > 15 && pm25 <= 25) {
+  //                 level = 'ดี';
+  //             } else if (pm25 > 25 && pm25 <= 37.5) {
+  //                 level = 'ปานกลาง'; // Good
+  //             } else if (pm25 > 37.5 && pm25 <= 75) {
+  //                 level = 'เริ่มมีผล'; // Moderate
+  //             } else {
+  //                 level = 'มีผล'; // Unhealthy for sensitive group
+  //             }
+  //             ///////////////////////////////////////////////////////////////////////////////////////////////
+  //             ///////////////////////////////////////// Text Color  /////////////////////////////////////////
+  //             ///////////////////////////////////////////////////////////////////////////////////////////////
+
+  //             const pm25Formatted = pm25.toFixed(2);
+  //             const valueElement = document.getElementById('value');
+  //             valueElement.innerHTML = `
+  //                                                             <span style="font-size: 12px; font-weight: 500;">ค่า PM2.5</span>
+  //                                                             <br />
+  //                                                             <span style="color: ${color};">
+  //                                                                 ${pm25Formatted} <span style="font-size: 10px; font-weight: 500; color: #000;">µg./m³</span>
+  //                                                             </span>
+  //                                                         `;
+  //             document.getElementById('level').innerHTML = `<span style="color: ${color}; font-weight: bold; font-size: 30px;"> ${level}</span>`
+  //         })
+  // }
+
+  const thZoom = () => {
+    const map = sphereMapRef.current;
+    map.goTo({
+      center: { lon: 100.590204861417, lat: 13.861545245028843 },
+      zoom: 4.8,
+    });
+  };
+
+  const zoomin = () => {
+    const map = sphereMapRef.current;
+    const currentZoom = map.zoom();
+    map.zoom(currentZoom + 1);
+  };
+
+  const zoomout = () => {
+    const map = sphereMapRef.current;
+    const currentZoom = map.zoom();
+    map.zoom(currentZoom - 1);
+  };
+
+  const compass = () => {
+    const map = sphereMapRef.current;
+    map.goTo({ pitch: 0, bearing: 0 });
+  };
+
+  useEffect(() => {
+    const map = sphereMapRef.current;
+    if (!map) return;
+
+    const handleRotate = () => {
+      const renderer = map.Renderer;
+      const transform = renderer?.transform;
+
+      const bearingAngle = transform?.bearing;
+      setbearingAngle(bearingAngle);
+    };
+
+    if (typeof map.Event?.bind === "function") {
+      map.Event.bind(sphere.EventName.Rotate, handleRotate);
+    }
+
+    return () => {
+      if (typeof map.Event?.unbind === "function") {
+        map.Event.unbind(sphere.EventName.Rotate, handleRotate);
+      }
+    };
+  }, [sphereMapRef.current]);
+
+  const StreetBase = () => {
+    const map = sphereMapRef.current;
+    map.Layers.setBase(window.sphere.Layers.STREETS);
+  };
+
+  const HybridBase = () => {
+    const map = sphereMapRef.current;
+    map.Layers.setBase(window.sphere.Layers.HYBRID);
+  };
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const popperRef = useRef(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  // Handle click outside to close the popper
+  const handleClickOutside = (event) => {
+    if (
+      popperRef.current &&
+      !popperRef.current.contains(event.target) &&
+      !event.currentTarget.contains(event.target)
+    ) {
+      setAnchorEl(null);
+    }
+  };
+
+  useEffect(() => {
+    if (anchorEl) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [anchorEl]);
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popper" : undefined;
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////// Geo Tool  ///////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+
+  const [activeComponent, setActiveComponent] = React.useState("TMD");
+
+  const clearWMSLayers = () => {
+    const map = sphereMapRef.current;
+    map.Layers.clear();
+  };
+
+  const [openSidebar, setopenSidebar] = useState(false);
+  const [openDashboard, setopenDashboard] = useState(false);
+
+  const toggleSidebar = () => {
+    setopenSidebar((prev) => !prev);
+    if (!openSidebar) setopenDashboard(false); // Close Dashboard when Sidebar opens
+  };
+
+  const toggleDashboard = () => {
+    setopenDashboard((prev) => !prev);
+    if (!openDashboard) setopenSidebar(false); // Close Sidebar when Dashboard opens
+  };
+
+  const [data, setData] = useState("");
+  const handleData = (newData) => {
+    setData(newData);
+  };
+
+  return (
+    <>
+      <div
+        id="map"
+        ref={mapRef}
+        style={{
+          width: "100%",
+        }}
+      >
+        {activeComponent === "TMD" && (
+          <TMDControl sphereMapRef={sphereMapRef} dataInf={handleData} />
+        )}
+        {activeComponent === "Satellite" && (
+          <SatControl sphereMapRef={sphereMapRef} dataInf={handleData} />
+        )}
+        {/* {activeComponent === 'Model' && <NKHControl sphereMapRef={sphereMapRef} dataInf={handleData} />} */}
+        {/* <MediaCard /> */}
+        <MiniDrawer openSidebar={openSidebar} toggleSidebar={toggleSidebar} />
+        <Dashboard
+          openDashboard={openDashboard}
+          toggleDashboard={toggleDashboard}
+          data={data}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            right: "1em",
+            top: "1em",
+            zIndex: "10",
+          }}
+        >
+          <div className="healthStack">
+            <Stack
+              className="Stack"
+              sx={{
+                position: "absolute",
+                zIndex: 10,
+                top: "0.5rem",
+                right: 420,
+              }}
+              direction="row"
+              spacing={1}
+            >
+              <Chip
+                onClick={insertAllhospital}
+                size="medium"
+                sx={{
+                  bgcolor: "white",
+                  color: "black",
+                  boxShadow:
+                    "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                }}
+                label="สถานพยาบาลทั้งหมด"
+              />
+              <Chip
+                size="medium"
+                onClick={insertHospital}
+                sx={{
+                  bgcolor: "white",
+                  boxShadow:
+                    "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                }}
+                label="โรงพยาบาล"
+                icon={
+                  <LocalHospitalIcon
+                    style={{
+                      color: "white",
+                      borderRadius: "50%",
+                      padding: "2px",
+                      backgroundColor: "#FF6968",
+                    }}
+                  />
+                }
+              />
+              <Chip
+                onClick={insertClinic}
+                size="medium"
+                sx={{
+                  bgcolor: "white",
+                  boxShadow:
+                    "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                }}
+                icon={
+                  <Vaccines
+                    style={{
+                      color: "white",
+                      borderRadius: "50%",
+                      backgroundColor: "#1DBEB8",
+                      padding: "2px",
+                    }}
+                  />
+                }
+                label="คลินิก"
+              />
+
+              <Chip
+                onClick={insertHealthSt}
+                size="medium"
+                sx={{
+                  bgcolor: "white",
+                  boxShadow:
+                    "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                }}
+                icon={
+                  <MedicalInformation
+                    style={{
+                      color: "white",
+                      borderRadius: "50%",
+                      backgroundColor: "#2196F3",
+                      padding: "2px",
+                    }}
+                  />
+                }
+                label="สถานีอนามัย"
+              />
+            </Stack>
+          </div>
+          <Paper
+            component="form"
+            sx={{
+              p: "2px 4px",
+              display: "flex",
+              alignItems: "center",
+              width: 400,
+              boxShadow:
+                "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+              borderRadius: "24px",
+            }}
+          >
+            <InputBase
+              id="result"
+              type="text"
+              inputRef={searchRef}
+              sx={{ ml: 1, flex: 1, fontFamily: "Prompt" }}
+              placeholder="ระบุคำค้นหา เช่น ชื่อสถานที่"
+              inputProps={{ "aria-label": "ระบุคำค้นหา เช่น ชื่อสถานที่" }}
+              onChange={handleSearch}
+            />
+            <Tooltip
+              title="ล้าง"
+              arrow
+              placement="bottom"
+              TransitionComponent={Zoom}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    color: "black",
+                    bgcolor: "white",
+                    fontFamily: "Prompt",
+                    "& .MuiTooltip-arrow": {
+                      color: "white",
+                    },
+                  },
+                },
+              }}
+            >
+              <IconButton onClick={handleClearClick}>
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title="ค้นหา"
+              arrow
+              placement="bottom"
+              TransitionComponent={Zoom}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    color: "black",
+                    bgcolor: "white",
+                    fontFamily: "Prompt",
+                    "& .MuiTooltip-arrow": {
+                      color: "white",
+                    },
+                  },
+                },
+              }}
+            >
+              <IconButton
+                onClick={handleSearch}
+                id="myBtn"
+                type="button"
+                sx={{ p: "10px" }}
+                aria-label="search"
+              >
+                <SearchIcon />
+              </IconButton>
+            </Tooltip>
+          </Paper>
+          {showSuggestions && (
+            <Paper
+              sx={{
+                borderRadius: "25px",
+                width: 400,
+                marginTop: "0.5rem",
+                boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+              }}
+            >
+              <Box
+                sx={{
+                  // overflowY: 'auto',
+                  maxHeight: "100vh",
+                }}
+              >
+                {suggestions.length > 0 ? (
+                  <List id="place">
+                    {suggestions.map((item, index) => (
+                      <ListItemButton
+                        onClick={() => handleSuggestionClick(item.name)}
+                        key={index}
+                        selected={index === selectedIndex}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginTop: "0.25rem",
+                          }}
+                        >
+                          <PlaceOutlinedIcon
+                            sx={{ color: "#747474" }}
+                            fontSize="medium"
+                          />
+
+                          <div
+                            style={{
+                              marginLeft: "0.5rem",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              maxWidth: "340px",
+                            }}
+                          >
+                            <span style={{ fontSize: "16px" }}>
+                              {item.name}
+                            </span>
+                            &nbsp;
+                            <span
+                              style={{ fontSize: "16px", color: "#747474" }}
+                            >
+                              {item.address}
+                            </span>
+                          </div>
+                        </div>
+                      </ListItemButton>
+                    ))}
+                  </List>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "3em",
+                      padding: "0.5rem",
+                      textAlign: "center",
+                      fontSize: "16px",
+                    }}
+                  >
+                    <p style={{ margin: 0 }}>ไม่พบข้อมูล</p>
+                  </div>
+                )}
+              </Box>
+            </Paper>
+          )}
+        </div>
+        <Box
+          className="Box-Heat"
+          sx={{
+            zIndex: "10",
+            marginTop: "-1.5%",
+            justifyContent: "space-between",
+          }}
+        >
+          <SpeedDial
+            className="heatModel"
+            ariaLabel="SpeedDial basic example"
+            icon={<LocalFireDepartmentIcon sx={{ width: "60px" }} />}
+            direction="left"
+            sx={{
+              marginRight: "0rem",
+              "& .MuiFab-primary": {
+                borderRadius: "50%",
+                width: 60,
+                height: 60,
+                background:
+                  "linear-gradient(145deg, #FF4500 3.3%, #FF6F00 45.86%, #DDA0DD 90%)",
+                color: "#FFFFFF",
+              },
+              "&:hover .MuiFab-primary": {
+                boxShadow:
+                  "0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.6)",
+                transition: "box-shadow 0.5s ease-in-out",
+                animation: "blinkShadow 2.5s infinite",
+              },
+            }}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  color: "#FF9900",
+                  bgcolor: "white",
+                  fontFamily: "Prompt",
+                  "& .MuiTooltip-arrow": {
+                    color: "white",
+                  },
+                },
+              },
+            }}
+          >
+            <SpeedDialAction
+              onClick={() => {
+                clearWMSLayers();
+                setActiveComponent("TMD");
+              }}
+              className={`HIDtmd ${activeComponent === "TMD" ? "active" : ""}`}
+              key="tmd"
+              icon={<img style={{ width: "25px" }} src={Tmd} />}
+              tooltipTitle="กรมอุตุนิยมวิทยา"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    color: "#FF9900",
+                    bgcolor: "#fff",
+                    fontFamily: "Prompt",
+                    "& .MuiTooltip-arrow": {
+                      color: "#FF9900",
+                    },
+                  },
+                },
+              }}
+            />
+
+            <SpeedDialAction
+              onClick={() => {
+                clearWMSLayers();
+                setActiveComponent("Satellite");
+              }}
+              className={`HIDsat ${activeComponent === "Satellite" ? "active" : ""}`}
+              key="satellite"
+              icon={<SatelliteAltIcon />}
+              tooltipTitle="ดาวเทียม"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    color: "#FF9900",
+                    bgcolor: "#fff",
+                    fontFamily: "Prompt",
+                    "& .MuiTooltip-arrow": {
+                      color: "#FF9900",
+                    },
+                  },
+                },
+              }}
+            />
+
+            {/* <SpeedDialAction
                             onClick={() => { clearWMSLayers(); setActiveComponent('Model'); }}
                             className={`HIDmodel ${activeComponent === 'Model' ? 'active' : ''}`}
                             // className="HIDmodel"
@@ -2562,279 +2798,336 @@ const MapHeat = () => {
                                 },
                             }}
                         /> */}
-                    </SpeedDial>
-                    <FormGroup
-                        className='Zoom'
-                        sx={{
-                            margin: '0.5rem',
-                            display: 'flex',
-                            justifyItems: 'center',
-                            alignItems: 'center',
-                            borderRadius: '15px',
-                            backgroundColor: '#ff9900',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)',
-                            color: 'white',
-                            width: '40px',
-                            '&:hover': {
-                                color: '#ff9900',
-                            },
-                        }}
-                    >
-                        <Tooltip
-                            title="ซูมเข้า"
-                            arrow
-                            placement="left"
-                            TransitionComponent={Zoom}
-                            componentsProps={{
-                                tooltip: {
-                                    sx: {
-                                        bgcolor: '#ff9900',
-                                        fontFamily: 'Prompt',
-                                        '& .MuiTooltip-arrow': {
-                                            color: '#ff9900',
-                                        },
-                                    },
-                                },
-                            }}
-                        >
-                            <IconButton
-                                className="zoomin"
-                                onClick={zoomin}
-                                sx={{
-                                    width: '35px',
-                                    color: 'white',
-                                }}
-                            >
-                                <AddIcon />
-                            </IconButton>
-                            <hr style={{ width: '80%', opacity: '50%' }} />
-                        </Tooltip>
-                        <Tooltip
-                            title="ซูมออก"
-                            arrow
-                            placement="left"
-                            TransitionComponent={Zoom}
-                            componentsProps={{
-                                tooltip: {
-                                    sx: {
-                                        bgcolor: '#ff9900',
-                                        fontFamily: 'Prompt',
-                                        '& .MuiTooltip-arrow': {
-                                            color: '#ff9900',
-                                        },
-                                    },
-                                },
-                            }}
-                        >
-                            <IconButton
-                                className="zoomout"
-                                onClick={zoomout}
-                                sx={{
-                                    borderRadius: '0',
-                                    width: '35px',
-                                    color: 'white',
-                                }}
-                            >
-                                <RemoveIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </FormGroup>
+          </SpeedDial>
 
-                    <Tooltip
-                        title="ขยายทั้งประเทศ" arrow placement="left"
-                        TransitionComponent={Zoom}
-                        componentsProps={{
-                            tooltip: {
-                                sx: {
-                                    bgcolor: '#ff9900',
-                                    fontFamily: 'Prompt',
-                                    '& .MuiTooltip-arrow': {
-                                        color: '#ff9900',
-                                    },
-                                },
-                            },
-                        }}
-                    >
-                        <IconButton
-                            className="thZoom"
-                            onClick={thZoom}
-                            sx={{
-                                margin: '0.5rem',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)',
-                                '&:hover': {
-                                    fill: "#ff9900",
-                                },
-                                img: {
-                                    width: '25px',
-                                },
-                            }}
-                        >
-                            <svg
-                                id='th'
-                                className="thSvg_HID"
-                                width="800px"
-                                height="800px"
-                                viewBox="0 0 141 260"
-                                xmlns="http://www.w3.org/2000/svg"
-                                // xmlns:xlink="http://www.w3.org/1999/xlink"
-                                version="1.1"
-                            >
-                                <polygon points="129.539,74.861 123.279,62.39 123.967,52.692 107.962,37.209 98.146,37.304 87.832,45.295 78.396,39.154 66.777,47.642 59.072,50.843 61.182,36.617 63.885,31.329 62.913,17.791 52.717,16.937 49.635,13.215 49.113,2 35.101,5.841 25.5,13.618 6.411,18.905 2.025,34.625 8.545,50.961 17.318,60.446 20.566,69.977 19.333,89.23 12.647,93.213 13.951,98.785 29.244,117.587 29.932,126.502 37.543,150.734 24.668,168.588 12.908,207.734 20.685,210.626 39.677,232.132 40.601,237.49 47.572,239.6 58.455,246.524 62.936,247.425 63.387,258 70.239,253.542 75.479,256.174 80.198,247.14 74.08,241.663 71.306,237.206 62.652,236.803 50.654,228.978 47.548,220.964 49.991,218.072 47.857,209.204 43.328,205.932 40.08,194.219 31.757,192.891 29.363,176.081 35.385,164.96 36.523,159.104 44.182,144.167 43.115,125.08 45.272,122.733 50.56,121.571 60.447,121.997 60.518,136.318 74.341,135.157 84.086,140.966 86.386,134.185 83.446,125.056 93.167,109.384 98.692,106.183 127.096,104.665 136.913,101.891 138.975,82.638" />
-                            </svg>
+          <Tooltip
+            title="เข็มทิศ"
+            arrow
+            placement="left"
+            TransitionComponent={Zoom}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "#ff9900",
+                  fontFamily: "Prompt",
+                  "& .MuiTooltip-arrow": {
+                    color: "#ff9900",
+                  },
+                },
+              },
+            }}
+          >
+            <IconButton
+              className="location_HID"
+              onClick={compass}
+              sx={{
+                margin: "0.5rem",
+                boxShadow:
+                  "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                color: "white",
+                "&:hover": {
+                  color: "#ff9900",
+                },
+              }}
+            >
+              <NavigationIcon
+                sx={{
+                  transform: `rotate(${-bearingAngle}deg)`,
+                  transition: "transform 0.5s ease",
+                }}
+              />
+            </IconButton>
+          </Tooltip>
 
-                        </IconButton>
-                    </Tooltip>
+          <FormGroup
+            className="Zoom"
+            sx={{
+              margin: "0.5rem",
+              display: "flex",
+              justifyItems: "center",
+              alignItems: "center",
+              borderRadius: "15px",
+              backgroundColor: "#ff9900",
+              boxShadow:
+                "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+              color: "white",
+              width: "40px",
+              "&:hover": {
+                color: "#ff9900",
+              },
+            }}
+          >
+            <Tooltip
+              title="ซูมเข้า"
+              arrow
+              placement="left"
+              TransitionComponent={Zoom}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    bgcolor: "#ff9900",
+                    fontFamily: "Prompt",
+                    "& .MuiTooltip-arrow": {
+                      color: "#ff9900",
+                    },
+                  },
+                },
+              }}
+            >
+              <IconButton
+                className="zoomin"
+                onClick={zoomin}
+                sx={{
+                  width: "35px",
+                  color: "white",
+                }}
+              >
+                <AddIcon />
+              </IconButton>
+              <hr style={{ width: "80%", opacity: "50%" }} />
+            </Tooltip>
+            <Tooltip
+              title="ซูมออก"
+              arrow
+              placement="left"
+              TransitionComponent={Zoom}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    bgcolor: "#ff9900",
+                    fontFamily: "Prompt",
+                    "& .MuiTooltip-arrow": {
+                      color: "#ff9900",
+                    },
+                  },
+                },
+              }}
+            >
+              <IconButton
+                className="zoomout"
+                onClick={zoomout}
+                sx={{
+                  borderRadius: "0",
+                  width: "35px",
+                  color: "white",
+                }}
+              >
+                <RemoveIcon />
+              </IconButton>
+            </Tooltip>
+          </FormGroup>
 
-                    <Tooltip
-                        title="แผนที่ฐาน" arrow placement="left"
-                        TransitionComponent={Zoom}
-                        componentsProps={{
-                            tooltip: {
-                                sx: {
-                                    bgcolor: '#ff9900',
-                                    fontFamily: 'Prompt',
-                                    '& .MuiTooltip-arrow': {
-                                        color: '#ff9900',
-                                    },
-                                },
-                            },
-                        }}
-                    >
-                        <IconButton
-                            aria-describedby={id} type="button"
-                            onClick={handleClick}
-                            className="basemap"
-                            sx={{
-                                margin: '0.5rem',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)',
-                                color: 'white',
-                                '&:hover': {
-                                    color: "#ff9900"
-                                },
-                            }}
-                        >
-                            <LayersIcon />
-                        </IconButton>
-                    </Tooltip>
+          <Tooltip
+            title="ขยายทั้งประเทศ"
+            arrow
+            placement="left"
+            TransitionComponent={Zoom}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "#ff9900",
+                  fontFamily: "Prompt",
+                  "& .MuiTooltip-arrow": {
+                    color: "#ff9900",
+                  },
+                },
+              },
+            }}
+          >
+            <IconButton
+              className="thZoom"
+              onClick={thZoom}
+              sx={{
+                margin: "0.5rem",
+                boxShadow:
+                  "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                "&:hover": {
+                  fill: "#ff9900",
+                },
+                img: {
+                  width: "25px",
+                },
+              }}
+            >
+              <svg
+                id="th"
+                className="thSvg_HID"
+                width="800px"
+                height="800px"
+                viewBox="0 0 141 260"
+                xmlns="http://www.w3.org/2000/svg"
+                // xmlns:xlink="http://www.w3.org/1999/xlink"
+                version="1.1"
+              >
+                <polygon points="129.539,74.861 123.279,62.39 123.967,52.692 107.962,37.209 98.146,37.304 87.832,45.295 78.396,39.154 66.777,47.642 59.072,50.843 61.182,36.617 63.885,31.329 62.913,17.791 52.717,16.937 49.635,13.215 49.113,2 35.101,5.841 25.5,13.618 6.411,18.905 2.025,34.625 8.545,50.961 17.318,60.446 20.566,69.977 19.333,89.23 12.647,93.213 13.951,98.785 29.244,117.587 29.932,126.502 37.543,150.734 24.668,168.588 12.908,207.734 20.685,210.626 39.677,232.132 40.601,237.49 47.572,239.6 58.455,246.524 62.936,247.425 63.387,258 70.239,253.542 75.479,256.174 80.198,247.14 74.08,241.663 71.306,237.206 62.652,236.803 50.654,228.978 47.548,220.964 49.991,218.072 47.857,209.204 43.328,205.932 40.08,194.219 31.757,192.891 29.363,176.081 35.385,164.96 36.523,159.104 44.182,144.167 43.115,125.08 45.272,122.733 50.56,121.571 60.447,121.997 60.518,136.318 74.341,135.157 84.086,140.966 86.386,134.185 83.446,125.056 93.167,109.384 98.692,106.183 127.096,104.665 136.913,101.891 138.975,82.638" />
+              </svg>
+            </IconButton>
+          </Tooltip>
 
-                    <Popper
-                        className='Basemap'
-                        TransitionComponent={Zoom}
-                        placement="left-start"
-                        modifiers={[
-                            {
-                                name: 'offset',
-                                options: {
-                                    offset: [0, 10], // Adjust the second value to move it lower
-                                },
-                            },
-                        ]}
-                        id={id}
-                        open={open}
-                        anchorEl={anchorEl}
-                        ref={popperRef}>
-                        <Card sx={{ marginRight: '1.5rem' }}>
-                            <Box className='imgMap'
-                                style={{
-                                    zIndex: '15',
-                                    textAlign: 'center',
-                                    display: 'flex'
-                                }}>
-                                <CardActionArea
-                                    onClick={StreetBase}
-                                    className='Street'
-                                    style={{ padding: '0.25rem' }}
-                                >
-                                    <img src={Street} alt="Street" />
-                                    <br />
-                                    <span>เส้นถนน</span>
-                                </CardActionArea>
+          <Tooltip
+            title="แผนที่ฐาน"
+            arrow
+            placement="left"
+            TransitionComponent={Zoom}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "#ff9900",
+                  fontFamily: "Prompt",
+                  "& .MuiTooltip-arrow": {
+                    color: "#ff9900",
+                  },
+                },
+              },
+            }}
+          >
+            <IconButton
+              aria-describedby={id}
+              type="button"
+              onClick={handleClick}
+              className="basemap"
+              sx={{
+                margin: "0.5rem",
+                boxShadow:
+                  "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                color: "white",
+                "&:hover": {
+                  color: "#ff9900",
+                },
+              }}
+            >
+              <LayersIcon />
+            </IconButton>
+          </Tooltip>
 
-                                <CardActionArea
-                                    onClick={HybridBase}
-                                    className='Sat'
-                                    style={{
-                                        padding: '0.25rem',
-                                        zIndex: '15'
-                                    }}
-                                >
-                                    <img src={Satt} />
-                                    <br />
-                                    <span>ดาวเทียม</span>
-                                </CardActionArea>
-                            </Box>
-                        </Card>
-                    </Popper>
-                    <Tooltip
-                        title="ตำแหน่งของฉัน" arrow placement="left"
-                        TransitionComponent={Zoom}
-                        componentsProps={{
-                            tooltip: {
-                                sx: {
-                                    bgcolor: '#ff9900',
-                                    fontFamily: 'Prompt',
-                                    '& .MuiTooltip-arrow': {
-                                        color: '#ff9900',
-                                    },
-                                },
-                            },
-                        }}
-                    >
-                        <IconButton
-                            className="location"
-                            onClick={location}
-                            sx={{
-                                margin: '0.5rem',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)',
-                                color: 'white',
-                                bgcolor: '#fff',
-                                '&:hover': {
-                                    color: "#ff9900",
-                                },
-                            }}
-                        >
-                            <MyLocationIcon />
-                        </IconButton>
-                    </Tooltip>
+          <Popper
+            className="Basemap"
+            TransitionComponent={Zoom}
+            placement="left-start"
+            modifiers={[
+              {
+                name: "offset",
+                options: {
+                  offset: [0, 10], // Adjust the second value to move it lower
+                },
+              },
+            ]}
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            ref={popperRef}
+          >
+            <Card sx={{ marginRight: "1.5rem" }}>
+              <Box
+                className="imgMap"
+                style={{
+                  zIndex: "15",
+                  textAlign: "center",
+                  display: "flex",
+                }}
+              >
+                <CardActionArea
+                  onClick={StreetBase}
+                  className="Street"
+                  style={{ padding: "0.25rem" }}
+                >
+                  <img src={Street} alt="Street" />
+                  <br />
+                  <span>เส้นถนน</span>
+                </CardActionArea>
 
-                    <Tooltip
-                        title="ล้างการทำงาน" arrow placement="left"
-                        TransitionComponent={Zoom}
-                        componentsProps={{
-                            tooltip: {
-                                sx: {
-                                    color: '#d52d2d',
-                                    bgcolor: 'white',
-                                    fontFamily: 'Prompt',
-                                    '& .MuiTooltip-arrow': {
-                                        color: 'white',
-                                    },
-                                },
-                            },
-                        }}
-                    >
-                        <IconButton
-                            className="remove"
-                            onClick={remove}
-                            sx={{
-                                margin: '0.5rem',
-                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)',
-                                color: 'white',
-                                '&:hover': {
-                                    color: "white",
-                                    '.MuiSvgIcon-root': {
-                                        color: '#d52d2d',
-                                    },
-                                },
-                            }}
-                        >
-                            <WrongLocationIcon
-                                sx={{
-                                    color: '#ff9900'
-                                }} />
-                        </IconButton>
-                    </Tooltip>
-                    {/* <FormGroup style={{ position: 'fixed', bottom: '2rem' }}>
+                <CardActionArea
+                  onClick={HybridBase}
+                  className="Sat"
+                  style={{
+                    padding: "0.25rem",
+                    zIndex: "15",
+                  }}
+                >
+                  <img src={Satt} />
+                  <br />
+                  <span>ดาวเทียม</span>
+                </CardActionArea>
+              </Box>
+            </Card>
+          </Popper>
+          <Tooltip
+            title="ตำแหน่งของฉัน"
+            arrow
+            placement="left"
+            TransitionComponent={Zoom}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: "#ff9900",
+                  fontFamily: "Prompt",
+                  "& .MuiTooltip-arrow": {
+                    color: "#ff9900",
+                  },
+                },
+              },
+            }}
+          >
+            <IconButton
+              className="location"
+              onClick={location}
+              sx={{
+                margin: "0.5rem",
+                boxShadow:
+                  "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                color: "white",
+                bgcolor: "#fff",
+                "&:hover": {
+                  color: "#ff9900",
+                },
+              }}
+            >
+              <MyLocationIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip
+            title="ล้างการทำงาน"
+            arrow
+            placement="left"
+            TransitionComponent={Zoom}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  color: "#d52d2d",
+                  bgcolor: "white",
+                  fontFamily: "Prompt",
+                  "& .MuiTooltip-arrow": {
+                    color: "white",
+                  },
+                },
+              },
+            }}
+          >
+            <IconButton
+              className="remove"
+              onClick={remove}
+              sx={{
+                margin: "0.5rem",
+                boxShadow:
+                  "0 2px 4px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(0, 0, 0, 0.02)",
+                color: "white",
+                "&:hover": {
+                  color: "white",
+                  ".MuiSvgIcon-root": {
+                    color: "#d52d2d",
+                  },
+                },
+              }}
+            >
+              <WrongLocationIcon
+                sx={{
+                  color: "#ff9900",
+                }}
+              />
+            </IconButton>
+          </Tooltip>
+          {/* <FormGroup style={{ position: 'fixed', bottom: '2rem' }}>
 
                         <Tooltip
                             title="การใช้งาน" arrow placement="left"
@@ -2868,10 +3161,10 @@ const MapHeat = () => {
                             </IconButton>
                         </Tooltip>
                     </FormGroup> */}
-                </Box>
-            </div >
-        </>
-    )
+        </Box>
+      </div>
+    </>
+  );
 };
 
 export default MapHeat;

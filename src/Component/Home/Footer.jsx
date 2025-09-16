@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './Footer.css';
-import moph_logo from '/src/Icon/moph_logo.png';
-import gistda_logo from '/src/Icon/Gistda_LOGO.png';
-import facebook_logo from '/src/Icon/Facebook.png';
-import twitter_logo from '/src/Icon/TwitterX.png';
-import ig_logo from '/src/Icon/Instagram.png';
-import youtube_logo from '/src/Icon/YouTube.png';
-import PcLogo from '/src/Icon/pc.png'
-import MHESI from '/src/Icon/MHESI.png'
-import MeteoLogo from '/src/Icon/meteo.png'
+import moph_logo from '/assets/Icon/moph_logo.png';
+import gistda_logo from '/assets/Icon/Gistda_LOGO.png';
+import facebook_logo from '/assets/Icon/Facebook.png';
+import twitter_logo from '/assets/Icon/TwitterX.png';
+import ig_logo from '/assets/Icon/Instagram.png';
+import youtube_logo from '/assets/Icon/YouTube.png';
+import PcLogo from '/assets/Icon/pc.png'
+import MHESI from '/assets/Icon/MHESI.png'
+import MeteoLogo from '/assets/Icon/meteo.png'
 import Iframe from 'react-iframe';
-import dropdown_icon from '/src/Icon/keyboard_arrow_down_24dp_303C46_FILL0_wght400_GRAD0_opsz24.png';
-import up_icon from '/src/Icon/keyboard_arrow_up_24dp_303C46_FILL0_wght400_GRAD0_opsz24.png';
+import dropdown_icon from '/assets/Icon/keyboard_arrow_down_24dp_303C46_FILL0_wght400_GRAD0_opsz24.png';
+import up_icon from '/assets/Icon/keyboard_arrow_up_24dp_303C46_FILL0_wght400_GRAD0_opsz24.png';
 
 const Footer = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -114,7 +114,7 @@ const Footer = () => {
                 <p>
                   เบอร์ติดต่อ: 0-2141-4444, 0-2141-4468, 0-2141-4505
                   <br />
-                  อีเมล: CHANIKA@GISTDA.OR.TH
+                  อีเมล: lifedee.gistda@gmail.com
                 </p>
               </div>
             </>
@@ -130,7 +130,7 @@ const Footer = () => {
               <div className={`dropdown ${showMap ? 'show' : ''}`}>
                 <span>
                   <Iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d830.2184689595492!2d100.57808863707783!3d13.845274944633791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29d321511392b%3A0xf17722d6e2159e59!2zR0lTVERBICjguJrguLLguIfguYDguILguJkp!5e0!3m2!1sth!2sth!4v1720145100044!5m2!1sth!2sth"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6344.522332828534!2d100.5618300768033!3d13.881869986523661!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2832ff601e93b%3A0x4adcb46a8124f677!2zR0lTVERBICjguKrguLPguJnguLHguIHguIfguLLguJnguYPguKvguI3guYgpIOC4quC4s-C4meC4seC4geC4h-C4suC4meC4nuC4seC4kuC4meC4suC5gOC4l-C4hOC5guC4meC5guC4peC4ouC4teC4reC4p-C4geC4suC4qOC5geC4peC4sOC4oOC4ueC4oeC4tOC4quC4suC4o-C4quC4meC5gOC4l-C4qCAo4Lit4LiH4LiE4LmM4LiB4Liy4Lij4Lih4Lir4Liy4LiK4LiZKQ!5e1!3m2!1sth!2sth!4v1747709287909!5m2!1sth!2sth"
                     width="100%"
                     height="100%"
                     frameBorder="0"
@@ -146,7 +146,7 @@ const Footer = () => {
             <>
               <h1>แผนที่</h1>
               <Iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d830.2184689595492!2d100.57808863707783!3d13.845274944633791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29d321511392b%3A0xf17722d6e2159e59!2zR0lTVERBICjguJrguLLguIfguYDguILguJkp!5e0!3m2!1sth!2sth!4v1720145100044!5m2!1sth!2sth"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6344.522332828534!2d100.5618300768033!3d13.881869986523661!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2832ff601e93b%3A0x4adcb46a8124f677!2zR0lTVERBICjguKrguLPguJnguLHguIHguIfguLLguJnguYPguKvguI3guYgpIOC4quC4s-C4meC4seC4geC4h-C4suC4meC4nuC4seC4kuC4meC4suC5gOC4l-C4hOC5guC4meC5guC4peC4ouC4teC4reC4p-C4geC4suC4qOC5geC4peC4sOC4oOC4ueC4oeC4tOC4quC4suC4o-C4quC4meC5gOC4l-C4qCAo4Lit4LiH4LiE4LmM4LiB4Liy4Lij4Lih4Lir4Liy4LiK4LiZKQ!5e1!3m2!1sth!2sth!4v1747709287909!5m2!1sth!2sth"
                 width="100%"
                 height="110"
                 frameBorder="0"

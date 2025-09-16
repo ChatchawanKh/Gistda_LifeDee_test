@@ -13,7 +13,7 @@
     position: absolute;
     display: flex;
     justify-content: center;
-    z-index: 11;
+    z-index: 25;
     left: 6rem;
     margin-top: 2vh;
     height: calc(100% - 4vh);
@@ -237,6 +237,7 @@
 }
 
 .card-swipe-detail {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -377,13 +378,18 @@
     }
 }
 
+.OpenDashboard-HID {
+    background-color: #fff !important;
+}
+
+
 .openDashboard-HID {
-    color: #FFA447;
+    color: #FFA447 !important;
     transition: background-color 0.3s ease;
 }
 
 .openDashboard-HID:hover {
-    color: #FFA447;
+    color: #FFA447 !important;
     transition: background-color 0.3s ease;
 }
 

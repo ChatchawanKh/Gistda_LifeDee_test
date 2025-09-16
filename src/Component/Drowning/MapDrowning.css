@@ -1,0 +1,212 @@
+html {
+  height: 100%;
+}
+
+* {
+font-family: 'Prompt', sans-serif !important;
+font-style: normal;
+}
+
+body {
+  margin: 0px;
+  height: 100%;
+}
+
+#map{
+  height: 100%;
+}
+
+#root {
+    height: 100%;
+}
+
+/* .Box {
+  button{
+    background-color: #344ca3;
+    border-radius: 15px;
+  }
+
+  .remove{
+    background-color: #fff;
+  }
+
+  margin: 0.25rem;
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: end;
+  top: 16rem !important;
+  right: 0.75rem;
+} */
+
+.Box_rcp {
+button{
+  background-color: #344ca3 ;
+  border-radius: 15px;
+}
+
+.remove{
+  background-color: #fff;
+}
+
+.infoIcon{
+  background-color: #fff;
+  bottom: 0;
+}
+
+margin: 0.25rem;
+position: absolute;
+z-index: 10;
+display: flex;
+flex-direction: column;
+-webkit-box-pack: center;
+justify-content: center;
+-webkit-box-align: center;
+align-items: end;
+top: 6rem;
+right: 0.75rem;
+pointer-events: none;
+}
+
+.Box_rcp > * {
+    pointer-events: auto;
+}
+
+.Basemap {
+z-index: 12;
+}
+
+.Sat img {
+transition: transform 0.5s, filter 0.5s ease-in-out;
+}
+
+.Sat:hover img {
+transform: scale(1.1);
+}
+
+.Street img {
+transition: transform 0.5s, filter 0.5s ease-in-out;
+}
+
+.Street:hover img {
+transform: scale(1.1);
+}
+
+
+
+.location_rcp,
+.basemap_rcp,
+.thaiZoom_rcp,
+.zoomout_rcp,
+.zoomin_rcp {
+background-color: #344ca3 !important;
+}
+
+.location_rcp:hover ,
+.basemap_rcp:hover,
+.thaiZoom_rcp:hover,
+.zoomout_rcp:hover,
+.zoomin_rcp:hover {
+background-color: rgba(0, 0, 0, 0.04)!important;
+}
+
+.thSvg_rcp {
+fill: #fff !important;
+transition: fill 0.3s ease;
+width: 25px;
+height: 25px;
+}
+
+.thSvg_rcp:hover {
+fill: #344ca3 !important;
+width: 25px;
+height: 25px;
+}
+
+.thaiZoom_rcp:hover svg{
+  fill: #344ca3 !important;
+}
+
+.check_rcp .css-byenzh-MuiButtonBase-root-MuiSwitch-switchBase.Mui-checked {
+  color:#e49795 !important;
+  box-shadow: 0px 0.5px 0.5px rgba(0, 0, 0, 0.4) !important;
+}
+
+
+.maplibregl-popup-close-button, 
+.mapboxgl-popup-close-button {
+border-color: transparent!important;
+font-size: 40px!important;
+margin-top: -1rem!important;
+height: 0!important;
+width: auto!important;
+}
+
+.maplibregl-popup-close-button:hover {
+background-color: transparent !important;
+}
+
+.maplibregl-popup-content {
+background-color: rgba(255, 255, 255, 0.9) !important;
+border-radius: 8px !important;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+
+}
+
+.maplibregl-popup-tip .mapboxgl-popup-tip {
+background-color: rgba(255, 255, 255, 0.9) !important;
+background-image: url('src/Icon/Marker_Animation.gif') !important;
+}
+
+#value{
+line-height: 0;
+}
+
+
+.maplibregl-popup-close-button .mapboxgl-popup-close-button {
+display: none !important;
+}
+
+.mapboxgl-user-location-accuracy-circle, 
+.maplibregl-user-location-accuracy-circle {
+background-color: none !important;
+}
+
+.maplibregl-marker:hover {
+z-index: 12;
+}
+
+
+.mapboxgl-user-location-accuracy-circle, .maplibregl-user-location-accuracy-circle{
+display: none;
+}
+
+.css-byenzh-MuiButtonBase-root-MuiSwitch-switchBase.Mui-checked+.MuiSwitch-track{
+background-color: #ECF7FF !important;
+opacity: 1 !important;
+}
+
+
+.rcpSlide {
+  z-index: 15;
+  position: absolute;
+  bottom: 15px;
+  right: 0.75rem;
+  /* transform: translateX(-50%); */
+}
+
+
+
+
+
+
+
+
+
+
+
+

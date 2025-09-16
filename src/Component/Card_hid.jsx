@@ -95,7 +95,11 @@ export default function MediaCard() {
                 <>
                   <Box id="attriBute">
 
-                    <span style={{ color: "#a6a4a4" }} id="title"></span>
+                    <span
+                      className="title" 
+                      style={{ color: "#a6a4a4" }} 
+                      id="title">
+                    </span>
                     <span
                       id="location"
                       style={{ fontSize: "16px", fontWeight: "bold" }}

@@ -1,0 +1,57 @@
+.css-10hburv-MuiTypography-root {
+    font-family: 'Prompt', sans-serif !important;
+    font-size: 18px !important;
+    font-weight: 400;
+}
+
+.nav-footer-content {
+    margin-top: auto;
+    line-height: 2.5;
+    text-align: center;
+    font-size: 0.8rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.logo-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    margin-right: 10px;
+    h1 {
+        font-family: 'Prompt';
+        font-size: 25px;
+        line-height: 25px;
+        background: linear-gradient(90deg, #2AB9C6 0%, #AACB55 29.4%, #F69021 53.9%, #F34B2D 84.4%), linear-gradient(90deg, #2AB9C6 0%, #AACB55 29.4%, #F69021 53.9%, #F34B2D 84.4%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+    }
+
+    p {
+        font-size: 12px;
+        line-height: 12px;
+        margin: 0;
+        font-weight: 550;
+        font-family: 'Prompt';
+        color: #5d5d5d;
+    }
+}
+
+.css-10hburv-MuiTypography-root {
+    font-size: 16px !important;
+}
+
+.MuiTypography-root {
+    font-family: 'Prompt', sans-serif !important;
+}
+
+

@@ -3,6 +3,9 @@
     font-size: 18px !important;
     font-weight: 400;
 }
+body {
+    font-family: 'Prompt', sans-serif;
+  }
 
 .nav-footer-content {
     margin-top: auto;
@@ -27,6 +30,7 @@
     margin-right: 10px;
     h1 {
         font-family: 'Prompt';
+        font-weight: 600;
         font-size: 25px;
         line-height: 25px;
         background: linear-gradient(90deg, #2AB9C6 0%, #AACB55 29.4%, #F69021 53.9%, #F34B2D 84.4%), linear-gradient(90deg, #2AB9C6 0%, #AACB55 29.4%, #F69021 53.9%, #F34B2D 84.4%);
@@ -48,6 +52,11 @@
 
 .css-10hburv-MuiTypography-root {
     font-size: 16px !important;
+    font-family: 'Prompt', sans-serif;
+}
+
+.MuiTypography-root {
+    font-family: 'Prompt', sans-serif !important;
 }
 
 

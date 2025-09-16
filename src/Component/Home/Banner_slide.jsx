@@ -7,9 +7,9 @@ import 'swiper/css/navigation';
 import './Banner_slide.css';
 
 // Import Banner Picture
-import BannerSlide1 from '/src/Icon/BannerSlide1.png';
-import BannerSlide2 from '/src/Icon/BannerSlide2.png';
-import BannerSlide3 from '/src/Icon/BannerSlide3.png';
+import BannerSlide1 from '/assets/Icon/BannerSlide1.png';
+import BannerSlide2 from '/assets/Icon/BannerSlide2.png';
+import BannerSlide3 from '/assets/Icon/BannerSlide3.png';
 
 // import required modules
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';

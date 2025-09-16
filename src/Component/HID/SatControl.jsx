@@ -22,7 +22,7 @@ import { Slider as BaseSlider, sliderClasses } from "@mui/base/Slider";
 import MediaCard from "../Card_hid";
 
 //LEGENDS
-import HIDSatLegend from "/src/Icon/legend/HID_Sat_Legend.png";
+import HIDSatLegend from "/assets/Icon/legend/HID_Sat_Legend.png";
 
 //ICON
 // import DeviceThermostatOutlinedIcon from "@mui/icons-material/DeviceThermostatOutlined";
@@ -44,21 +44,27 @@ const SatControl = React.forwardRef((props, ref) => {
   const [currentLayerType, setCurrentLayerType] = useState("UTFVI_TH_D");
   const [activeButton, setActiveButton] = useState("UTFVI_TH_D");
   const [satLayerName, setsatLayerName] = useState("daytime_data");
-  // const [sattime, setsatTime] = useState("กลางวัน");
+  const [sattime, setsatTime] = useState("กลางวัน");
 
   const theme = useTheme();
   const { sphereMapRef, dataInf } = props;
   const [activeStep, setActiveStep] = useState(1);
 
+  const [isEnabled, setIsEnabled] = useState(false);
   const intervalRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-
-  // const map = sphereMapRef.current;
-  const mapRef = useRef(null);
 
   const [dataInfo, setDataInfo] = useState("");
   const debounceTimer = useRef(null);
   const satlayRef = useRef(activeStep);
+  const [currentTime, setcurrentTime] = useState(null);
+
+  const handleMapClickRef = useRef(null);
+  const satLayerRef = useRef(null);
+  const tmdTimeRef = useRef(null);
+
+  // const map = sphereMapRef.current;
+  // const mapRef = useRef(null);
 
   useEffect(() => {
     if (dataInf) {
@@ -66,381 +72,566 @@ const SatControl = React.forwardRef((props, ref) => {
     }
   }, [dataInfo, dataInf]);
 
+  // useEffect(() => {
+  //   handleDayClick();
+
+  //   const map = sphereMapRef.current;
+
+  //   if (!window.sphere || !map) {
+  //     console.error("Sphere SDK or map is not initialized.");
+  //     return;
+  //   }
+
+  //   const handleMapClick = async (event) => {
+
+  //     if (!event) {
+  //       console.error("Event is null or undefined.");
+  //       return;
+  //     }
+
+  //       const latTMD = event.lat;
+  //       const lonTMD = event.lon;
+
+  //       const response = await axios.get(
+  //         "https://pm25.gistda.or.th/rest/getPm25byLocation",
+  //         {
+  //           params: {
+  //             lat: latTMD,
+  //             lng: lonTMD,
+  //           },
+  //         }
+  //       );
+
+  //       const pm25Data = response.data;
+  //       const tb = pm25Data.data?.loc?.["tb_tn"];
+  //       const ap = pm25Data.data?.loc?.["ap_tn"];
+  //       const pv = pm25Data.data?.loc?.["pv_tn"];
+  //       console.log("pm25Data:", pm25Data);
+
+  //       function fetchTemp() {
+  //                   const culture = "th-TH";
+  //                   const url = `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`;
+
+  //                   return fetch(url)
+  //                     .then((response) => {
+  //                       if (!response.ok) {
+  //                         throw new Error(`fetchTemp response not ok: ${response.statusText}`);
+  //                       }
+  //                       return response.json();
+  //                     })
+  //                     .then((data) => {
+  //                       if (!data.weather3Hour) {
+  //                         throw new Error("Missing weather3Hour in fetchTemp");
+  //                       }
+
+  //                       const { dryBlubTemperature, rainfall } = data.weather3Hour;
+  //                       const temp = dryBlubTemperature.toFixed(0);
+
+  //                       let rainfallIcon, rainText = "ฝนตก", rainValue = rainfall, mm = "มม.";
+  //                       if (rainfall < 0.1) {
+  //                         rainfallIcon = noRain;
+  //                         rainText = "ไม่มีฝนตก";
+  //                         rainValue = "";
+  //                         mm = "";
+  //                       } else if (rainfall <= 10) {
+  //                         rainfallIcon = lightRain;
+  //                       } else if (rainfall <= 35) {
+  //                         rainfallIcon = moderateRain;
+  //                       } else if (rainfall <= 90) {
+  //                         rainfallIcon = heavyRain;
+  //                       } else {
+  //                         rainfallIcon = veryHeavyRain;
+  //                       }
+
+  //                       return { rainfallIcon, rainText, rainValue, temp, mm };
+  //                     })
+  //                     .catch((error) => {
+  //                       console.error("fetchTemp error:", error);
+  //                       throw error;
+  //                     });
+  //       }
+
+  //       function fetchRain() {
+  //         const culture = "th-TH";
+  //         const url = `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`;
+
+  //         return fetch(url)
+  //           .then((response) => {
+  //             if (!response.ok) {
+  //               throw new Error(`Network response was not ok: ${response.statusText}`);
+  //             }
+  //             return response.json();
+  //           })
+  //           .then((data) => {
+  //             const forecastData = data[0];
+  //             if (forecastData && forecastData.weatherForecast7Day) {
+  //               const weatherForecast = forecastData.weatherForecast7Day;
+  //               const { rainArea, windSpeed, windDirection: windDir } = weatherForecast;
+
+  //               const windDirDeg = renderToString(
+  //                 <NavigationRoundedIcon
+  //                   style={{
+  //                     color: "#758CA3",
+  //                     width: 18,
+  //                     verticalAlign: "middle",
+  //                     transform: `rotate(${windDir}deg)`,
+  //                   }}
+  //                 />
+  //               );
+
+  //               const waterDrop = renderToString(
+  //                 <WaterDropRoundedIcon
+  //                   style={{
+  //                     color: "#56c8f5",
+  //                     width: 18,
+  //                     verticalAlign: "middle",
+  //                   }}
+  //                 />
+  //               );
+
+  //               return { waterDrop, rainArea, windDirDeg, windSpeed };
+  //             } else {
+  //               console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
+  //               return {
+  //                 waterDrop: null,
+  //                 rainArea: null,
+  //                 windDirDeg: null,
+  //                 windSpeed: null,
+  //               };
+  //             }
+  //           })
+  //           .catch((error) => {
+  //             console.error("fetchRain error:", error);
+  //             throw error;
+  //           });
+  //       }
+
+  //       const dataInfElement = document.getElementById("dataInf");
+  //       const dataDate = dataInfElement.dataset.date;
+  //       const apiTime = new Date(dataDate).getTime();
+
+  //       // let dataName = "daytime_data";
+  //       const dataInfSelect = document.getElementById("dataInf");
+  //       // dataInfElementDay.setAttribute('data-layer', dataName);
+  //       const LayerSelected = dataInfSelect.dataset.layer;
+
+  //       const heatIndexResponse = await axios.get(
+  //         `https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/${LayerSelected}/ImageServer/identify`,
+  //         {
+  //           params: {
+  //             geometry: `{y:${latTMD},x:${lonTMD}}`,
+  //             geometryType: "esriGeometryPoint",
+  //             time: encodeURIComponent(apiTime),
+  //             returnGeometry: false,
+  //             returnCatalogItems: true,
+  //             returnPixelValues: true,
+  //             processAsMultidimensional: false,
+  //             maxItemCount: 10,
+  //             f: "pjson",
+  //           },
+  //         }
+  //       );
+
+  //       const hidTMDValueCoor = heatIndexResponse.data?.value;
+  //       const hidCoor = parseFloat(hidTMDValueCoor);
+  //       console.log(`hidCoor`, hidCoor);
+
+  //       const hidUpdateJson =
+  //         heatIndexResponse.data.catalogItems.features[0].attributes.Date;
+
+  //       const hidUnix = new Date(hidUpdateJson);
+  //       const thaiWeekdays = [
+  //         "อาทิตย์",
+  //         "จันทร์",
+  //         "อังคาร",
+  //         "พุธ",
+  //         "พฤหัส",
+  //         "ศุกร์",
+  //         "เสาร์",
+  //       ];
+  //       const weekday = thaiWeekdays[hidUnix.getDay()];
+
+  //       let textColor, level, strokeColor, strokeWidth;
+
+  //         if (hidCoor < 0) {
+  //           textColor = "#C5E0D3";
+  //           strokeColor = "#00000099";
+  //           strokeWidth = "1";
+  //           level = "ดีมาก";
+  //         } else if (hidCoor >= 0 && hidCoor <= 0.005) {
+  //           textColor = "#8CC2AB";
+  //           strokeColor = "#00000099";
+  //           strokeWidth = "1";
+  //           level = "ดี";
+  //         } else if (hidCoor >= 0.005 && hidCoor <= 0.01) {
+  //           textColor = "#FFD046";
+  //           strokeColor = "#00000099";
+  //           strokeWidth = "1";
+  //           level = "ปกติ";
+  //         } else if (hidCoor >= 0.01 && hidCoor <= 0.015) {
+  //           textColor = "#F49C30";
+  //           level = "ควรระวัง";
+  //         } else if (hidCoor >= 0.015 && hidCoor <= 0.02) {
+  //           textColor = "#E9671C";
+  //           level = "เฝ้าระวัง";
+  //         } else {
+  //           textColor = "#DC3546";
+  //           level = "อันตราย";
+  //         }
+
+  //       const loadingHtml = `
+  //           <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
+  //               <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
+  //               <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
+  //           </div>
+  //           <style>
+  //               @keyframes spin {
+  //                   0% { transform: rotate(0deg); }
+  //                   100% { transform: rotate(360deg); }
+  //               }
+  //           </style>
+  //       `;
+
+  //       Promise.all([fetchTemp(), fetchRain()])
+  //                 .then(([tempData, rainData]) => {
+  //                   console.log("Promise.all resolved data:", {
+  //                     tempData,
+  //                     rainData,
+  //                   });
+  //                   if (tempData && rainData) {
+  //                     const combinedData = { ...tempData, ...rainData };
+  //                     updateWeatherDetails(combinedData);
+  //                   } else {
+  //                     console.error("Failed to fetch one or both data sources");
+
+  //                     const errorData = {
+  //                       rainfallIcon: "",
+  //                       rainText: "",
+  //                       rainValue: "",
+  //                       temp: "",
+  //                       mm: "",
+  //                       waterDrop: "",
+  //                       rainArea: "",
+  //                       windDirDeg: "",
+  //                       windSpeed: "",
+  //                     };
+  //                     updateWeatherDetails(errorData);
+  //                   }
+  //                 })
+  //                 .catch((error) => {
+  //                   console.error("Promise.all error:", error);
+  //                   const errorData = {
+  //                     rainfallIcon: "",
+  //                     rainText: "",
+  //                     rainValue: "",
+  //                     temp: "",
+  //                     mm: "",
+  //                     waterDrop: "",
+  //                     rainArea: "",
+  //                     windDirDeg: "",
+  //                     windSpeed: "",
+  //                   };
+  //                   updateWeatherDetails(errorData);
+  //                 });
+
+  //               function updateWeatherDetails({
+  //                 rainfallIcon,
+  //                 rainText,
+  //                 rainValue,
+  //                 temp,
+  //                 mm,
+  //                 waterDrop,
+  //                 rainArea,
+  //                 windDirDeg,
+  //                 windSpeed,
+  //               }) {
+
+  //         // const titleElement = document.getElementById("title");
+  //         // let sattime = titleElement ? titleElement.textContent : '';
+
+  //         const rainIcon = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "")
+  //                 ? `${rainfallIcon}`
+  //                 : "";
+
+  //               const rainIconStyle = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "")
+  //                 ? ""
+  //                 : "opacity: 0";
+  //                 const formattedTemp = (temp !== undefined && temp !== null && temp !== "")
+  //                 ? `${temp} °C`
+  //                 : "";
+  //                 const formattedRainArea = (rainArea !== undefined && rainArea !== null && rainArea !== "")
+  //                     ? `${rainArea}% ของพื้นที่`
+  //                     : ``;
+  //                 const formattedWindSpeed = (windSpeed !== undefined && windSpeed !== null && windSpeed !== "")
+  //                 ? `${windSpeed} กม./ชม.`
+  //                 : "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน <br>";
+
+  //         const popupDetail = `
+  //                 <div style="padding:0.5rem;">
+  //                     <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
+  //                     <span style="font-size: 14px;"></span>
+
+  //                     <img style="width: 30px; vertical-align: middle; ${rainIconStyle}" src="${rainIcon}" alt="Rainfall Icon" />
+  //                     <span style="color: #a6a4a4; font-size: 16px;">${formattedTemp}</span>
+  //                     <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
+  //                     <span id="rainPer-pop"></span><span id="wind"></span></br>
+  //                     <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${formattedRainArea}</span>
+  //                     <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${formattedWindSpeed}</span><br />
+
+  //                     <span style="font-size: 14px;">${sattime}</span><br />
+  //                     <span id='value' style={{ fontWeight: 'bold', fontSize: '30px' }}><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor};
+  //                     text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">${hidCoor.toFixed(3)} </span></span>
+  //                     <span id="level"><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor};
+  //                     text-shadow: 0 0 ${strokeWidth}px ${strokeColor};"> ${level}</span><br />
+  //                     <span id="updateTMD" style="font-size: 12px; color: #a6a6a6;">
+  //                       อัพเดตล่าสุด วัน${weekday}ที่ ${hidUnix.getDate()}
+  //                       ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)}
+  //                       ${hidUnix.getFullYear() + 543} เวลา
+  //                       ${hidUnix.getHours()}:${
+  //                         hidUnix.getMinutes() < 10
+  //                           ? "0" + hidUnix.getMinutes()
+  //                           : hidUnix.getMinutes()
+  //                       } น.
+  //                     </span>
+  //                 </div>
+  //               `;
+
+  //         var popUp = new sphere.Popup(
+  //           { lon: lonTMD, lat: latTMD },
+  //           {
+  //             title: `
+  //               <span style='font-weight: 500; margin-left: 0.5rem;'>ตำแหน่งที่สนใจ</span>
+  //               <span style='font-weight: 400; color: #a6a6a6;'>
+  //                   ${latTMD.toFixed(4)}, ${lonTMD.toFixed(4)}
+  //               </span>
+  //           `,
+  //             detail: loadingHtml,
+  //             loadDetail: updateDetail,
+  //             size: { width: "100%" },
+  //             closable: true,
+  //           }
+  //         );
+
+  //         // eslint-disable-next-line no-inner-declarations
+  //         function updateDetail(element) {
+  //           setTimeout(function () {
+  //             element.innerHTML = popupDetail;
+  //           }, 1000);
+  //         }
+  //         map.Overlays.add(popUp);
+  //       }
+
+  //   }
+  //   map.Event.bind(sphere.EventName.Click, handleMapClick);
+
+  //   return () => {
+  //     if (map && map.Event) {
+  //       map.Event.unbind(sphere.EventName.Click, handleMapClick);
+  //     }
+  //   };
+
+  // }, [map]);
+
   useEffect(() => {
-    handleDayClick();
-    
     const map = sphereMapRef.current;
 
     if (!window.sphere || !map) {
       console.error("Sphere SDK or map is not initialized.");
       return;
     }
-    
-    
-    const handleMapClick = async (event) => {
 
+    let thBound = new sphere.Layer('0', {
+                    type: sphere.LayerType.WMS,
+                    url: "https://gistdaportal.gistda.or.th/data2/services/L05_Province_GISTDA_50k_nonlabel/MapServer/WMSServer",
+                    zoomRange: { min: 1, max: 15 },
+                    zIndex: 10,
+                    opacity: 0.8,
+                    id: 'L05_Province_GISTDA_50k_nonlabel'
+                })
+                map.Layers.add(thBound);
+
+    const handleMapClick = async (event) => {
       if (!event) {
         console.error("Event is null or undefined.");
         return;
-      } 
-
-        const latTMD = event.lat;
-        const lonTMD = event.lon;
-
-        const response = await axios.get(
-          "https://pm25.gistda.or.th/rest/getPm25byLocation",
-          {
-            params: {
-              lat: latTMD,
-              lng: lonTMD,
-            },
-          }
-        );
-
-        const pm25Data = response.data;
-        const tb = pm25Data.data?.loc?.["tb_tn"];
-        const ap = pm25Data.data?.loc?.["ap_tn"];
-        const pv = pm25Data.data?.loc?.["pv_tn"];
-        console.log("pm25Data:", pm25Data);
-
-        function fetchTemp() {
-                    const culture = "th-TH";
-                    const url = `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`;
-                    
-                    return fetch(url)
-                      .then((response) => {
-                        if (!response.ok) {
-                          throw new Error(`fetchTemp response not ok: ${response.statusText}`);
-                        }
-                        return response.json();
-                      })
-                      .then((data) => {
-                        if (!data.weather3Hour) {
-                          throw new Error("Missing weather3Hour in fetchTemp");
-                        }
-                  
-                        const { dryBlubTemperature, rainfall } = data.weather3Hour;
-                        const temp = dryBlubTemperature.toFixed(0);
-                  
-                        let rainfallIcon, rainText = "ฝนตก", rainValue = rainfall, mm = "มม.";
-                        if (rainfall < 0.1) {
-                          rainfallIcon = noRain;
-                          rainText = "ไม่มีฝนตก";
-                          rainValue = "";
-                          mm = "";
-                        } else if (rainfall <= 10) {
-                          rainfallIcon = lightRain;
-                        } else if (rainfall <= 35) {
-                          rainfallIcon = moderateRain;
-                        } else if (rainfall <= 90) {
-                          rainfallIcon = heavyRain;
-                        } else {
-                          rainfallIcon = veryHeavyRain;
-                        }
-                  
-                        return { rainfallIcon, rainText, rainValue, temp, mm };
-                      })
-                      .catch((error) => {
-                        console.error("fetchTemp error:", error);
-                        throw error;
-                      });
-        }
-
-        function fetchRain() {
-          const culture = "th-TH";
-          const url = `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`;
-          
-          return fetch(url)
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`Network response was not ok: ${response.statusText}`);
-              }
-              return response.json();
-            })
-            .then((data) => {
-              const forecastData = data[0];
-              if (forecastData && forecastData.weatherForecast7Day) {
-                const weatherForecast = forecastData.weatherForecast7Day;
-                const { rainArea, windSpeed, windDirection: windDir } = weatherForecast;
-        
-                const windDirDeg = renderToString(
-                  <NavigationRoundedIcon
-                    style={{
-                      color: "#758CA3",
-                      width: 18,
-                      verticalAlign: "middle",
-                      transform: `rotate(${windDir}deg)`,
-                    }}
-                  />
-                );
-        
-                const waterDrop = renderToString(
-                  <WaterDropRoundedIcon
-                    style={{
-                      color: "#56c8f5",
-                      width: 18,
-                      verticalAlign: "middle",
-                    }}
-                  />
-                );
-        
-                return { waterDrop, rainArea, windDirDeg, windSpeed };
-              } else {
-                console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
-                return {
-                  waterDrop: null,
-                  rainArea: null,
-                  windDirDeg: null,
-                  windSpeed: null,
-                };
-              }
-            })
-            .catch((error) => {
-              console.error("fetchRain error:", error);
-              throw error;
-            });
-        }
-
-        const dataInfElement = document.getElementById("dataInf");
-        const dataDate = dataInfElement.dataset.date;
-        const apiTime = new Date(dataDate).getTime();
-
-        // let dataName = "daytime_data";
-        const dataInfSelect = document.getElementById("dataInf");
-        // dataInfElementDay.setAttribute('data-layer', dataName);
-        const LayerSelected = dataInfSelect.dataset.layer;
-
-        const heatIndexResponse = await axios.get(
-          `https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/${LayerSelected}/ImageServer/identify`,
-          {
-            params: {
-              geometry: `{y:${latTMD},x:${lonTMD}}`,
-              geometryType: "esriGeometryPoint",
-              time: encodeURIComponent(apiTime),
-              returnGeometry: false,
-              returnCatalogItems: true,
-              returnPixelValues: true,
-              processAsMultidimensional: false,
-              maxItemCount: 10,
-              f: "pjson",
-            },
-          }
-        );
-
-        const hidTMDValueCoor = heatIndexResponse.data?.value;
-        const hidCoor = parseFloat(hidTMDValueCoor);
-        console.log(`hidCoor`, hidCoor);
-        
-  
-        const hidUpdateJson =
-          heatIndexResponse.data.catalogItems.features[0].attributes.Date;
-
-        const hidUnix = new Date(hidUpdateJson);
-        const thaiWeekdays = [
-          "อาทิตย์",
-          "จันทร์",
-          "อังคาร",
-          "พุธ",
-          "พฤหัส",
-          "ศุกร์",
-          "เสาร์",
-        ];
-        const weekday = thaiWeekdays[hidUnix.getDay()];
-
-        let textColor, level, strokeColor, strokeWidth;
-
-          if (hidCoor < 0) {
-            textColor = "#C5E0D3";
-            strokeColor = "#00000099";
-            strokeWidth = "1";
-            level = "ดีมาก";
-          } else if (hidCoor >= 0 && hidCoor <= 0.005) {
-            textColor = "#8CC2AB";
-            strokeColor = "#00000099";
-            strokeWidth = "1";
-            level = "ดี";
-          } else if (hidCoor >= 0.005 && hidCoor <= 0.01) {
-            textColor = "#FFD046";
-            strokeColor = "#00000099";
-            strokeWidth = "1";
-            level = "ปกติ";
-          } else if (hidCoor >= 0.01 && hidCoor <= 0.015) {
-            textColor = "#F49C30";
-            level = "ควรระวัง";
-          } else if (hidCoor >= 0.015 && hidCoor <= 0.02) {
-            textColor = "#E9671C";
-            level = "เฝ้าระวัง";
-          } else {
-            textColor = "#DC3546";
-            level = "อันตราย";
-          }
-
-        const loadingHtml = `
-            <div style="display: flex; align-items: center; justify-content: center; padding: 16px;">
-                <div style="border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #3498db; width: 24px; height: 24px; animation: spin 1s linear infinite; margin-right: 8px;"></div>
-                <span style="font-size: 14px;">กำลังค้นหาข้อมูล...</span>
-            </div>
-            <style>
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            </style>
-        `;
-
-        Promise.all([fetchTemp(), fetchRain()])
-                  .then(([tempData, rainData]) => {
-                    console.log("Promise.all resolved data:", {
-                      tempData,
-                      rainData,
-                    });
-                    if (tempData && rainData) {
-                      const combinedData = { ...tempData, ...rainData };
-                      updateWeatherDetails(combinedData);
-                    } else {
-                      console.error("Failed to fetch one or both data sources");
-
-                      const errorData = {
-                        rainfallIcon: "",
-                        rainText: "",
-                        rainValue: "",
-                        temp: "",
-                        mm: "",
-                        waterDrop: "",
-                        rainArea: "",
-                        windDirDeg: "",
-                        windSpeed: "",
-                      };
-                      updateWeatherDetails(errorData);
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Promise.all error:", error);
-                    const errorData = {
-                      rainfallIcon: "",
-                      rainText: "",
-                      rainValue: "",
-                      temp: "",
-                      mm: "",
-                      waterDrop: "",
-                      rainArea: "",
-                      windDirDeg: "",
-                      windSpeed: "",
-                    };
-                    updateWeatherDetails(errorData);
-                  });
-
-                function updateWeatherDetails({
-                  rainfallIcon,
-                  rainText,
-                  rainValue,
-                  temp,
-                  mm,
-                  waterDrop,
-                  rainArea,
-                  windDirDeg,
-                  windSpeed,
-                }) {
-
-          const titleElement = document.getElementById("title");
-          let sattime = titleElement ? titleElement.textContent : '';
-
-          const rainIcon = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? `${rainfallIcon}` 
-                  : "";
-
-                const rainIconStyle = (rainfallIcon !== undefined && rainfallIcon !== null && rainfallIcon !== "") 
-                  ? ""
-                  : "opacity: 0";
-                  const formattedTemp = (temp !== undefined && temp !== null && temp !== "") 
-                  ? `${temp} °C` 
-                  : "";
-                  const formattedRainArea = (rainArea !== undefined && rainArea !== null && rainArea !== "")
-                      ? `${rainArea}% ของพื้นที่`
-                      : ``;
-                  const formattedWindSpeed = (windSpeed !== undefined && windSpeed !== null && windSpeed !== "") 
-                  ? `${windSpeed} กม./ชม.` 
-                  : "ค่าพยากรณ์อากาศไม่พร้อมใช้งาน <br>";
-
-          const popupDetail = `
-                  <div style="padding:0.5rem;">
-                      <span id="location" style="font-size: 16px; font-weight: bold;">${tb} ${ap} ${pv}</span><br />
-                      <span style="font-size: 14px;"></span>
-                
-
-                      <img style="width: 30px; vertical-align: middle; ${rainIconStyle}" src="${rainIcon}" alt="Rainfall Icon" />
-                      <span style="color: #a6a4a4; font-size: 16px;">${formattedTemp}</span>
-                      <span style="color: #a6a4a4; font-size: 16px;"> ${rainText} ${rainValue} ${mm}</span>
-                      <span id="rainPer-pop"></span><span id="wind"></span></br>
-                      <span style="color: #a6a4a4; font-size: 16px;">${waterDrop} ${formattedRainArea}</span>
-                      <span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${formattedWindSpeed}</span><br />
-
-
-
-                      <span style="font-size: 14px;">${sattime}</span><br />
-                      <span id='value' style={{ fontWeight: 'bold', fontSize: '30px' }}><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
-                      text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">${hidCoor.toFixed(3)} </span></span>
-                      <span id="level"><span style="color: ${textColor}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
-                      text-shadow: 0 0 ${strokeWidth}px ${strokeColor};"> ${level}</span><br />
-                      <span id="updateTMD" style="font-size: 12px; color: #a6a6a6;">
-                        อัพเดตล่าสุด วัน${weekday}ที่ ${hidUnix.getDate()} 
-                        ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)} 
-                        ${hidUnix.getFullYear() + 543} เวลา 
-                        ${hidUnix.getHours()}:${
-                          hidUnix.getMinutes() < 10
-                            ? "0" + hidUnix.getMinutes()
-                            : hidUnix.getMinutes()
-                        } น.
-                      </span>
-                  </div>
-                `;
-
-          var popUp = new sphere.Popup(
-            { lon: lonTMD, lat: latTMD },
-            {
-              title: `
-                <span style='font-weight: 500; margin-left: 0.5rem;'>ตำแหน่งที่สนใจ</span>
-                <span style='font-weight: 400; color: #a6a6a6;'>
-                    ${latTMD.toFixed(4)}, ${lonTMD.toFixed(4)}
-                </span>
-            `,
-              detail: loadingHtml,
-              loadDetail: updateDetail,
-              size: { width: "100%" },
-              closable: true,
-            }
-          );
-
-          // eslint-disable-next-line no-inner-declarations
-          function updateDetail(element) {
-            setTimeout(function () {
-              element.innerHTML = popupDetail;
-            }, 1000);
-          }
-          map.Overlays.add(popUp);
-        }
-          
-
-    }
-    map.Event.bind(sphere.EventName.Click, handleMapClick);
-
-    return () => {
-      if (map && map.Event) {
-        map.Event.unbind(sphere.EventName.Click, handleMapClick);
       }
+
+      const satLayer = satLayerRef.current;
+      const tmdTime = tmdTimeRef.current;
+
+      const latTMD = event.lat;
+      const lonTMD = event.lon;
+
+      const pm25Promise = await axios.get(
+        "https://pm25.gistda.or.th/rest/getPm25byLocation",
+        {
+          params: {
+            lat: latTMD,
+            lng: lonTMD,
+          },
+        }
+      );
+
+      const loctext = pm25Promise.data.data.loc.loctext;
+
+      // const dataInfElement = document.getElementById("dataInf");
+      // const dataDate = dataInfElement.dataset.date;
+      // const apiTime = new Date(dataDate).getTime();
+      // console.log(apiTime);
+
+      // const tmdTime = currentTime
+      const fullDate = `${tmdTime}-01`;
+      const unixTimestamp = new Date(fullDate).getTime();
+
+      const heatIndexPromise = await axios.get(
+        `https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/${satLayer}/ImageServer/identify`,
+        {
+          params: {
+            geometry: `{y:${latTMD},x:${lonTMD}}`,
+            geometryType: "esriGeometryPoint",
+            time: unixTimestamp,
+            returnGeometry: false,
+            returnCatalogItems: true,
+            returnPixelValues: true,
+            processAsMultidimensional: false,
+            maxItemCount: 10,
+            f: "pjson",
+          },
+        }
+      );
+
+      const hidCoorRaw = heatIndexPromise.data.value;
+      const hidCoor = Number(hidCoorRaw);
+      const hid = hidCoor.toFixed(3);
+      const hidUpdateJson = heatIndexPromise.data?.catalogItems?.features?.[0]?.attributes?.Date;
+      
+
+      const hidUnix = new Date(hidUpdateJson);
+      const thaiWeekdays = [
+        "อาทิตย์",
+        "จันทร์",
+        "อังคาร",
+        "พุธ",
+        "พฤหัส",
+        "ศุกร์",
+        "เสาร์",
+      ];
+      const weekday = thaiWeekdays[hidUnix.getDay()];
+
+      let level = "";
+      let color = "";
+      let strokeColor = "";
+      let strokeWidth = "";
+      let display = "";
+
+      if (isNaN(hid)) {
+        color = "#999999";
+        level = "ไม่พบข้อมูล";
+        display = "none"
+      } else if (hid < 0) {
+        color = "#C5E0D3";
+        level = "ดีมาก";
+      } else if (hid >= 0 && hid <= 0.005) {
+        color = "#8CC2AB";
+        level = "ดี";
+      } else if (hid >= 0.005 && hid < 0.01) {
+        color = "#FFD046";
+        strokeColor = "#00000099";
+        strokeWidth = "1";
+        level = "ปกติ";
+      } else if (hid >= 0.01 && hid < 0.015) {
+        color = "#F49C30";
+        level = "ควรระวัง";
+      } else if (hid >= 0.015 && hid < 0.02) {
+        color = "#E9671C";
+        level = "เฝ้าระวัง";
+      } else {
+        color = "#DC3546";
+        level = "อันตราย";
+      }
+
+      let timeLabel = "";
+
+      if (satLayer === "nighttime_data") {
+        timeLabel = "กลางคืน";
+      } else if (satLayer === "daytime_data") {
+        timeLabel = "กลางวัน";
+      }
+
+      const initialPopupContent = `
+        <div style="padding:0.5rem;">
+          <span style='font-weight: 600; font-size: 16px; display: ${display}'>${loctext}</span> <br />
+
+          <span id="weather_click"></span>
+          <span id="rainfall_click"></span>
+          
+          <span id="rainPer_click"></span>
+          <span id="wind_click"></span>
+
+          <span style="font-size: 12px; ">ดัชนีความร้อนจากดาวเทียม (${timeLabel})</span><br />
+          <span id='value' style="font-weight: bold; font-size: 30px;">
+            <span style="color: ${color}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
+            text-shadow: 0 0 ${strokeWidth}px ${strokeColor}; display: ${display} ">${hid} </span>
+          </span>
+          <span id="level">
+            <span style="color: ${color}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
+            text-shadow: 0 0 ${strokeWidth}px ${strokeColor};"> ${level}</span>
+          </span><br />
+
+          <span id="updateTMD" style="font-size: 12px; color: #a6a6a6; display: ${display}">
+            อัพเดตล่าสุด วัน${weekday}ที่ ${hidUnix.getDate()} 
+            ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)} 
+            ${hidUnix.getFullYear() + 543} เวลา 
+            ${hidUnix.getHours()}:${
+              hidUnix.getMinutes() < 10
+                ? "0" + hidUnix.getMinutes()
+                : hidUnix.getMinutes()
+            } น.
+          </span>
+        </div>
+      `;
+
+      var popUp = new sphere.Popup(
+        { lon: lonTMD, lat: latTMD },
+        {
+          title: `
+            <span style='font-weight: 500; margin-left: 0.5rem;'>ตำแหน่งที่สนใจ</span>
+            <span style='font-weight: 400; color: #a6a6a6;'>
+                ${latTMD.toFixed(4)}, ${lonTMD.toFixed(4)}
+            </span>
+          `,
+          detail: initialPopupContent,
+          size: { width: "100%" },
+          closable: true,
+        }
+      );
+
+      map.Overlays.add(popUp);
     };
-    
+
+    handleMapClickRef.current = handleMapClick;
+    map.Event.bind(sphere.EventName.Click, handleMapClick);
   }, [map]);
 
+  const handleDayClick = (tmdTime) => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
 
-  const handleDayClick = () => {
-    // setsatTime("กลางวัน");
+    const valueElement = document.getElementById("value");
+    valueElement.innerHTML = "<span></span>";
 
-    setsatLayerName("daytime_data");
-    setCurrentLayerType("0");
-    updateLayer("UTFVI_TH_D", activeStep);
-    setActiveButton("UTFVI_TH_D");
-    
+    const newSatTime = "กลางวัน";
+    setsatTime(newSatTime);
+
+    const titleDay = document.getElementsByClassName("title");
+
+    if (titleDay.length > 0) {
+      titleDay[0].innerHTML = `<span style="font-size: 14px; font-weight: 500; color:#f57542;">ดัชนีความร้อนจากดาวเทียม (${newSatTime})</span><br>`;
+    } else {
+      console.error("ไม่พบ element ที่มี class 'title'");
+    }
+
     const satLegend = document.getElementById("legend");
     if (satLegend) {
       satLegend.src = HIDSatLegend;
@@ -452,431 +643,289 @@ const SatControl = React.forwardRef((props, ref) => {
       satLegend.style.zIndex = "10";
     }
 
-    const getLoc = async () => {
-      try {
-        const controller = new AbortController();
-        const signal = controller.signal;
+    const newLayerName = "daytime_data";
+    const newLayerType = "UTFVI_TH_D";
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const { latitude, longitude } = position.coords;
+    updateLayer({ layerName: newLayerName, step: activeStep });
+    handleBack({ layerName: newLayerName, step: activeStep });
+    handleNext({ layerName: newLayerName, step: activeStep });
+    handleSlide({ layerName: newLayerName, step: activeStep });
+    // togglePlayStop(newLayerName);
 
-          const pm25Response = await axios.get(
-            `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${latitude}&lng=${longitude}`,
-            { signal }
-          );
-          const pm25Data = pm25Response.data.data;
-          const { tb_tn: tb, ap_tn: ap, pv_tn: pv } = pm25Data.loc;
-
-          const layerAttr = document.getElementById("dataInf");
-          const currentTime = layerAttr.getAttribute("data-date");
-          console.log(`ASDFGHJK`, encodeURIComponent(currentTime));
-
-          const fullDate = `${currentTime}-01`;
-          const unixTimestamp = new Date(fullDate).getTime();
-          console.log(`Unix Timestamp (milliseconds):`, unixTimestamp);
-
-          let dataName = "daytime_data";
-          const dataInfSelect = document.getElementById("dataInf");
-          dataInfSelect.setAttribute('data-layer', dataName);
-          const LayerSelected = dataInfSelect.dataset.layer;
-
-          const modis_day = await axios.get(
-            `https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/${LayerSelected}/ImageServer/identify`,
-            {
-              params: {
-                geometry: `{y:${latitude},x:${longitude}}`,
-                geometryType: "esriGeometryPoint",
-                time: unixTimestamp,
-                returnGeometry: false,
-                returnCatalogItems: true,
-                returnPixelValues: true,
-                processAsMultidimensional: false,
-                maxItemCount: 10,
-                f: "pjson",
-              },
-            }
-          );
-
-          console.log(modis_day);
-
-          const modis_dayValue = modis_day.data.value;
-          const day_hid = parseFloat(modis_dayValue);
-          console.log(day_hid);
-
-          // const modis_dayJson =
-          //   modis_day.data.catalogItems.features[0].attributes.Date;
-
-          const hidUnix = new Date();
-          const thaiWeekdays = [
-            "อาทิตย์",
-            "จันทร์",
-            "อังคาร",
-            "พุธ",
-            "พฤหัสบดี",
-            "ศุกร์",
-            "เสาร์",
-          ];
-          const weekday = thaiWeekdays[hidUnix.getDay()];
-
-          const updateElement = document.getElementById("update");
-          updateElement.innerHTML = `* ค่าพยากรณ์อากาศ วัน${weekday}ที่ ${hidUnix.getDate()} 
-                                                           ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)} 
-                                                           ${hidUnix.getFullYear() + 543}`;
-
-          const locationElement = document.getElementById("location");
-          locationElement.innerHTML = `${tb} ${ap} ${pv}`;
-
-          let color, level, strokeColor, strokeWidth;
-
-          if (day_hid < 0) {
-            color = "#C5E0D3";
-            level = "ดีมาก";
-          } else if (day_hid >= 0 && day_hid <= 0.005) {
-            color = "#8CC2AB";
-            level = "ดี";
-          } else if (day_hid >= 0.005 && day_hid <= 0.01) {
-            color = "#FFD046";
-            strokeColor = "#00000099";
-            strokeWidth = "1";
-            level = "ปกติ";
-          } else if (day_hid >= 0.01 && day_hid <= 0.015) {
-            color = "#F49C30";
-            level = "ควรระวัง";
-          } else if (day_hid >= 0.015 && day_hid <= 0.02) {
-            color = "#E9671C";
-            level = "เฝ้าระวัง";
-          } else {
-            color = "#DC3546";
-            level = "อันตราย";
-          }
-
-          const titleElement = document.getElementById("title");
-          const valueElement = document.getElementById("value");
-          const levelElement = document.getElementById("level");
-
-          titleElement.innerHTML = `<span style="font-size: 14px; font-weight: 500;">ดัชนีความร้อนจากดาวเทียม (กลางวัน)</span></br> `;
-          valueElement.innerHTML = `<span style="color: ${color}; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
-                                    text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">
-                                    ${day_hid.toFixed(3)}
-                                  </span>`;
-
-          levelElement.innerHTML = `<span style="color: ${color}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor};"> ${level}</span>`;
-
-          const fetchTemp = () => {
-            const culture = "th-TH";
-            const forecastStatus = (
-              <span style={{ color: "#a6a4a4", fontSize: "16px" }}>
-                <CloudOffTwoToneIcon
-                  style={{
-                    color: "#a6a4a4",
-                    width: 30,
-                    verticalAlign: "middle",
-                  }}
-                />
-                ค่าพยากรณ์อากาศไม่พร้อมใช้งาน
-              </span>
-            );
-            fetch(
-              `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
-            )
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error(
-                    "Network response was not ok " + response.statusText
-                  );
-                }
-                return response.json();
-              })
-              .then((data) => {
-                const dryBlubTemperature = data.weather3Hour.dryBlubTemperature;
-                const temp = dryBlubTemperature.toFixed(0);
-                const rainFall = data.weather3Hour.rainfall;
-
-                let rainValue;
-                let rainfallIcon;
-                let rainText;
-                let mm;
-
-                if (rainFall === undefined || rainFall === null) {
-                  // No rainfall data available
-                  rainfallIcon = (
-                    <CloudOffTwoToneIcon
-                      style={{
-                        color: "#a6a4a4",
-                        width: 30,
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  );
-                  rainText = forecastStatus;
-                  rainValue = "";
-                  mm = "";
-                } else {
-                  // Rainfall data processing
-                  if (rainFall < 0.1) {
-                    rainfallIcon = noRain;
-                    rainText = "ไม่มีฝนตก";
-                    rainValue = "";
-                    mm = "";
-                  } else if (rainFall <= 10) {
-                    rainfallIcon = lightRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainFall;
-                    mm = "มม.";
-                  } else if (rainFall <= 35) {
-                    rainfallIcon = moderateRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainFall;
-                    mm = "มม.";
-                  } else if (rainFall <= 90) {
-                    rainfallIcon = heavyRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainFall;
-                    mm = "มม.";
-                  } else {
-                    rainfallIcon = veryHeavyRain;
-                    rainText = "ฝนตก";
-                    rainValue = rainFall;
-                    mm = "มม.";
-                  }
-                }
-
-                const weatherElement =
-                      document.getElementById("weather");
-                    weatherElement.innerHTML = `
-                      ${rainfallIcon ? `<img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}" alt="Rainfall Icon" />` : ReactDOMServer.renderToString(rainfallIcon)}
-                      <span style="color: #a6a4a4; font-size: 16px;">${temp || ReactDOMServer.renderToString(forecastStatus)} °C</span>
-                    `;
-
-                    // Update rainfall info
-                    const rain = document.getElementById("rainfall");
-                    rain.innerHTML = `
-                      <span style="font-size: 16px; color: #a6a4a4;">
-                        ${ReactDOMServer.renderToString(rainText || forecastStatus)}
-                        ${rainValue !== undefined ? rainValue : ReactDOMServer.renderToString(forecastStatus)} 
-                        ${mm || ""}
-                      </span>
-                    `;
-                  })
-                  .catch((error) => {
-                    console.error(
-                      "There has been a problem with your fetch operation:",
-                      error
-                    );
-
-                    const weatherElement =
-                      document.getElementById("weather");
-                    weatherElement.innerHTML = `
-                      <span style="color: #a6a4a4; font-size: 16px;"></span>
-                    `;
-
-                    const rain = document.getElementById("rainfall");
-                    rain.innerHTML = `
-                      <span style="font-size: 16px; color: #a6a4a4;">
-                        
-                        </span>
-                    `;
-
-                    const rainper = document.getElementById("rainPer");
-                    rainper.innerHTML = `
-                      <span style="font-size: 16px; color: #a6a4a4;">
-                        ${ReactDOMServer.renderToString(forecastStatus)}
-                        </span>
-                    `;
-
-                    const wind = document.getElementById("wind");
-                    wind.innerHTML = `
-                      <span style="font-size: 16px; color: #a6a4a4;">
-                        
-                        </span>
-                    `;
-                  });
-          };
-          fetchTemp();
-
-          const fetchRain = () => {
-            const culture = "th-TH";
-            fetch(
-              `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
-            )
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error(
-                    "Network response was not ok " + response.statusText
-                  );
-                }
-                return response.json();
-              })
-              .then((data) => {
-                const forecastData = data[0];
-
-                if (forecastData && forecastData.weatherForecast7Day) {
-                  const weatherForecast = forecastData.weatherForecast7Day;
-                  const rainArea = weatherForecast.rainArea;
-                  const windSpeed = weatherForecast.windSpeed;
-                  const windDir = weatherForecast.windDirection;
-
-                  const windDirDeg = renderToString(
-                    <NavigationRoundedIcon
-                      style={{
-                        color: "#758CA3",
-                        width: 18,
-                        verticalAlign: "middle",
-                        transform: `rotate(${windDir}deg)`,
-                      }}
-                    />
-                  );
-
-                  const waterDrop = renderToString(
-                    <WaterDropRoundedIcon
-                      style={{
-                        color: "#56c8f5",
-                        width: 18,
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  );
-
-                  document.getElementById("rainPer").innerHTML =
-                    `<span style="font-size: 16px; color: #a6a4a4;">${waterDrop} ${rainArea}% ของพื้นที่</span>`;
-                  document.getElementById("wind").innerHTML =
-                    `<span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${windSpeed} กม./ชม.</span>`;
-                } else {
-                  console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
-                }
-              })
-              .catch((error) => {
-                console.error(
-                  "There has been a problem with your fetch operation:",
-                  error
-                );
-              });
-          };
-          fetchRain();
-        });
-      } catch (error) {
-        console.error("Error in getLoc:", error);
-      }
-    };
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    intervalRef.current = setInterval(getLoc, 5000);
-    console.log("handleDayClick called");
-    
+    getLoc(newLayerName);
+    setsatLayerName(newLayerName);
+    setCurrentLayerType(newLayerType);
+    setActiveButton(newLayerType);
+    createLayer(tmdTime, newLayerName);
   };
 
+  const handleNightClick = (tmdTime) => {
+    const valueElement = document.getElementById("value");
+    valueElement.innerHTML = "<span></span>";
+    const levelElement = document.getElementById("level");
+    levelElement.innerHTML = "<span></span>";
 
-  const handleNightClick = () => {
-      // setsatTime("กลางคืน");
+    const newSatTime = "กลางคืน";
+    setsatTime(newSatTime);
 
-      setsatLayerName("nighttime_data");
+    const titleNight = document.getElementsByClassName("title");
 
-      setCurrentLayerType('UTFVI_TH_N');
-      updateLayer('UTFVI_TH_N', activeStep);
-      setActiveButton('UTFVI_TH_N');
-      
-      const satLegend = document.getElementById("legend");
-                          if (satLegend) {
-                            satLegend.src = HIDSatLegend;
-                            satLegend.style.width = "355px";
-                            satLegend.style.position = "relative";
-                            satLegend.style.top = "0";
-                            satLegend.style.left = "0";
-                            satLegend.style.right = "1rem";
-                            satLegend.style.zIndex = "10";
-                          }
+    if (titleNight.length > 0) {
+      titleNight[0].innerHTML = `<span style="font-size: 14px; font-weight: 500; color:#f57542;">ดัชนีความร้อนจากดาวเทียม (${newSatTime})</span><br>`;
+    } else {
+      console.error("ไม่พบ element ที่มี class 'title'");
+    }
 
-      const getLoc = async () => {
-      try {
-        const controller = new AbortController();
-        const signal = controller.signal;
+    const satLegend = document.getElementById("legend");
+    if (satLegend) {
+      satLegend.src = HIDSatLegend;
+      satLegend.style.width = "355px";
+      satLegend.style.position = "relative";
+      satLegend.style.top = "0";
+      satLegend.style.left = "0";
+      satLegend.style.right = "1rem";
+      satLegend.style.zIndex = "10";
+    }
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const { latitude, longitude } = position.coords;
+    const newLayerName = "nighttime_data";
+    const newLayerType = "UTFVI_TH_N";
 
-          const pm25Response = await axios.get(
-            `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${latitude}&lng=${longitude}`,
-            { signal }
-          );
-          const pm25Data = pm25Response.data.data;
-          const { tb_tn: tb, ap_tn: ap, pv_tn: pv } = pm25Data.loc;
+    updateLayer({ layerName: newLayerName, step: activeStep });
+    handleBack({ layerName: newLayerName, step: activeStep });
+    handleNext({ layerName: newLayerName, step: activeStep });
+    handleSlide({ layerName: newLayerName, step: activeStep });
 
-          const layerAttr = document.getElementById("dataInf");
-          const currentTime = layerAttr.getAttribute("data-date");
+    getLoc(newLayerName);
+    setsatLayerName(newLayerName);
+    setCurrentLayerType(newLayerType);
+    setActiveButton(newLayerType);
+    createLayer(tmdTime, newLayerName);
+  };
 
-          const fullDate = `${currentTime}-01`;
-          const unixTimestamp = new Date(fullDate).getTime();
+  const createLayer = (tmdTime, satLayer) => {
+    getLoc(satLayer, tmdTime);
 
+    satLayerRef.current = satLayer;
+    tmdTimeRef.current = tmdTime;
 
-          let dataName = "nighttime_data";
-          const dataInfElement = document.getElementById("dataInf");
-          dataInfElement.setAttribute('data-layer', dataName);
-          const LayerSelected = dataInfElement.dataset.layer;
+    if (handleMapClickRef.current) {
+      handleMapClickRef.current({ mock: true });
+    }
 
-          const modis_day = await axios.get(
-            `https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/${LayerSelected}/ImageServer/identify`,
-            {
-              params: {
-                geometry: `{y:${latitude},x:${longitude}}`,
-                geometryType: "esriGeometryPoint",
-                time: unixTimestamp,
-                returnGeometry: false,
-                returnCatalogItems: true,
-                returnPixelValues: true,
-                processAsMultidimensional: false,
-                maxItemCount: 10,
-                f: "pjson",
-              },
-            }
-          );
+    return new window.sphere.Layer(`${satLayer}`, {
+      type: window.sphere.LayerType.WMS,
+      url: `https://gistdaportal.gistda.or.th/imagedata/services/GISTDA_LifeD/${satLayer}/ImageServer/WMSServer?service=WMS&time=${tmdTime}`,
+      zoomRange: { min: 1, max: 15 },
+      zIndex: 5,
+      opacity: 0.75,
+    });
+  };
 
-          console.log(modis_day);
+  const activeLayersRef = useRef({});
 
-          const modis_dayValue = modis_day.data.value;
-          const day_hid = parseFloat(modis_dayValue);
-          console.log(day_hid);
+  const updateLayer = ({ step = 1, layerName }) => {
+    const map = sphereMapRef.current;
+    const monthNames = [
+      "มกราคม",
+      "กุมภาพันธ์",
+      "มีนาคม",
+      "เมษายน",
+      "พฤษภาคม",
+      "มิถุนายน",
+      "กรกฎาคม",
+      "สิงหาคม",
+      "กันยายน",
+      "ตุลาคม",
+      "พฤศจิกายน",
+      "ธันวาคม",
+    ];
 
-          // const modis_dayJson =
-          //   modis_day.data.catalogItems.features[0].attributes.Date;
+    const startYear = 2021;
+    const startMonth = 1;
+    const endYear = 2025;
+    const endMonth = 4;
 
-          const hidUnix = new Date();
-          const thaiWeekdays = [
-            "อาทิตย์",
-            "จันทร์",
-            "อังคาร",
-            "พุธ",
-            "พฤหัสบดี",
-            "ศุกร์",
-            "เสาร์",
-          ];
-          const weekday = thaiWeekdays[hidUnix.getDay()];
+    // Generate date array
+    const dateArray = [];
+    for (let year = startYear; year <= endYear; year++) {
+      const start = year === startYear ? startMonth : 1;
+      const end = year === endYear ? endMonth : 12;
+      for (let month = start; month <= end; month++) {
+        const formattedMonth = String(month).padStart(2, "0");
+        dateArray.push({ year, month: formattedMonth });
+      }
+    }
 
-          const updateElement = document.getElementById("update");
-          updateElement.innerHTML = `* ค่าพยากรณ์อากาศ วัน${weekday}ที่ ${hidUnix.getDate()} 
+    // Validate step
+    if (step < 1 || step > dateArray.length) {
+      console.warn("Step is out of range. No update performed.");
+      return;
+    }
+
+    // Get the current date based on the step
+    const { year, month } = dateArray[step - 1];
+    const currentTime = `${year}-${month}`;
+
+    // const fullmonth = `ดัชนีความร้อนจากดาวเทียม เดือน${monthNames[parseInt(month, 10) - 1]} พ.ศ.${
+    //     parseInt(year, 10) + 543
+    //   }`
+
+    // SliderValueLabel(fullmonth);
+
+    setcurrentTime(currentTime);
+
+    // Update layer attribution
+    const layerAttr = document.getElementById("dataInf");
+    if (layerAttr) {
+      layerAttr.setAttribute("data-date", currentTime);
+      layerAttr.innerHTML = `ดัชนีความร้อนจากดาวเทียม เดือน${monthNames[parseInt(month, 10) - 1]} พ.ศ.${
+        parseInt(year, 10) + 543
+      }`;
+    } else {
+      console.error('Element with id="dataInf" not found.');
+    }
+
+    try {
+      // Remove all existing layers from previous steps
+      Object.values(activeLayersRef.current).forEach((layer) => {
+        if (layer) {
+          map.Layers.remove(layer);
+        }
+      });
+
+      // Create and add the new layer using the current satLayerName
+      const currentLayer = createLayer(currentTime, layerName);
+      const dataInf = currentLayer.style.layers[0]?.id;
+      setDataInfo(dataInf);
+      map.Layers.add(currentLayer);
+
+      // Store only the current layer
+      activeLayersRef.current = { [step]: currentLayer };
+    } catch (error) {
+      console.error("Error updating WMS layer:", error);
+    }
+  };
+
+  useEffect(() => {
+    const waitForTitle = setInterval(() => {
+      const titleEl = document.getElementsByClassName("title");
+      if (titleEl.length > 0) {
+        clearInterval(waitForTitle);
+        handleDayClick();
+        // getLoc();
+        intervalRef.current = setTimeout(getLoc, 5000);        
+      }
+    }, 100);
+
+    return () => clearInterval(waitForTitle);
+  }, []);
+
+  // useEffect(() => {
+
+  const getLoc = (layerName, currentTime) => {
+    try {
+      const controller = new AbortController();
+      const signal = controller.signal;
+
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        const pm25Response = await axios.get(
+          `https://pm25.gistda.or.th/rest/getPm25byLocation?lat=${latitude}&lng=${longitude}`,
+          { signal }
+        );
+
+        const pm25Data = pm25Response.data.data;
+        const { tb_tn: tb, ap_tn: ap, pv_tn: pv } = pm25Data.loc;
+        const time = currentTime;
+
+        const fullDate = `${time}-01`;
+
+        const unixTimestamp = new Date(fullDate).getTime();
+
+        const modis_hid = await axios.get(
+          `https://gistdaportal.gistda.or.th/imagedata/rest/services/GISTDA_LifeD/${layerName}/ImageServer/identify`,
+          {
+            params: {
+              geometry: `{y:${latitude},x:${longitude}}`,
+              geometryType: "esriGeometryPoint",
+              time: unixTimestamp,
+              returnGeometry: false,
+              returnCatalogItems: true,
+              returnPixelValues: true,
+              processAsMultidimensional: false,
+              maxItemCount: 10,
+              f: "pjson",
+            },
+          }
+        );
+
+        const hid_value = modis_hid.data.value;
+        const hid = parseFloat(hid_value);
+
+        const hidUnix = new Date();
+        const thaiWeekdays = [
+          "อาทิตย์",
+          "จันทร์",
+          "อังคาร",
+          "พุธ",
+          "พฤหัสบดี",
+          "ศุกร์",
+          "เสาร์",
+        ];
+        const weekday = thaiWeekdays[hidUnix.getDay()];
+
+        const updateElement = document.getElementById("update");
+        updateElement.innerHTML = `* ค่าพยากรณ์อากาศ วัน${weekday}ที่ ${hidUnix.getDate()} 
                                                            ${new Intl.DateTimeFormat("th-TH", { month: "long" }).format(hidUnix)} 
                                                            ${hidUnix.getFullYear() + 543}`;
 
-          const locationElement = document.getElementById("location");
-          locationElement.innerHTML = `${tb} ${ap} ${pv}`;
+        const locationElement = document.getElementById("location");
+        locationElement.innerHTML = `${tb} ${ap} ${pv}`;
 
-          let color, level, strokeColor, strokeWidth;
+        let color, level, strokeColor, strokeWidth;
 
-          if (day_hid < 0) {
+        const valueElement = document.getElementById("value");
+        const levelElement = document.getElementById("level");
+
+        // แสดง spinner และข้อความโหลดล่วงหน้า
+        valueElement.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: center; height: 30px;">
+                <div style="width: 24px; height: 24px; border: 3px solid #ccc; border-top: 3px solid #333; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+              </div>
+            `;
+        levelElement.innerHTML = `<span style="color: #999999; font-weight: bold; font-size: 30px;"></span>`;
+
+        // เพิ่ม keyframes สำหรับ spinner
+        const style = document.createElement("style");
+        style.innerHTML = `
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `;
+        document.head.appendChild(style);
+
+        // โหลดข้อมูลและอัปเดตผลลัพธ์
+        setTimeout(() => {
+          if (isNaN(hid)) {
+            color = "#999999";
+            level = "ไม่พบข้อมูล";
+          } else if (hid < 0) {
             color = "#C5E0D3";
             level = "ดีมาก";
-          } else if (day_hid >= 0 && day_hid <= 0.005) {
+          } else if (hid >= 0 && hid <= 0.005) {
             color = "#8CC2AB";
             level = "ดี";
-          } else if (day_hid >= 0.005 && day_hid <= 0.01) {
+          } else if (hid >= 0.005 && hid <= 0.01) {
             color = "#FFD046";
             strokeColor = "#00000099";
             strokeWidth = "1";
             level = "ปกติ";
-          } else if (day_hid >= 0.01 && day_hid <= 0.015) {
+          } else if (hid >= 0.01 && hid <= 0.015) {
             color = "#F49C30";
             level = "ควรระวัง";
-          } else if (day_hid >= 0.015 && day_hid <= 0.02) {
+          } else if (hid >= 0.015 && hid <= 0.02) {
             color = "#E9671C";
             level = "เฝ้าระวัง";
           } else {
@@ -884,37 +933,67 @@ const SatControl = React.forwardRef((props, ref) => {
             level = "อันตราย";
           }
 
-          const titleElement = document.getElementById("title");
-          const valueElement = document.getElementById("value");
-          const levelElement = document.getElementById("level");
-
-          titleElement.innerHTML = `<span style="font-size: 14px; font-weight: 500;">ดัชนีความร้อนจากดาวเทียม (กลางคืน)</span></br> `;
-          valueElement.innerHTML = `<span style="color: ${color}; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; 
-                                    text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">
-                                    ${day_hid.toFixed(3)}
-                                  </span>`;
+          valueElement.innerHTML =
+            isNaN(hid) || hid === ""
+              ? `<span style="color: ${color}; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; text-shadow: 0 0 ${strokeWidth}px ${strokeColor};"></span>`
+              : `<span style="color: ${color}; -webkit-text-stroke: ${strokeWidth}px ${strokeColor}; text-shadow: 0 0 ${strokeWidth}px ${strokeColor};">
+                    ${hid.toFixed(3)}
+                  </span>`;
 
           levelElement.innerHTML = `<span style="color: ${color}; font-weight: bold; font-size: 30px; -webkit-text-stroke: ${strokeWidth}px ${strokeColor};"> ${level}</span>`;
+        }, 2500);
 
-          const fetchTemp = () => {
-            const culture = "th-TH";
-            fetch(
-              `https://172.27.173.43:4000/3Hour?FilterText=${pv}&Culture=${culture}`
-            )
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error(
-                    "Network response was not ok " + response.statusText
-                  );
-                }
-                return response.json();
-              })
-              .then((data) => {
-                const dryBlubTemperature = data.weather3Hour.dryBlubTemperature;
-                const temp = dryBlubTemperature.toFixed(0);
-                const rainFall = data.weather3Hour.rainfall;
+        const fetchTemp = () => {
+          const culture = "th-TH";
+          const forecastStatus = (
+            <span style={{ color: "#a6a4a4", fontSize: "16px" }}>
+              <CloudOffTwoToneIcon
+                style={{
+                  color: "#a6a4a4",
+                  width: 30,
+                  verticalAlign: "middle",
+                }}
+              />
+              ค่าพยากรณ์อากาศไม่พร้อมใช้งาน
+            </span>
+          );
+          fetch(
+            `https://life-dee-proxy-552507355198.asia-southeast1.run.app/3Hour?FilterText=${pv}&Culture=${culture}`
+          )
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  "Network response was not ok " + response.statusText
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              const dryBlubTemperature = data.weather3Hour.dryBlubTemperature;
+              const temp = dryBlubTemperature.toFixed(0);
+              const rainFall = data.weather3Hour.rainfall;
 
-                let rainValue, rainfallIcon, rainText, mm;
+              let rainValue;
+              let rainfallIcon;
+              let rainText;
+              let mm;
+
+              if (rainFall === undefined || rainFall === null) {
+                // No rainfall data available
+                rainfallIcon = (
+                  <CloudOffTwoToneIcon
+                    style={{
+                      color: "#a6a4a4",
+                      width: 30,
+                      verticalAlign: "middle",
+                    }}
+                  />
+                );
+                rainText = forecastStatus;
+                rainValue = "";
+                mm = "";
+              } else {
+                // Rainfall data processing
                 if (rainFall < 0.1) {
                   rainfallIcon = noRain;
                   rainText = "ไม่มีฝนตก";
@@ -923,6 +1002,7 @@ const SatControl = React.forwardRef((props, ref) => {
                 } else if (rainFall <= 10) {
                   rainfallIcon = lightRain;
                   rainText = "ฝนตก";
+                  rainValue = rainFall;
                   mm = "มม.";
                 } else if (rainFall <= 35) {
                   rainfallIcon = moderateRain;
@@ -940,219 +1020,140 @@ const SatControl = React.forwardRef((props, ref) => {
                   rainValue = rainFall;
                   mm = "มม.";
                 }
+              }
 
-                const weatherElement = document.getElementById("weather");
-                weatherElement.innerHTML = `
-                                        <img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}" 
-                                        alt="Rainfall Icon" /><span style="color: #a6a4a4; font-size: 16px;" >${temp} °C </span>`;
-                const rain = document.getElementById("rainfall");
-                rain.innerHTML = `<span style="font-size: 16px; color: #a6a4a4;">${rainText} ${rainValue} ${mm}</span>`;
-              })
-              .catch((error) => {
-                console.error(
-                  "There has been a problem with your fetch operation:",
-                  error
+              const weatherElement = document.getElementById("weather");
+              weatherElement.innerHTML = `
+                      ${rainfallIcon ? `<img style="width: 30px; vertical-align: middle;" src="${rainfallIcon}" alt="Rainfall Icon" />` : ReactDOMServer.renderToString(rainfallIcon)}
+                      <span style="color: #a6a4a4; font-size: 16px;">${temp || ReactDOMServer.renderToString(forecastStatus)} °C</span>
+                    `;
+
+              // Update rainfall info
+              const rain = document.getElementById("rainfall");
+              rain.innerHTML = `
+                      <span style="font-size: 16px; color: #a6a4a4;">
+                        ${ReactDOMServer.renderToString(rainText || forecastStatus)}
+                        ${rainValue !== undefined ? rainValue : ReactDOMServer.renderToString(forecastStatus)} 
+                        ${mm || ""}
+                      </span>
+                    `;
+            })
+            .catch((error) => {
+              console.error(
+                "There has been a problem with your fetch operation:",
+                error
+              );
+
+              const weatherElement = document.getElementById("weather");
+              weatherElement.innerHTML = `
+                      <span style="color: #a6a4a4; font-size: 16px;"></span>
+                    `;
+
+              const rain = document.getElementById("rainfall");
+              rain.innerHTML = `
+                      <span style="font-size: 16px; color: #a6a4a4;">
+                        
+                        </span>
+                    `;
+
+              const rainper = document.getElementById("rainPer");
+              rainper.innerHTML = `
+                      <span style="font-size: 16px; color: #a6a4a4;">
+                        ${ReactDOMServer.renderToString(forecastStatus)}
+                        </span>
+                    `;
+
+              const wind = document.getElementById("wind");
+              wind.innerHTML = `
+                      <span style="font-size: 16px; color: #a6a4a4;">
+                        
+                        </span>
+                    `;
+            });
+        };
+        fetchTemp();
+
+        const fetchRain = () => {
+          const culture = "th-TH";
+          fetch(
+            `https://life-dee-proxy-552507355198.asia-southeast1.run.app/7Day?FilterText=${pv}&Culture=${culture}`
+          )
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  "Network response was not ok " + response.statusText
                 );
-              });
-          };
-          fetchTemp();
+              }
+              return response.json();
+            })
+            .then((data) => {
+              const forecastData = data[0];
 
-          const fetchRain = () => {
-            const culture = "th-TH";
-            fetch(
-              `https://172.27.173.43:4000/7Day?FilterText=${pv}&Culture=${culture}`
-            )
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error(
-                    "Network response was not ok " + response.statusText
-                  );
-                }
-                return response.json();
-              })
-              .then((data) => {
-                const forecastData = data[0];
+              if (forecastData && forecastData.weatherForecast7Day) {
+                const weatherForecast = forecastData.weatherForecast7Day;
+                const rainArea = weatherForecast.rainArea;
+                const windSpeed = weatherForecast.windSpeed;
+                const windDir = weatherForecast.windDirection;
 
-                if (forecastData && forecastData.weatherForecast7Day) {
-                  const weatherForecast = forecastData.weatherForecast7Day;
-                  const rainArea = weatherForecast.rainArea;
-                  const windSpeed = weatherForecast.windSpeed;
-                  const windDir = weatherForecast.windDirection;
-
-                  const windDirDeg = renderToString(
-                    <NavigationRoundedIcon
-                      style={{
-                        color: "#758CA3",
-                        width: 18,
-                        verticalAlign: "middle",
-                        transform: `rotate(${windDir}deg)`,
-                      }}
-                    />
-                  );
-
-                  const waterDrop = renderToString(
-                    <WaterDropRoundedIcon
-                      style={{
-                        color: "#56c8f5",
-                        width: 18,
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  );
-
-                  document.getElementById("rainPer").innerHTML =
-                    `<span style="font-size: 16px; color: #a6a4a4;">${waterDrop} ${rainArea}% ของพื้นที่</span>`;
-                  document.getElementById("wind").innerHTML =
-                    `<span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${windSpeed} กม./ชม.</span>`;
-                } else {
-                  console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
-                }
-              })
-              .catch((error) => {
-                console.error(
-                  "There has been a problem with your fetch operation:",
-                  error
+                const windDirDeg = renderToString(
+                  <NavigationRoundedIcon
+                    style={{
+                      color: "#758CA3",
+                      width: 18,
+                      verticalAlign: "middle",
+                      transform: `rotate(${windDir}deg)`,
+                    }}
+                  />
                 );
-              });
-          };
-          fetchRain();
-        });
-      } catch (error) {
-        console.error("Error in getLoc:", error);
-      }
-    };
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    intervalRef.current = setInterval(getLoc, 5000);
 
-  };
+                const waterDrop = renderToString(
+                  <WaterDropRoundedIcon
+                    style={{
+                      color: "#56c8f5",
+                      width: 18,
+                      verticalAlign: "middle",
+                    }}
+                  />
+                );
 
-  const createLayer = (tmdTime, satLayerName) => {
-    console.log('creating layer name:', satLayerName );
-    
-
-    return new window.sphere.Layer(`${satLayerName}`, {
-      type: window.sphere.LayerType.WMS,
-      url: `https://gistdaportal.gistda.or.th/imagedata/services/GISTDA_LifeD/${satLayerName}/ImageServer/WMSServer?service=WMS&time=${tmdTime}`,
-      zoomRange: { min: 1, max: 15 },
-      zIndex: 5,
-      opacity: 0.75,
-    });
-  };
-
-  // Hold the layers: Each step
-  const activeLayersRef = useRef({});
-
-  const updateLayer = ({ step = 1 }) => {
-    const map = sphereMapRef.current;
-    const monthNames = [
-      "มกราคม",
-      "กุมภาพันธ์",
-      "มีนาคม",
-      "เมษายน",
-      "พฤษภาคม",
-      "มิถุนายน",
-      "กรกฎาคม",
-      "สิงหาคม",
-      "กันยายน",
-      "ตุลาคม",
-      "พฤศจิกายน",
-      "ธันวาคม",
-    ];
-    
-    const startYear = 2020;
-    const startMonth = 1;
-    const endYear = 2024;
-    const endMonth = 11;
-    
-    // Generate date array
-    const dateArray = [];
-    for (let year = startYear; year <= endYear; year++) {
-      const start = year === startYear ? startMonth : 1;
-      const end = year === endYear ? endMonth : 12;
-      for (let month = start; month <= end; month++) {
-        const formattedMonth = String(month).padStart(2, "0");
-        dateArray.push({ year, month: formattedMonth });
-      }
-    }
-  
-    // Validate step
-    if (step < 1 || step > dateArray.length) {
-      console.warn("Step is out of range. No update performed.");
-      return;
-    }
-  
-    // Get the current date based on the step
-    const { year, month } = dateArray[step - 1];
-    const currentTime = `${year}-${month}`;
-  
-    // Update layer attribution
-    const layerAttr = document.getElementById("dataInf");
-    if (layerAttr) {
-      layerAttr.setAttribute("data-date", currentTime);
-      layerAttr.innerHTML = `ดัชนีความร้อนจากดาวเทียม เดือน${monthNames[parseInt(month, 10) - 1]} พ.ศ.${
-        parseInt(year, 10) + 543
-      }`;
-    } else {
-      console.error('Element with id="dataInf" not found.');
-    }
-  
-    try {
-      // Remove all existing layers from previous steps
-      Object.values(activeLayersRef.current).forEach(layer => {
-        if (layer) {
-          map.Layers.remove(layer);
-        }
+                document.getElementById("rainPer").innerHTML =
+                  `<span style="font-size: 16px; color: #a6a4a4;">${waterDrop} ${rainArea}% ของพื้นที่</span>`;
+                document.getElementById("wind").innerHTML =
+                  `<span style="font-size: 16px; color: #a6a4a4;"> ${windDirDeg} ${windSpeed} กม./ชม.</span>`;
+              } else {
+                console.error("ค่าพยากรณ์อากาศไม่พร้อมใช้งาน ณ ขณะนี้");
+              }
+            })
+            .catch((error) => {
+              console.error(
+                "There has been a problem with your fetch operation:",
+                error
+              );
+            });
+        };
+        fetchRain();
       });
-  
-      // Create and add the new layer using the current satLayerName
-      const currentLayer = createLayer(currentTime, satLayerName);
-      const dataInf = currentLayer.style.layers[0]?.id;
-      setDataInfo(dataInf);
-      map.Layers.add(currentLayer);
-  
-      // Store only the current layer
-      activeLayersRef.current = { [step]: currentLayer };
     } catch (error) {
-      console.error("Error updating WMS layer:", error);
+      console.error("Error in getLoc:", error);
     }
   };
 
-  useEffect(() => {
-    setsatLayerName("daytime_data");
-    updateLayer({ step: 1 });
-
-    const timeout = setTimeout(() => {
-      handleDayClick();
-    }, 500);
-
-    return () => {
-      clearTimeout(timeout);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
-  
   useEffect(() => {
     if (satLayerName) {
       updateLayer({ step: 1 });
     }
-  }, [satLayerName]);
-  
+  }, []);
 
-  
-  const togglePlayStop = () => {
+  const togglePlayStop = (layerName) => {
     if (isPlaying) {
       clearInterval(intervalRef.current);
       setIsPlaying(false);
     } else {
       intervalRef.current = setInterval(() => {
         setActiveStep((prevActiveStep) => {
-          const newStep = prevActiveStep < 61 ? prevActiveStep + 1 : 1;
-          updateLayer({ step: newStep });
-          if (newStep > 60) {
+          const newStep = prevActiveStep < 51 ? prevActiveStep + 1 : 1;
+          updateLayer({ step: newStep, layerName });
+          if (newStep > 51) {
             clearInterval(intervalRef.current);
             setIsPlaying(false);
           }
@@ -1163,35 +1164,45 @@ const SatControl = React.forwardRef((props, ref) => {
     }
   };
 
-  const handleSlide = (newStep) => {
-    console.log("New step:", newStep);
-    satlayRef.current = newStep;
+  const handleSlide = ({ step, layerName }) => {
+    satlayRef.current = step;
 
     clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
-      setActiveStep(() => {
-        console.log("Updating active step to:", newStep);
-        updateLayer({ step: newStep });
-        return newStep;
-      });
+      updateLayer({ step, layerName });
+      setActiveStep(step);
     }, 500);
   };
 
+  // const handleSlide = ({ step, layerName }) => {
+  //   console.log("New step:", step);
+  //   console.log("LayerName:", layerName, typeof layerName);
+  //   satlayRef.current = step;
+
+  //   clearTimeout(debounceTimer.current);
+  //   debounceTimer.current = setTimeout(() => {
+  //     setActiveStep(() => {
+  //       console.log("Updating active step to:", step);
+  //       if (typeof layerName !== "string") {
+  //         console.error("layerName is not string! Fix it before updateLayer.");
+  //         return step; // หรือ handle error
+  //       }
+  //       updateLayer({ step, layerName });
+  //       return step;
+  //     });
+  //   }, 500);
+  // };
+
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => {
-      const nextStep = Math.min(prevActiveStep + 1, 60);
-      updateLayer({ step: nextStep });
-      return nextStep;
-    });
+    const nextStep = Math.min(activeStep + 1, 52);
+    updateLayer({ step: nextStep, layerName: satLayerName });
+    setActiveStep(nextStep);
   };
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => {
-      // กำหนด step ให้เริ่มจาก 1 และลดลงจากนั้น
-      const prevStep = Math.max(prevActiveStep - 1, 0);
-      updateLayer({ step: prevStep });
-      return prevStep;
-    });
+    const prevStep = Math.max(activeStep - 1, 1);
+    updateLayer({ step: prevStep, layerName: satLayerName });
+    setActiveStep(prevStep);
   };
 
   useEffect(() => {
@@ -1501,19 +1512,21 @@ const SatControl = React.forwardRef((props, ref) => {
           <Slider
             defaultValue={activeStep}
             shiftStep={1}
-            max={60}
+            max={52}
             min={1}
             step={1}
             marks
-            onChange={(_, value) => handleSlide(value)}
-
+            onChange={(_, value) =>
+              handleSlide({ step: value, layerName: satLayerName })
+            }
             valueLabelDisplay="auto"
             valueLabelFormat={(value) => value}
-            slots={{
-              valueLabel: (props) => (
-                <SliderValueLabel {...props} value={activeStep} />
-              ),
-            }}
+            aria-label="Small"
+            // slots={{
+            //   valueLabel: (props) => (
+            //     <SliderValueLabel {...props} value={activeStep} />
+            //   ),
+            // }}
             sx={{
               height: "75px",
               padding: "0",
@@ -1613,7 +1626,7 @@ const SatControl = React.forwardRef((props, ref) => {
               <div style={{ display: "flex", alignItems: "center" }}>
                 {/* Play Button */}
                 <Button
-                  onClick={togglePlayStop}
+                  onClick={() => togglePlayStop(satLayerName)}
                   sx={{
                     marginRight: "0.5rem",
                     padding: "0",

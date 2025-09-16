@@ -25,10 +25,10 @@ import Button from '@mui/material/Button';
 // import MyLocationIcon from '@mui/icons-material/MyLocation';
 import ClearIcon from '@mui/icons-material/Clear';
 import InfoIcon from '@mui/icons-material/Info';
-import Card_dash_bg from '/src/Icon/Dashboard_card_Deng_bg.png';
-import ModalPM25 from '/src/Icon/Modal_pm25.png';
-import Sexual from '/src/Icon/sexual_icon.png';
-import PM25levelChart from '/src/Icon/PM25Level.png';
+import Card_dash_bg from '/assets/Icon/Dashboard_card_Deng_bg.png';
+import ModalPM25 from '/assets/Icon/Modal_pm25.png';
+import Sexual from '/assets/Icon/sexual_icon.png';
+import PM25levelChart from '/assets/Icon/PM25Level.png';
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import PlaceIcon from '@mui/icons-material/Place';
 

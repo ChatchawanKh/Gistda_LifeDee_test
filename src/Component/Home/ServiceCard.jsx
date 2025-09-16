@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
 import './ServiceCard.css';
-import PM from '/src/Icon/PM.png';
-import Air from '/src/Icon/Air.png';
-import CN from '/src/Icon/CN.png';
-import Room from '/src/Icon/Room.png';
-import Form from '/src/Icon/Form.png';
-import Library from '/src/Icon/Libary.png';
-import phone_mock from '/src/Icon/iPhone-12-mock.png';
-import bg1 from '/src/Icon/sc-bg-1.png';
-import bg2 from '/src/Icon/sc-bg-2.png';
-import bg3 from '/src/Icon/sc-bg-3.png';
-import bg4 from '/src/Icon/sc-bg-4.png';
+import PM from '/assets/Icon/PM.png';
+import Air from '/assets/Icon/Air.png';
+import CN from '/assets/Icon/CN.png';
+import Room from '/assets/Icon/Room.png';
+import Form from '/assets/Icon/Form.png';
+import Library from '/assets/Icon/Libary.png';
+import phone_mock from '/assets/Icon/iPhone-12-mock.png';
+import bg1 from '/assets/Icon/sc-bg-1.png';
+import bg2 from '/assets/Icon/sc-bg-2.png';
+import bg3 from '/assets/Icon/sc-bg-3.png';
+import bg4 from '/assets/Icon/sc-bg-4.png';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -118,22 +118,22 @@ const ServiceCard = () => {
                         >
                             <SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <a href="https://www.pollutionclinic.com/home/front/" target="_blank" rel="noopener noreferrer">
-                            <div className="sv-card" style={{ backgroundImage: 'url(/src/Icon/CN.png)' }}></div>
+                            <div className="sv-card" style={{ backgroundImage: 'url(/assets/Icon/CN.png)' }}></div>
                         </a>
                     </SwiperSlide>
                     <SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <a href="https://4health.anamai.moph.go.th/assessform" target="_blank" rel="noopener noreferrer">
-                            <div className="sv-card" style={{ backgroundImage: 'url(/src/Icon/Form.png)' }}></div>
+                            <div className="sv-card" style={{ backgroundImage: 'url(/assets/Icon/Form.png)' }}></div>
                         </a>
                     </SwiperSlide>
                     <SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <a href="https://hia.anamai.moph.go.th/th/airpollution-health" target="_blank" rel="noopener noreferrer">
-                            <div className="sv-card" style={{ backgroundImage: 'url(/src/Icon/Libary.png)' }}></div>
+                            <div className="sv-card" style={{ backgroundImage: 'url(/assets/Icon/Libary.png)' }}></div>
                         </a>
                     </SwiperSlide>
                     <SwiperSlide style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <a href="https://podfoon.anamai.moph.go.th/" target="_blank" rel="noopener noreferrer">
-                            <div className="sv-card" style={{ backgroundImage: 'url(/src/Icon/Room.png)' }}></div>
+                            <div className="sv-card" style={{ backgroundImage: 'url(/assets/Icon/Room.png)' }}></div>
                         </a>
                     </SwiperSlide>
                         </Swiper>
